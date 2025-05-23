@@ -1,9 +1,13 @@
-import "./App.css";
+import Router from "./route/Router";
+import Header from "./commons/layout/Header";
+import Footer from "./commons/layout/Footer";
 
 function App() {
   return (
     <>
-      <h1>Vite + React</h1>
+      <Header />
+      <Router />
+      <Footer />
     </>
   );
 }
