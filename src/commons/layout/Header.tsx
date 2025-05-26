@@ -1,8 +1,44 @@
-﻿function Header() {
+﻿import Button from "../inputs/Button";
+import { useAuthStore } from "../../store/useAuthStore";
+import UserIcon from "../../assets/icon/icon_user.svg?react";
+import ChevronDownIcon from "../../assets/icon/icon_chevron_down.svg?react";
+
+function Header() {
+  const { user } = useAuthStore();
+  const isLoggedIn = !!user;
+
   return (
-    <>
-      <div>header</div>
-    </>
+    <header className="w-full mx-auto p-5 shadow-md border-b border-gray_1 bg-white font-sans">
+      <div className="flex items-center justify-between">
+        <h1 className="text-primary text-2xl sm:text-3xl font-extrabold">
+          DriveU
+        </h1>
+
+        {!isLoggedIn ? (
+          <div className="flex min-w-[282px] gap-4">
+            <Button size="medium" color="primary" onClick={() => {}}>
+              로그인
+            </Button>
+            <Button size="medium" color="secondary" onClick={() => {}}>
+              회원가입
+            </Button>
+          </div>
+        ) : (
+          <div className="flex gap-4 text-font items-center">
+            <span className="text-big-bold font-bold">
+              정지원 <span className="font-regular text-big-regular">님</span>
+            </span>
+            <div className="flex items-center gap-2 px-3 py-1 border rounded">
+              <span className="text-sm sm:text-base font-semibold">
+                25년 1학기
+              </span>
+              <ChevronDownIcon />
+            </div>
+            <UserIcon />
+          </div>
+        )}
+      </div>
+    </header>
   );
 }
 
