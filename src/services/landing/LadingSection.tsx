@@ -33,7 +33,7 @@ function LandingSection({
   );
 
   return (
-    <section className="max-w-screen-xl bg-[#FFFFFF] mx-auto flex flex-col lg:flex-row items-center justify-between gap-10 py-10 px-6 lg:px-20">
+    <section className="max-w-screen-xl bg-[#FFFFFF] mx-auto flex flex-col lg:flex-row items-center justify-between gap-10 py-10 px-6">
       {imageLeft ? (
         <>
           {image}
