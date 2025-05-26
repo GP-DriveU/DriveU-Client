@@ -2,10 +2,12 @@
 import { useAuthStore } from "../../store/useAuthStore";
 import UserIcon from "../../assets/icon/icon_user.svg?react";
 import ChevronDownIcon from "../../assets/icon/icon_chevron_down.svg?react";
+import { useNavigate } from "react-router-dom";
 
 function Header() {
   const { user } = useAuthStore();
   const isLoggedIn = !!user;
+  const navigate = useNavigate();
 
   return (
     <header
@@ -18,18 +20,22 @@ function Header() {
         </h1>
 
         {!isLoggedIn ? (
-          <div className="flex min-w-[282px] gap-4">
-            <Button size="medium" color="primary" onClick={() => {}}>
+          <div className="flex min-w-[150px] gap-4">
+            <Button
+              size="medium"
+              color="primary"
+              onClick={() => {
+                navigate("/login");
+              }}
+            >
               로그인
-            </Button>
-            <Button size="medium" color="secondary" onClick={() => {}}>
-              회원가입
             </Button>
           </div>
         ) : (
           <div className="flex gap-4 text-font items-center">
             <span className="text-big-bold font-bold">
-              정지원 <span className="font-regular text-big-regular">님</span>
+              {user.name}
+              <span className="font-regular text-big-regular">님</span>
             </span>
             <div className="flex items-center gap-2 px-3 py-1 border rounded">
               <span className="text-sm sm:text-base font-semibold">
