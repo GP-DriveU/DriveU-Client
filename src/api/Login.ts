@@ -1,10 +1,11 @@
 ﻿import type { User } from "../store/useAuthStore";
 import { http } from "./Fetch";
 
-// todo: 더미데이터 => 실제 API로 변경 필요
 interface OAuthResponse {
-  access_token: string;
-  refresh_token: string;
+  token: {
+    accessToken: string;
+    refreshToken: string;
+  };
 }
 
 interface RefreshReponse {
@@ -14,13 +15,12 @@ interface RefreshReponse {
 export const startGoogleLogin = (redirectUri: string) => {
   return `${
     import.meta.env.VITE_API_BASE_URL
-  }/oauth/google/start?redirect=${encodeURIComponent(redirectUri)}`;
+  }auth/google?redirect=${encodeURIComponent(redirectUri)}`;
 };
 
 export const exchangeGoogleCode = async (code: string, redirectUri: string) => {
-  const response = await http.post<OAuthResponse>(
-    `/oauth/google/auth?redirect=${encodeURIComponent(redirectUri)}`,
-    { code }
+  const response = await http.get<OAuthResponse>(
+    `auth/code/google?code=${code}&redirect=${encodeURIComponent(redirectUri)}`
   );
   return response.response;
 };
