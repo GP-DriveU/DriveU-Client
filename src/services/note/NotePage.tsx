@@ -52,13 +52,15 @@ function NotePage() {
   };
 
   return (
-    <div className="flex bg-white">
-      <Gallery
-        items={items}
-        onToggleSelect={handleToggleSelect}
-        onToggleFavorite={handleToggleFavorite}
-        selectable={true}
-      />
+    <div className="w-full flex bg-white">
+      <div className="w-full px-6">
+        <Gallery
+          items={items}
+          onToggleSelect={handleToggleSelect}
+          onToggleFavorite={handleToggleFavorite}
+          selectable={true}
+        />
+      </div>
     </div>
   );
 }

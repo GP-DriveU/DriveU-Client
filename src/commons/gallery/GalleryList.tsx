@@ -15,7 +15,7 @@ const Gallery: React.FC<GalleryProps> = ({
   selectable,
 }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 w-full">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-16 px-4 py-6 w-full">
       {items.map((item) => (
         <GalleryItem
           key={item.id}

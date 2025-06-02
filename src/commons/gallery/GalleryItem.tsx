@@ -41,8 +41,8 @@ const GalleryItem: React.FC<{
         borderBottom: "0.5px solid #4B5563",
       }}
     >
-      <div className="w-full max-w-[285px] relative flex items-center">
-        <div className="ml-8 flex-1 text-black text-xl font-normal">
+      <div className="w-full relative flex items-center">
+        <div className="ml-8 flex-1 text-black text-xl font-normal truncate whitespace-nowrap overflow-hidden">
           {item.title}
         </div>
         <div className="absolute left-0 top-[3px] w-6 h-6 flex items-center justify-center">
@@ -78,11 +78,11 @@ const GalleryItem: React.FC<{
         </div>
       </div>
 
-      <div className="w-full max-w-[285px] min-h-[95px] text-font text-base sm:text-lg font-normal whitespace-pre-line">
+      <div className="w-full min-h-[95px] text-font text-base sm:text-lg font-normal whitespace-pre-line">
         {item.description}
       </div>
 
-      <div className="w-full max-w-[285px] flex justify-end items-center gap-4">
+      <div className="w-full max-w-[200px] ml-auto flex justify-end items-center gap-4">
         <Button color="secondary" size="small" onClick={() => {}}>
           수정
         </Button>

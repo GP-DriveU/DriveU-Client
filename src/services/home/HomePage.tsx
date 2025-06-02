@@ -142,7 +142,7 @@ function HomePage() {
   return (
     <div className="w-full flex flex-col">
       <HomeSection />
-      <div className="flex-1">
+      <div className="flex-1 px-6">
         <div className="px-4 justify-center text-black text-xl font-semibold font-pretendard">
           즐겨찾기한 파일
         </div>
@@ -153,7 +153,7 @@ function HomePage() {
           selectable={true}
         />
       </div>
-      <div className="flex-1">
+      <div className="flex-1 px-6">
         <div className="px-4 justify-center text-black text-xl font-semibold font-pretendard">
           즐겨찾기한 파일
         </div>
