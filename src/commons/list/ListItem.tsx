@@ -9,6 +9,7 @@ import Button from "../inputs/Button";
 export interface Item {
   id: string;
   title: string;
+  description: string;
   type: "doc" | "note" | "etc";
   categories: string[];
   isSelected: boolean;
@@ -38,7 +39,7 @@ const ListItem: React.FC<{
       style={{
         borderTop: "0.5px solid #4B5563",
         borderBottom: "0.5px solid #4B5563",
-      }} // Tailwind gray-200
+      }}
     >
       <div className="flex items-center gap-2">
         <div className="cursor-pointer">
@@ -61,7 +62,9 @@ const ListItem: React.FC<{
             getIcon(item.type)
           )}
         </div>
-        <div className="font-medium flex items-center">{item.title}</div>
+        <div className="w-48 font-medium flex flex-col">
+          <div>{item.title}</div>
+        </div>
         <div
           onClick={(e) => {
             e.stopPropagation();

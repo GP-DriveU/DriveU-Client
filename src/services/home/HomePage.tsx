@@ -1,5 +1,4 @@
-﻿import Sidebar from "../../commons/layout/sidebar/SideBar";
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import { useDirectoryStore } from "../../store/useDirectoryStore";
 import List from "../../commons/list/List";
 import { type Item } from "../../commons/list/ListItem";
@@ -90,12 +89,13 @@ function HomePage() {
 
     setSemesterDirectories("2024-1", dummyData);
     setSelectedSemester("2024-1");
-  }, [setSemesterDirectories, setSelectedSemester]);
+  }, []);
 
   const dummyItems: Item[] = [
     {
       id: "1",
       title: "객체지향프로그래밍 1주차",
+      description: "오늘은 클래스와 객체를 배웠습니다.",
       type: "doc",
       categories: ["객지프"],
       isSelected: false,
@@ -104,6 +104,7 @@ function HomePage() {
     {
       id: "2",
       title: "자료구조 정리노트",
+      description: "스택, 큐, 트리 기본 개념 정리",
       type: "note",
       categories: ["자료구조"],
       isSelected: true,
@@ -112,6 +113,7 @@ function HomePage() {
     {
       id: "3",
       title: "분산시스템 발표자료",
+      description: "CAP 이론 및 사례 정리",
       type: "doc",
       categories: ["분산시"],
       isSelected: false,
@@ -138,32 +140,29 @@ function HomePage() {
   };
 
   return (
-    <div className="flex bg-white">
-      <Sidebar />
-      <div className="w-full flex flex-col">
-        <HomeSection />
-        <div className="flex-1">
-          <div className="px-4 justify-center text-black text-xl font-semibold font-pretendard">
-            즐겨찾기한 파일
-          </div>
-          <List
-            items={items}
-            onToggleSelect={handleToggleSelect}
-            onToggleFavorite={handleToggleFavorite}
-            selectable={true}
-          />
+    <div className="w-full flex flex-col">
+      <HomeSection />
+      <div className="flex-1">
+        <div className="px-4 justify-center text-black text-xl font-semibold font-pretendard">
+          즐겨찾기한 파일
         </div>
-        <div className="flex-1">
-          <div className="px-4 justify-center text-black text-xl font-semibold font-pretendard">
-            즐겨찾기한 파일
-          </div>
-          <List
-            items={items}
-            onToggleSelect={handleToggleSelect}
-            onToggleFavorite={handleToggleFavorite}
-            selectable={true}
-          />
+        <List
+          items={items}
+          onToggleSelect={handleToggleSelect}
+          onToggleFavorite={handleToggleFavorite}
+          selectable={true}
+        />
+      </div>
+      <div className="flex-1">
+        <div className="px-4 justify-center text-black text-xl font-semibold font-pretendard">
+          즐겨찾기한 파일
         </div>
+        <List
+          items={items}
+          onToggleSelect={handleToggleSelect}
+          onToggleFavorite={handleToggleFavorite}
+          selectable={true}
+        />
       </div>
     </div>
   );
