@@ -4,6 +4,7 @@ import LandingPage from "../services/landing/LandingPage";
 import { useAuthStore } from "../store/useAuthStore";
 import LoginPage from "../services/auth/LoginPage";
 import NotePage from "../services/note/NotePage";
+import OAuthCallback from "../services/auth/OauthPage";
 
 function Router() {
   const { user } = useAuthStore();
@@ -12,6 +13,7 @@ function Router() {
   return (
     <Routes>
       <Route path="/" element={isLoggedIn ? <HomePage /> : <LandingPage />} />
+      <Route path="/oauth/google" element={<OAuthCallback />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/note" element={<NotePage />} />
     </Routes>

@@ -1,6 +1,6 @@
-﻿import { useEffect, useState } from "react";
+﻿import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useFetchUser } from "../../hooks/auth/useFetchUser";
+import { fetchAndStoreUser } from "../../hooks/auth/useFetchUser";
 import { exchangeGoogleCode } from "../../api/Login";
 
 function OAuthCallback() {
@@ -11,7 +11,12 @@ function OAuthCallback() {
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [refreshToken, setRefreshToken] = useState<string | null>(null);
 
+  const hasFetched = useRef(false);
+
   useEffect(() => {
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     const code = searchParams.get("code");
     if (!code) {
       navigate("/login");
@@ -19,18 +24,22 @@ function OAuthCallback() {
     }
 
     exchangeGoogleCode(code, redirectUri)
-      .then(({ access_token, refresh_token }) => {
-        setAccessToken(access_token);
-        setRefreshToken(refresh_token);
+      .then((res) => {
+        setAccessToken(res.token.accessToken);
+        setRefreshToken(res.token.refreshToken);
       })
       .catch(() => {
         navigate("/login");
       });
   }, [navigate, redirectUri, searchParams]);
 
-  useFetchUser(accessToken, refreshToken, () => {
-    navigate("/home");
-  });
+  useEffect(() => {
+    if (accessToken && refreshToken) {
+      fetchAndStoreUser(accessToken, refreshToken, () => {
+        navigate("/", { replace: true });
+      });
+    }
+  }, [accessToken, refreshToken, navigate]);
 
   return (
     <>
