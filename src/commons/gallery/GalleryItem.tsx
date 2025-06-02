@@ -32,7 +32,8 @@ const GalleryItem: React.FC<{
   onToggleSelect: (id: string) => void;
   onToggleFavorite: (id: string) => void;
   selectable: boolean;
-}> = ({ item, onToggleSelect, onToggleFavorite, selectable }) => {
+  onClickItem: (id: string) => void;
+}> = ({ item, onToggleSelect, onToggleFavorite, selectable, onClickItem }) => {
   return (
     <div
       className="px-4 py-4 bg-white border-t border-b border-font flex flex-col items-center font-pretendard space-y-6"
@@ -40,6 +41,7 @@ const GalleryItem: React.FC<{
         borderTop: "0.5px solid #4B5563",
         borderBottom: "0.5px solid #4B5563",
       }}
+      onClick={() => onClickItem(item.id)}
     >
       <div className="w-full relative flex items-center">
         <div className="ml-8 flex-1 text-black text-xl font-normal truncate whitespace-nowrap overflow-hidden">

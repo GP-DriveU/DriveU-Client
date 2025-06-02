@@ -32,7 +32,8 @@ const ListItem: React.FC<{
   onToggleSelect: (id: string) => void;
   onToggleFavorite: (id: string) => void;
   selectable: boolean;
-}> = ({ item, onToggleSelect, onToggleFavorite, selectable }) => {
+  onClickItem: (id: string) => void;
+}> = ({ item, onToggleSelect, onToggleFavorite, selectable, onClickItem }) => {
   return (
     <div
       className="flex items-center justify-between px-4 py-2 bg-white shadow-sm mb-2"
@@ -40,6 +41,7 @@ const ListItem: React.FC<{
         borderTop: "0.5px solid #4B5563",
         borderBottom: "0.5px solid #4B5563",
       }}
+      onClick={() => onClickItem(item.id)}
     >
       <div className="flex items-center gap-2">
         <div className="cursor-pointer">

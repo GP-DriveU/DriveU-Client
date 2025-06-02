@@ -6,6 +6,7 @@ interface GalleryProps {
   onToggleSelect: (id: string) => void;
   onToggleFavorite: (id: string) => void;
   selectable: boolean;
+  onClickItem: (id: string) => void;
 }
 
 const Gallery: React.FC<GalleryProps> = ({
@@ -13,6 +14,7 @@ const Gallery: React.FC<GalleryProps> = ({
   onToggleSelect,
   onToggleFavorite,
   selectable,
+  onClickItem,
 }) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-16 px-4 py-6 w-full">
@@ -23,6 +25,7 @@ const Gallery: React.FC<GalleryProps> = ({
           onToggleSelect={onToggleSelect}
           onToggleFavorite={onToggleFavorite}
           selectable={selectable}
+          onClickItem={onClickItem}
         />
       ))}
     </div>

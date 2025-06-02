@@ -3,9 +3,11 @@ import { useDirectoryStore } from "../../store/useDirectoryStore";
 import List from "../../commons/list/List";
 import { type Item } from "../../commons/list/ListItem";
 import HomeSection from "./HomeSection";
+import { useNavigate } from "react-router-dom";
 
 function HomePage() {
   const { setSemesterDirectories, setSelectedSemester } = useDirectoryStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const dummyData = [
@@ -139,6 +141,10 @@ function HomePage() {
     );
   };
 
+  const handleItemClick = (id: string) => {
+    navigate(`/study/강의필기/${id}`);
+  };
+
   return (
     <div className="w-full flex flex-col">
       <HomeSection />
@@ -150,7 +156,8 @@ function HomePage() {
           items={items}
           onToggleSelect={handleToggleSelect}
           onToggleFavorite={handleToggleFavorite}
-          selectable={true}
+          selectable={false}
+          onClickItem={handleItemClick}
         />
       </div>
       <div className="flex-1 px-6">
@@ -161,7 +168,8 @@ function HomePage() {
           items={items}
           onToggleSelect={handleToggleSelect}
           onToggleFavorite={handleToggleFavorite}
-          selectable={true}
+          selectable={false}
+          onClickItem={handleItemClick}
         />
       </div>
     </div>

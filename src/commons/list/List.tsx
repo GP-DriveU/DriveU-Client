@@ -5,6 +5,7 @@ interface ListProps {
   onToggleSelect: (id: string) => void;
   onToggleFavorite: (id: string) => void;
   selectable: boolean;
+  onClickItem: (id: string) => void;
 }
 
 const List: React.FC<ListProps> = ({
@@ -12,6 +13,7 @@ const List: React.FC<ListProps> = ({
   onToggleSelect,
   onToggleFavorite,
   selectable,
+  onClickItem,
 }) => {
   return (
     <div className="px-4 py-6 rounded-md">
@@ -22,6 +24,7 @@ const List: React.FC<ListProps> = ({
           onToggleSelect={onToggleSelect}
           onToggleFavorite={onToggleFavorite}
           selectable={selectable}
+          onClickItem={onClickItem}
         />
       ))}
     </div>

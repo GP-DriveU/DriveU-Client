@@ -6,6 +6,7 @@ import LoginPage from "../services/auth/LoginPage";
 import NotePage from "../services/note/NotePage";
 import OAuthCallback from "../services/auth/OauthPage";
 import AppLayout from "../services/AppLayout";
+import NoteDetailPage from "../services/note/NoteDetailPage";
 
 function Router() {
   const { user } = useAuthStore();
@@ -32,6 +33,14 @@ function Router() {
         element={
           <AppLayout>
             <NotePage />
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/study/강의필기/:id"
+        element={
+          <AppLayout>
+            <NoteDetailPage />
           </AppLayout>
         }
       />

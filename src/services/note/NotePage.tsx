@@ -2,6 +2,7 @@
 import Gallery from "../../commons/gallery/Gallery";
 import List from "../../commons/list/List";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import FABButton from "../../commons/fab/FABButton";
 import TitleSection from "../../commons/section/TitleSection";
 import IconFilter from "../../assets/icon/icon_filter.svg?react";
@@ -43,6 +44,7 @@ function NotePage() {
   const [viewMode, setViewMode] = useState<"gallery" | "list">("list");
   const [selectedIconId, setSelectedIconId] = useState<string>("three");
   const [selectableMode, setSelectableMode] = useState(false);
+  const navigate = useNavigate();
 
   const iconItems = [
     { id: "one", icon: <IconFilter /> },
@@ -66,6 +68,10 @@ function NotePage() {
     );
   };
 
+  const handleItemClick = (id: string) => {
+    navigate(`/study/강의필기/${id}`);
+  };
+
   return (
     <div className="w-full flex bg-white flex-col">
       <TitleSection
@@ -86,6 +92,7 @@ function NotePage() {
             onToggleSelect={handleToggleSelect}
             onToggleFavorite={handleToggleFavorite}
             selectable={selectableMode}
+            onClickItem={handleItemClick}
           />
         ) : (
           <List
@@ -93,6 +100,7 @@ function NotePage() {
             onToggleSelect={handleToggleSelect}
             onToggleFavorite={handleToggleFavorite}
             selectable={selectableMode}
+            onClickItem={handleItemClick}
           />
         )}
       </div>
