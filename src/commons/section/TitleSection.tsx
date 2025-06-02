@@ -7,7 +7,7 @@ interface IconItem {
 
 interface TitleSectionProps {
   title: string;
-  semester: string;
+  semester?: string;
   items: IconItem[];
   onIconClick?: (id: string) => void;
   selectedId?: string;

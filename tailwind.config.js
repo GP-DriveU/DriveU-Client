@@ -1,6 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  safelist: [
+    {
+      pattern: /bg-tag-(yellow|green|orange|red|gray|lightblue)/,
+    },
+    {
+      pattern: /outline-tag-(yellow|green|orange|red|gray|lightblue)/,
+    },
+  ],
   theme: {
     extend: {
       colors: {
