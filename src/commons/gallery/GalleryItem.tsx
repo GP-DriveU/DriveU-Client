@@ -66,7 +66,8 @@ const GalleryItem: React.FC<{
           )}
         </div>
         <div
-          className="w-6 h-6 ml-auto cursor-pointer"
+          className="w-6 h-6 ml-auto cursor-pointer select-none"
+          onMouseDown={(e) => e.preventDefault()}
           onClick={(e) => {
             e.stopPropagation();
             onToggleFavorite(item.id);

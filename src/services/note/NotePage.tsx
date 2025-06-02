@@ -1,6 +1,11 @@
 ﻿import { type Item } from "../../commons/gallery/GalleryItem";
-import Gallery from "../../commons/gallery/GalleryList";
+import Gallery from "../../commons/gallery/Gallery";
+import List from "../../commons/list/List";
 import { useState } from "react";
+import TitleSection from "../../commons/section/TitleSection";
+import IconFilter from "../../assets/icon/icon_filter.svg?react";
+import IconGallery from "../../assets/icon/icon_grid.svg?react";
+import IconList from "../../assets/icon/icon_list.svg?react";
 
 function NotePage() {
   const dummyItems: Item[] = [
@@ -34,6 +39,14 @@ function NotePage() {
   ];
 
   const [items, setItems] = useState<Item[]>(dummyItems);
+  const [viewMode, setViewMode] = useState<"gallery" | "list">("list");
+  const [selectedIconId, setSelectedIconId] = useState<string>("three");
+
+  const iconItems = [
+    { id: "one", icon: <IconFilter /> },
+    { id: "two", icon: <IconGallery /> },
+    { id: "three", icon: <IconList /> },
+  ];
 
   const handleToggleSelect = (id: string) => {
     setItems((prev) =>
@@ -52,14 +65,34 @@ function NotePage() {
   };
 
   return (
-    <div className="w-full flex bg-white">
+    <div className="w-full flex bg-white flex-col">
+      <TitleSection
+        title="강의 필기"
+        semester="25년 1학기"
+        items={iconItems}
+        selectedId={selectedIconId}
+        onIconClick={(id) => {
+          setSelectedIconId(id);
+          if (id === "two") setViewMode("gallery");
+          else if (id === "three") setViewMode("list");
+        }}
+      />
       <div className="w-full px-6">
-        <Gallery
-          items={items}
-          onToggleSelect={handleToggleSelect}
-          onToggleFavorite={handleToggleFavorite}
-          selectable={true}
-        />
+        {viewMode === "gallery" ? (
+          <Gallery
+            items={items}
+            onToggleSelect={handleToggleSelect}
+            onToggleFavorite={handleToggleFavorite}
+            selectable={false}
+          />
+        ) : (
+          <List
+            items={items}
+            onToggleSelect={handleToggleSelect}
+            onToggleFavorite={handleToggleFavorite}
+            selectable={true}
+          />
+        )}
       </div>
     </div>
   );

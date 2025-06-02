@@ -14,7 +14,7 @@ const List: React.FC<ListProps> = ({
   selectable,
 }) => {
   return (
-    <div className="p-4 rounded-md">
+    <div className="px-4 py-6 rounded-md">
       {items.map((item) => (
         <ListItem
           key={item.id}
