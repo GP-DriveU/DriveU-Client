@@ -1,9 +1,10 @@
 ﻿import React from "react";
 import SidebarItem from "./SideBarItem";
 import IconAdd from "../../../assets/icon/icon_adddir.svg?react";
+
 interface SidebarGroupProps {
   title: string;
-  items: string[];
+  items: { name: string; slug: string }[];
   basePath: string;
   currentPath: string;
 }
@@ -20,12 +21,12 @@ const SidebarGroup: React.FC<SidebarGroupProps> = ({
       <IconAdd />
     </div>
     <hr className="border-font border-t-0.5" />
-    {items.map((item) => {
-      const path = `${basePath}/${item}`;
+    {items.map(({ name, slug }) => {
+      const path = `${basePath}/${slug}`;
       return (
         <SidebarItem
-          key={item}
-          label={item}
+          key={slug}
+          label={name}
           to={path}
           isActive={currentPath === path}
         />

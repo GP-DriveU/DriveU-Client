@@ -5,6 +5,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import LoginPage from "../services/auth/LoginPage";
 import NotePage from "../services/note/NotePage";
 import OAuthCallback from "../services/auth/OauthPage";
+import AppLayout from "../services/AppLayout";
 
 function Router() {
   const { user } = useAuthStore();
@@ -12,10 +13,28 @@ function Router() {
 
   return (
     <Routes>
-      <Route path="/" element={isLoggedIn ? <HomePage /> : <LandingPage />} />
+      <Route
+        path="/"
+        element={
+          isLoggedIn ? (
+            <AppLayout>
+              <HomePage />
+            </AppLayout>
+          ) : (
+            <LandingPage />
+          )
+        }
+      />
       <Route path="/oauth/google" element={<OAuthCallback />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/note" element={<NotePage />} />
+      <Route
+        path="/study/강의필기"
+        element={
+          <AppLayout>
+            <NotePage />
+          </AppLayout>
+        }
+      />
     </Routes>
   );
 }

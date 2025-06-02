@@ -9,9 +9,10 @@ import IconStore from "../../../assets/icon/icon_store.svg?react";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
-  const currentDirectories = useDirectoryStore((state) =>
-    state.getCurrentDirectories()
+  const getCurrentDirectories = useDirectoryStore(
+    (state) => state.getCurrentDirectories
   );
+  const currentDirectories = getCurrentDirectories();
 
   const isHome = location.pathname === "/";
   return (
@@ -22,7 +23,7 @@ const Sidebar: React.FC = () => {
         }`}
       >
         <IconHome className={`${isHome ? "text-white" : ""}`} />
-        <SidebarItem label="전체보기" isActive={isHome} />
+        <SidebarItem label="전체보기" isActive={isHome} to={"/"} />
       </div>
       {(() => {
         const routeMap: Record<
@@ -41,7 +42,10 @@ const Sidebar: React.FC = () => {
             <SidebarGroup
               key={group.id}
               title={`${emoji} ${name}`}
-              items={group.children.map((child) => child.name)}
+              items={group.children.map((child) => ({
+                name: child.name,
+                slug: encodeURIComponent(child.name),
+              }))}
               basePath={`/${slug}`}
               currentPath={location.pathname}
             />
