@@ -28,7 +28,7 @@ const SidebarGroup: React.FC<SidebarGroupProps> = ({
           key={slug}
           label={name}
           to={path}
-          isActive={currentPath === path}
+          isActive={currentPath.startsWith(path)}
         />
       );
     })}
