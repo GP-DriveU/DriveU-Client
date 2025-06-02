@@ -2,6 +2,7 @@
 import Gallery from "../../commons/gallery/Gallery";
 import List from "../../commons/list/List";
 import { useState } from "react";
+import FABButton from "../../commons/fab/FABButton";
 import TitleSection from "../../commons/section/TitleSection";
 import IconFilter from "../../assets/icon/icon_filter.svg?react";
 import IconGallery from "../../assets/icon/icon_grid.svg?react";
@@ -41,6 +42,7 @@ function NotePage() {
   const [items, setItems] = useState<Item[]>(dummyItems);
   const [viewMode, setViewMode] = useState<"gallery" | "list">("list");
   const [selectedIconId, setSelectedIconId] = useState<string>("three");
+  const [selectableMode, setSelectableMode] = useState(false);
 
   const iconItems = [
     { id: "one", icon: <IconFilter /> },
@@ -83,16 +85,21 @@ function NotePage() {
             items={items}
             onToggleSelect={handleToggleSelect}
             onToggleFavorite={handleToggleFavorite}
-            selectable={false}
+            selectable={selectableMode}
           />
         ) : (
           <List
             items={items}
             onToggleSelect={handleToggleSelect}
             onToggleFavorite={handleToggleFavorite}
-            selectable={true}
+            selectable={selectableMode}
           />
         )}
+      </div>
+      <div className="fixed bottom-6 right-6 z-50">
+        <FABButton
+          onGenerateProblem={() => setSelectableMode((prev) => !prev)}
+        />
       </div>
     </div>
   );
