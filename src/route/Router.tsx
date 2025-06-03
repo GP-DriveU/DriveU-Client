@@ -8,6 +8,7 @@ import OAuthCallback from "../services/auth/OauthPage";
 import AppLayout from "../services/AppLayout";
 import NoteDetailPage from "../services/note/NoteDetailPage";
 import NoteEditPage from "../services/note/NoteEditPage";
+import MyPage from "../services/mypage/MyPage";
 
 function Router() {
   const { user } = useAuthStore();
@@ -50,6 +51,14 @@ function Router() {
         element={
           <AppLayout>
             <NoteEditPage />
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/mypage"
+        element={
+          <AppLayout>
+            <MyPage />
           </AppLayout>
         }
       />

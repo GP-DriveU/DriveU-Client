@@ -5,7 +5,7 @@ interface ButtonProps {
   children: React.ReactNode;
   className?: string;
   disabled?: boolean;
-  color?: "primary" | "secondary";
+  color?: "primary" | "secondary" | "danger";
   size?: "big" | "medium" | "small";
 }
 
@@ -20,6 +20,7 @@ function Button({
   const colorStyle = {
     primary: "bg-primary_light text-primary",
     secondary: "bg-secondary text-white",
+    danger: "bg-danger text-white",
   };
 
   const sizeStyle = {
