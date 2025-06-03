@@ -32,7 +32,7 @@ const Sidebar: React.FC = () => {
             { slug: string; id: number; emoji: string }
           > = {
             학업: { slug: "study", id: 100, emoji: "🏫" },
-            수업: { slug: "subject", id: 200, emoji: "📚" },
+            과목: { slug: "subject", id: 200, emoji: "📚" },
             대외활동: { slug: "activity", id: 300, emoji: "📢" },
           };
           return Object.entries(routeMap).map(([name, { slug, emoji, id }]) => {
