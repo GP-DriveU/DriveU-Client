@@ -9,47 +9,53 @@ import IconStore from "../../../assets/icon/icon_store.svg?react";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
-  const currentDirectories = useDirectoryStore((state) =>
-    state.getCurrentDirectories()
+  const getCurrentDirectories = useDirectoryStore(
+    (state) => state.getCurrentDirectories
   );
+  const currentDirectories = getCurrentDirectories();
 
   const isHome = location.pathname === "/";
   return (
-    <aside className="w-[278px] min-w-[220px] min-h-[810px] h-full px-10 py-6 bg-primary_light flex flex-col gap-6">
-      <div
-        className={`flex flex-row items-center ${
-          isHome ? "bg-primary text-white" : ""
-        }`}
-      >
-        <IconHome className={`${isHome ? "text-white" : ""}`} />
-        <SidebarItem label="전체보기" isActive={isHome} />
+    <aside className="w-[278px] min-w-[220px] min-h-screen px-10 py-6 bg-primary_light flex flex-col gap-4">
+      <div className="flex-shrink-0 mb-6 flex flex-col gap-3">
+        <div
+          className={`flex flex-row items-center mb-6 ${
+            isHome ? "bg-primary text-white" : ""
+          }`}
+        >
+          <IconHome className={`${isHome ? "text-white" : ""}`} />
+          <SidebarItem label="전체보기" isActive={isHome} to={"/"} />
+        </div>
+        {(() => {
+          const routeMap: Record<
+            string,
+            { slug: string; id: number; emoji: string }
+          > = {
+            학업: { slug: "study", id: 100, emoji: "🏫" },
+            수업: { slug: "subject", id: 200, emoji: "📚" },
+            대외활동: { slug: "activity", id: 300, emoji: "📢" },
+          };
+          return Object.entries(routeMap).map(([name, { slug, emoji, id }]) => {
+            const group = currentDirectories.find((dir) => dir.id === id);
+            if (!group) return null;
+
+            return (
+              <SidebarGroup
+                key={group.id}
+                title={`${emoji} ${name}`}
+                items={group.children.map((child) => ({
+                  name: child.name,
+                  slug: encodeURIComponent(child.name),
+                }))}
+                basePath={`/${slug}`}
+                currentPath={location.pathname}
+              />
+            );
+          });
+        })()}
       </div>
-      {(() => {
-        const routeMap: Record<
-          string,
-          { slug: string; id: number; emoji: string }
-        > = {
-          학업: { slug: "study", id: 100, emoji: "🏫" },
-          수업: { slug: "subject", id: 200, emoji: "📚" },
-          대외활동: { slug: "activity", id: 300, emoji: "📢" },
-        };
-        return Object.entries(routeMap).map(([name, { slug, emoji, id }]) => {
-          const group = currentDirectories.find((dir) => dir.id === id);
-          if (!group) return null;
 
-          return (
-            <SidebarGroup
-              key={group.id}
-              title={`${emoji} ${name}`}
-              items={group.children.map((child) => child.name)}
-              basePath={`/${slug}`}
-              currentPath={location.pathname}
-            />
-          );
-        });
-      })()}
-
-      <div className="mt-auto w-full flex flex-col gap-4">
+      <div className="flex-shrink-0 w-full flex flex-col gap-4">
         <div className="flex flex-row items-center">
           <IconTrash />
           <SidebarItem

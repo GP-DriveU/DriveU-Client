@@ -1,6 +1,7 @@
-﻿import ListItem, { type Item } from "./ListItem";
+﻿import React from "react";
+import GalleryItem, { type Item } from "./GalleryItem";
 
-interface ListProps {
+interface GalleryProps {
   items: Item[];
   onToggleSelect: (id: string) => void;
   onToggleFavorite: (id: string) => void;
@@ -8,7 +9,7 @@ interface ListProps {
   onClickItem: (id: string) => void;
 }
 
-const List: React.FC<ListProps> = ({
+const Gallery: React.FC<GalleryProps> = ({
   items,
   onToggleSelect,
   onToggleFavorite,
@@ -16,9 +17,9 @@ const List: React.FC<ListProps> = ({
   onClickItem,
 }) => {
   return (
-    <div className="px-4 py-6 rounded-md">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-16 px-4 py-6 w-full">
       {items.map((item) => (
-        <ListItem
+        <GalleryItem
           key={item.id}
           item={item}
           onToggleSelect={onToggleSelect}
@@ -31,4 +32,4 @@ const List: React.FC<ListProps> = ({
   );
 };
 
-export default List;
+export default Gallery;

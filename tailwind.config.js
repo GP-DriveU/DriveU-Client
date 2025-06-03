@@ -1,6 +1,16 @@
 /** @type {import('tailwindcss').Config} */
+import typography from "@tailwindcss/typography";
+
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  safelist: [
+    {
+      pattern: /bg-tag-(yellow|green|orange|red|gray|lightblue)/,
+    },
+    {
+      pattern: /outline-tag-(yellow|green|orange|red|gray|lightblue)/,
+    },
+  ],
   theme: {
     extend: {
       colors: {
@@ -52,5 +62,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [typography],
 };

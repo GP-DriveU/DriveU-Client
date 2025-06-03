@@ -27,7 +27,7 @@ const getIcon = (type: Item["type"]) => {
   }
 };
 
-const ListItem: React.FC<{
+const GalleryItem: React.FC<{
   item: Item;
   onToggleSelect: (id: string) => void;
   onToggleFavorite: (id: string) => void;
@@ -36,15 +36,18 @@ const ListItem: React.FC<{
 }> = ({ item, onToggleSelect, onToggleFavorite, selectable, onClickItem }) => {
   return (
     <div
-      className="flex items-center justify-between px-4 py-2 bg-white shadow-sm mb-2"
+      className="px-4 py-4 bg-white border-t border-b border-font flex flex-col items-center font-pretendard space-y-6"
       style={{
         borderTop: "0.5px solid #4B5563",
         borderBottom: "0.5px solid #4B5563",
       }}
       onClick={() => onClickItem(item.id)}
     >
-      <div className="flex items-center gap-2">
-        <div className="cursor-pointer">
+      <div className="w-full relative flex items-center">
+        <div className="ml-8 flex-1 text-black text-xl font-normal truncate whitespace-nowrap overflow-hidden">
+          {item.title}
+        </div>
+        <div className="absolute left-0 top-[3px] w-6 h-6 flex items-center justify-center">
           {selectable ? (
             <div
               className="w-5 h-5 min-w-[20px] min-h-[20px] flex items-center bg-primary_light justify-center rounded-sm"
@@ -64,32 +67,25 @@ const ListItem: React.FC<{
             getIcon(item.type)
           )}
         </div>
-        <div className="w-48 font-medium flex flex-col">
-          <div>{item.title}</div>
-        </div>
         <div
+          className="w-6 h-6 ml-auto cursor-pointer select-none"
+          onMouseDown={(e) => e.preventDefault()}
           onClick={(e) => {
             e.stopPropagation();
             onToggleFavorite(item.id);
           }}
-          className="cursor-pointer ml-2 flex-shrink-0 z-10 p-1"
-          style={{ userSelect: "none" }}
         >
           <IconFavorite
             className={item.isFavorite ? "text-danger" : "text-gray-300"}
           />
         </div>
-        {item.categories.map((category, idx) => (
-          <span
-            key={idx}
-            className="text-xs text-center outline outline-1 outline-offset-[-1px] outline-tag-yellow bg-tag-yellow/50 text-font px-3 py-0.5 rounded-[5px]"
-            style={{ userSelect: "none" }}
-          >
-            {category}
-          </span>
-        ))}
       </div>
-      <div className="flex gap-2 min-w-[200px]">
+
+      <div className="w-full min-h-[95px] text-font text-base sm:text-lg font-normal whitespace-pre-line">
+        {item.description}
+      </div>
+
+      <div className="w-full max-w-[200px] ml-auto flex justify-end items-center gap-4">
         <Button color="secondary" size="small" onClick={() => {}}>
           수정
         </Button>
@@ -104,4 +100,4 @@ const ListItem: React.FC<{
   );
 };
 
-export default ListItem;
+export default GalleryItem;
