@@ -5,6 +5,7 @@ import { useState } from "react";
 import Tag from "../../commons/tag/Tag";
 import TitleSection from "../../commons/section/TitleSection";
 import { useNavigate } from "react-router-dom";
+import TabBar from "../../commons/layout/tabbar/TabBar";
 
 function NoteDetailPage() {
   const iconItems = [{ id: "one", icon: <IconEdit /> }];
@@ -12,8 +13,6 @@ function NoteDetailPage() {
   const navigate = useNavigate();
   const dummyTags = [
     { title: "객지프", color: "" },
-    { title: "동적할당", color: "" },
-    { title: "메모리", color: "" },
   ];
 
   return (
@@ -32,6 +31,13 @@ function NoteDetailPage() {
       <TextSection
         title="태그"
         rightElement={<Tag tags={dummyTags} onSave={() => {}} />}
+      />
+      <div className="ml-auto px-10 pt-4">
+        <TabBar />
+      </div>
+      <TextSection
+        title="내용"
+        rightElement={<></>}
       />
     </div>
   );
