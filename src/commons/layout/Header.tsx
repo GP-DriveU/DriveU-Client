@@ -43,7 +43,11 @@ function Header() {
               </span>
               <ChevronDownIcon />
             </div>
-            <UserIcon />
+            <UserIcon
+              onClick={() => {
+                navigate("/mypage");
+              }}
+            />
           </div>
         )}
       </div>
