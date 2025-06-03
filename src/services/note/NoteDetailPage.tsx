@@ -1,25 +1,29 @@
-﻿import TextSection from "../../commons/section/TextSection";
+﻿import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import TextSection from "../../commons/section/TextSection";
+import TitleSection from "../../commons/section/TitleSection";
+import Tag from "../../commons/tag/Tag";
+import TabBar from "../../commons/layout/tabbar/TabBar";
 import IconEdit from "../../assets/icon/icon_edit.svg?react";
 import IconArrowLeft from "../../assets/icon/icon_arrow_left.svg?react";
-import { useState, useEffect } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
-import Tag from "../../commons/tag/Tag";
-import TitleSection from "../../commons/section/TitleSection";
-import { useNavigate } from "react-router-dom";
-import TabBar from "../../commons/layout/tabbar/TabBar";
+import MDEditor from "@uiw/react-md-editor";
+import { getCodeString } from "rehype-rewrite";
+import katex from "katex";
+import "katex/dist/katex.min.css";
 
 function NoteDetailPage() {
   const iconItems = [{ id: "one", icon: <IconEdit /> }];
-  const [selectedIconId, setSelectedIconId] = useState<string>();
+  const { id } = useParams();
+  const [selectedIconId] = useState<string>();
   const navigate = useNavigate();
-  const dummyTags = [
-    { title: "객지프", color: "" },
-  ];
+  const dummyTags = [{ title: "객지프", color: "" }];
 
+  const [title, setTitle] = useState("");
   const [markdownContent, setMarkdownContent] = useState("");
 
   useEffect(() => {
+    // Simulate API fetch
+    setTitle("객체지향프로그래밍 1주차");
     const dummyMarkdown = `
 # 객체지향프로그래밍 요약
 
@@ -41,6 +45,14 @@ function NoteDetailPage() {
 ---
 
 > 💡 **참고**: 상속을 사용할 때는 의존성 관계를 주의해야 합니다.
+
+This is to display the 
+\`\$\$\c = \\pm\\sqrt{a^2 + b^2}\$\$\`
+ in one line
+
+\`\`\`KaTeX
+c = \\pm\\sqrt{a^2 + b^2}
+\`\`\`
 
 \`\`\`ts
 class Animal {
@@ -75,11 +87,13 @@ _끝._
         <IconArrowLeft onClick={() => navigate(-1)} />
       </div>
       <TitleSection
-        title="객체지향프로그래밍 1주차"
+        title={title}
         items={iconItems}
         selectedId={selectedIconId}
-        onIconClick={(id) => {
-          setSelectedIconId(id);
+        onIconClick={() => {
+          navigate(`/study/강의필기/${id}/edit`, {
+            state: { title, markdownContent },
+          });
         }}
       />
       <TextSection
@@ -92,10 +106,61 @@ _끝._
       <TextSection
         title="내용"
         rightElement={
-          <div className="prose max-w-none font-pretendard rounded-[10px] outline outline-[0.80px] outline-offset-[-0.80px] outline-font p-4">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {markdownContent}
-            </ReactMarkdown>
+          <div
+            className="prose prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded max-w-none font-pretendard rounded-[10px] outline outline-[0.80px] outline-offset-[-0.80px] outline-font p-4 bg-white"
+            data-color-mode="light"
+          >
+            <div className="wmde-markdown-var [&_.wmde-markdown]:bg-white">
+              <MDEditor.Markdown
+                source={markdownContent}
+                components={{
+                  code({ children = [], className, ...props }) {
+                    const code =
+                      props.node && props.node.children
+                        ? getCodeString(props.node.children)
+                        : children;
+
+                    if (
+                      typeof code === "string" &&
+                      /^\$\$(.*)\$\$/.test(code)
+                    ) {
+                      const html = katex.renderToString(
+                        code.replace(/^\$\$(.*)\$\$/, "$1"),
+                        {
+                          throwOnError: false,
+                        }
+                      );
+                      return (
+                        <code
+                          dangerouslySetInnerHTML={{ __html: html }}
+                          style={{ background: "transparent" }}
+                        />
+                      );
+                    }
+
+                    if (
+                      typeof code === "string" &&
+                      typeof className === "string" &&
+                      /^language-katex/.test(className.toLowerCase())
+                    ) {
+                      const html = katex.renderToString(code, {
+                        throwOnError: false,
+                      });
+                      return (
+                        <code
+                          dangerouslySetInnerHTML={{ __html: html }}
+                          style={{ fontSize: "150%" }}
+                        />
+                      );
+                    }
+
+                    return (
+                      <code className={String(className)}>{children}</code>
+                    );
+                  },
+                }}
+              />
+            </div>
           </div>
         }
       />
