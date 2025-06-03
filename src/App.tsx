@@ -5,13 +5,13 @@ import { BrowserRouter } from "react-router-dom";
 
 function App() {
   return (
-    <>
+    <div className="min-h-screen flex flex-col">
       <BrowserRouter>
         <Header />
         <Router />
         <Footer />
       </BrowserRouter>
-    </>
+    </div>
   );
 }
 

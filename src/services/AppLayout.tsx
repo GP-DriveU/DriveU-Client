@@ -106,7 +106,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   if (!selectedSemester || !semesterDirectories[selectedSemester]) return null;
 
   return (
-    <div className="flex bg-white">
+    <div className="flex min-h-screen bg-white">
       <Sidebar />
       <div className="flex-1">{children}</div>
     </div>

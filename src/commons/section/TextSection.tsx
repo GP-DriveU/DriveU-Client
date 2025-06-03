@@ -7,8 +7,8 @@ interface TextSectionProps {
 
 const TextSection: React.FC<TextSectionProps> = ({ title, rightElement }) => {
   return (
-    <div className="flex gap-6 items-center w-full px-10 py-6">
-      <div className="text-font text-2xl items-center font-semibold font-pretendard">
+    <div className="flex gap-6 w-full px-10 pb-6">
+      <div className="text-font text-2xl items-start font-semibold font-pretendard">
         {title}
       </div>
       {rightElement && <div className="flex-grow">{rightElement}</div>}

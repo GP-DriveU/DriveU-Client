@@ -27,7 +27,7 @@ const TitleSection: React.FC<TitleSectionProps> = ({
   };
 
   return (
-    <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4 px-10 pt-12 font-pretendard">
+    <div className="w-full flex flex-col sm:flex-row justify-between items-center gap-4 px-10 pt-12 pb-6 font-pretendard">
       <div className="flex flex-row items-end gap-3">
         <div className="text-black text-2xl sm:text-3xl font-extrabold">
           {title}
