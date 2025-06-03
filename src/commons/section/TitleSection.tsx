@@ -8,7 +8,7 @@ interface IconItem {
 interface TitleSectionProps {
   title: string;
   semester?: string;
-  items: IconItem[];
+  items?: IconItem[];
   onIconClick?: (id: string) => void;
   selectedId?: string;
 }
@@ -36,21 +36,23 @@ const TitleSection: React.FC<TitleSectionProps> = ({
           {semester}
         </div>
       </div>
-      <div className="flex justify-start items-center gap-3">
-        {items.map(({ id, icon }) => (
-          <div
-            key={id}
-            onClick={() => handleClick(id)}
-            className={`w-8 h-8 flex items-center justify-center cursor-pointer rounded ${
-              selectedId === id ? "bg-primary text-white" : "text-black"
-            }`}
-          >
-            <div className={selectedId === id ? "fill-white text-white" : ""}>
-              {icon}
+      {items && items.length > 0 && (
+        <div className="flex justify-start items-center gap-3">
+          {items.map(({ id, icon }) => (
+            <div
+              key={id}
+              onClick={() => handleClick(id)}
+              className={`w-8 h-8 flex items-center justify-center cursor-pointer rounded ${
+                selectedId === id ? "bg-primary text-white" : "text-black"
+              }`}
+            >
+              <div className={selectedId === id ? "fill-white text-white" : ""}>
+                {icon}
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
