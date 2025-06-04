@@ -1,5 +1,6 @@
 ﻿import Button from "../inputs/Button";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useSemesterStore } from "../../store/useSemesterStore";
 import UserIcon from "../../assets/icon/icon_user.svg?react";
 import ChevronDownIcon from "../../assets/icon/icon_chevron_down.svg?react";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +9,7 @@ function Header() {
   const { user } = useAuthStore();
   const isLoggedIn = !!user;
   const navigate = useNavigate();
+  const { selectedSemesterKey } = useSemesterStore();
 
   return (
     <header
@@ -39,7 +41,12 @@ function Header() {
             </span>
             <div className="flex items-center gap-2 px-3 py-1 border rounded">
               <span className="text-sm sm:text-base font-semibold">
-                25년 1학기
+                {selectedSemesterKey
+                  ? (() => {
+                      const [year, term] = selectedSemesterKey.split("-");
+                      return `${year}년 ${term === "SPRING" ? "1" : "2"}학기`;
+                    })()
+                  : ""}
               </span>
               <ChevronDownIcon />
             </div>
