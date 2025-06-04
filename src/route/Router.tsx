@@ -9,6 +9,8 @@ import AppLayout from "../services/AppLayout";
 import NoteDetailPage from "../services/note/NoteDetailPage";
 import NoteEditPage from "../services/note/NoteEditPage";
 import MyPage from "../services/mypage/MyPage";
+import QuestionListPage from "../services/question/QuestionListPage";
+import QuestionDetailPage from "../services/question/QuestionDetailPage";
 
 function Router() {
   const { user } = useAuthStore();
@@ -59,6 +61,22 @@ function Router() {
         element={
           <AppLayout>
             <MyPage />
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/question"
+        element={
+          <AppLayout>
+            <QuestionListPage />
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/question/:id"
+        element={
+          <AppLayout>
+            <QuestionDetailPage />
           </AppLayout>
         }
       />

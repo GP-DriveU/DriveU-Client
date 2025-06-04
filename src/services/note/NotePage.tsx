@@ -2,6 +2,8 @@
 import Gallery from "../../commons/gallery/Gallery";
 import List from "../../commons/list/List";
 import { useState } from "react";
+import AlertModal from "../../commons/modals/AlertModal";
+import ProgressModal from "../../commons/modals/ProgressModal";
 import { useNavigate } from "react-router-dom";
 import FABButton from "../../commons/fab/FABButton";
 import TitleSection from "../../commons/section/TitleSection";
@@ -44,7 +46,18 @@ function NotePage() {
   const [viewMode, setViewMode] = useState<"gallery" | "list">("list");
   const [selectedIconId, setSelectedIconId] = useState<string>("three");
   const [selectableMode, setSelectableMode] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const navigate = useNavigate();
+
+  // Mock async function for generating questions
+  const generateQuestions = async () => {
+    setIsLoadingModalOpen(true);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    setIsLoadingModalOpen(false);
+    setIsConfirmModalOpen(true);
+  };
 
   const iconItems = [
     { id: "one", icon: <IconFilter /> },
@@ -58,6 +71,11 @@ function NotePage() {
         item.id === id ? { ...item, isSelected: !item.isSelected } : item
       )
     );
+  };
+
+  // Helper to reset all selections
+  const resetSelection = () => {
+    setItems((prev) => prev.map((item) => ({ ...item, isSelected: false })));
   };
 
   const handleToggleFavorite = (id: string) => {
@@ -106,9 +124,55 @@ function NotePage() {
       </div>
       <div className="fixed bottom-6 right-6 z-50">
         <FABButton
-          onGenerateProblem={() => setSelectableMode((prev) => !prev)}
+          isGenerating={isGenerating}
+          isSelecting={selectableMode}
+          onStartGenerating={() => {
+            resetSelection();
+            setIsGenerating(true);
+            setSelectableMode(true);
+          }}
+          onCancelGenerating={() => {
+            resetSelection();
+            setIsGenerating(false);
+            setSelectableMode(false);
+          }}
+          onSubmitGenerating={() => {
+            resetSelection();
+            generateQuestions();
+            setIsGenerating(false);
+            setSelectableMode(false);
+          }}
+          onCancelSelecting={() => {
+            resetSelection();
+            setSelectableMode(false);
+          }}
+          onStartSelecting={() => {
+            resetSelection();
+            setSelectableMode(true);
+          }}
         />
       </div>
+      {isLoadingModalOpen && (
+        <ProgressModal
+          isOpen={isLoadingModalOpen}
+          title="문제 생성 중..."
+          description="잠시만 기다려주세요."
+        />
+      )}
+      {isConfirmModalOpen && (
+        <AlertModal
+          title="문제 생성이 완료되었습니다."
+          description="선택한 노트를 기반으로 문제가 생성되었습니다. 생성된 문제를 확인하고 싶으시다면,
+이동 버튼을 클릭해주세요."
+          onConfirm={() => {
+            setIsConfirmModalOpen(false);
+            navigate("/question/1"); // TODO: replace with real ID
+          }}
+          onCancel={() => setIsConfirmModalOpen(false)}
+          confirmText="이동"
+          cancelText="취소"
+        />
+      )}
     </div>
   );
 }
