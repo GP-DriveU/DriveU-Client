@@ -1,97 +1,11 @@
-﻿import { useEffect, useState } from "react";
-import { useDirectoryStore } from "../../store/useDirectoryStore";
+﻿import { useState } from "react";
 import List from "../../commons/list/List";
 import { type Item } from "../../commons/list/ListItem";
 import HomeSection from "./HomeSection";
 import { useNavigate } from "react-router-dom";
 
 function HomePage() {
-  const { setSemesterDirectories, setSelectedSemester } = useDirectoryStore();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const dummyData = [
-      {
-        id: 100,
-        name: "학업",
-        is_default: true,
-        order: 1,
-        children: [
-          {
-            id: 101,
-            name: "강의필기",
-            is_default: true,
-            order: 1,
-            children: [],
-          },
-          { id: 102, name: "과제", is_default: true, order: 2, children: [] },
-          {
-            id: 103,
-            name: "프로젝트",
-            is_default: true,
-            order: 2,
-            children: [],
-          },
-        ],
-      },
-      {
-        id: 200,
-        name: "수업",
-        is_default: true,
-        order: 2,
-        children: [
-          {
-            id: 201,
-            name: "객지론",
-            is_default: false,
-            order: 1,
-            children: [],
-          },
-          {
-            id: 202,
-            name: "자료구조",
-            is_default: false,
-            order: 1,
-            children: [],
-          },
-          {
-            id: 203,
-            name: "분산시",
-            is_default: false,
-            order: 1,
-            children: [],
-          },
-        ],
-      },
-      {
-        id: 300,
-        name: "대외활동",
-        is_default: true,
-        order: 3,
-        children: [
-          { id: 301, name: "동아리", is_default: true, order: 1, children: [] },
-          {
-            id: 302,
-            name: "공모전",
-            is_default: true,
-            order: 2,
-            children: [
-              {
-                id: 310,
-                name: "머시기 공모전",
-                is_default: false,
-                order: 1,
-                children: [],
-              },
-            ],
-          },
-        ],
-      },
-    ];
-
-    setSemesterDirectories("2024-1", dummyData);
-    setSelectedSemester("2024-1");
-  }, []);
 
   const dummyItems: Item[] = [
     {
@@ -150,7 +64,7 @@ function HomePage() {
       <HomeSection />
       <div className="flex-1 px-6">
         <div className="px-4 justify-center text-black text-xl font-semibold font-pretendard">
-          즐겨찾기한 파일
+          최근 업로드한 파일
         </div>
         <List
           items={items}

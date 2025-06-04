@@ -1,15 +1,14 @@
-﻿import { useEffect, useState, useRef } from "react";
+﻿import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { fetchAndStoreUser } from "../../hooks/auth/useFetchUser";
 import { exchangeGoogleCode } from "../../api/Login";
+import { useAuthStore } from "../../store/useAuthStore";
+import { useSemesterStore } from "../../store/useSemesterStore";
+import { useDirectoryStore } from "../../store/useDirectoryStore";
 
 function OAuthCallback() {
   const redirectUri = `${window.location.origin}/oauth/google`;
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [refreshToken, setRefreshToken] = useState<string | null>(null);
 
   const hasFetched = useRef(false);
 
@@ -25,21 +24,28 @@ function OAuthCallback() {
 
     exchangeGoogleCode(code, redirectUri)
       .then((res) => {
-        setAccessToken(res.token.accessToken);
-        setRefreshToken(res.token.refreshToken);
+        const { user, token, semesters, directories } = res;
+        useAuthStore
+          .getState()
+          .login(user, token.accessToken, token.refreshToken);
+
+        const { year, term } = semesters[0];
+        useSemesterStore.getState().setSelectedSemester(year, term);
+        useDirectoryStore.getState().setSelectedSemester(year, term);
+        useSemesterStore.getState().setSemesters(semesters);
+        useDirectoryStore.getState().setDirectoriesFromServer([
+          {
+            year,
+            term,
+            directories,
+          },
+        ]);
+        navigate("/", { replace: true });
       })
       .catch(() => {
         navigate("/login");
       });
   }, [navigate, redirectUri, searchParams]);
-
-  useEffect(() => {
-    if (accessToken && refreshToken) {
-      fetchAndStoreUser(accessToken, refreshToken, () => {
-        navigate("/", { replace: true });
-      });
-    }
-  }, [accessToken, refreshToken, navigate]);
 
   return (
     <>
