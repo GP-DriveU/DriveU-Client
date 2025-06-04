@@ -225,7 +225,11 @@ _끝._
           }
         />
       )}
-      <ProgressModal isOpen={loading} />
+      <ProgressModal
+        title="AI 요약 생성 중"
+        description="잠시만 기다려주세요."
+        isOpen={loading}
+      />
     </div>
   );
 }
