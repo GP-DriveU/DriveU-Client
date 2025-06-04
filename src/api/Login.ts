@@ -2,10 +2,33 @@
 import { http } from "./Fetch";
 
 interface OAuthResponse {
+  user: {
+    userId: number;
+    name: string;
+  };
+  semesters: {
+    userSemesterId: number;
+    year: number;
+    term: "SPRING" | "SUMMER" | "FALL" | "WINTER";
+    isCurrent: boolean;
+  }[];
   token: {
     accessToken: string;
     refreshToken: string;
   };
+  directories: {
+    id: number;
+    name: string;
+    order: number;
+    is_default: boolean;
+    children: {
+      id: number;
+      name: string;
+      order: number;
+      is_default: boolean;
+      children: any[]; // Assuming no deeper nesting
+    }[];
+  }[];
 }
 
 interface RefreshReponse {
