@@ -12,9 +12,19 @@ const Sidebar: React.FC = () => {
   const getCurrentDirectories = useDirectoryStore(
     (state) => state.getCurrentDirectories
   );
+
   const currentDirectories = getCurrentDirectories();
 
+  if (currentDirectories.length === 0) {
+    return (
+      <aside className="w-[278px] min-w-[220px] min-h-screen px-10 py-6 bg-primary_light flex flex-col gap-4">
+        <div className="text-center text-font">학기 정보가 없습니다.</div>
+      </aside>
+    );
+  }
+
   const isHome = location.pathname === "/";
+
   return (
     <aside className="w-[278px] min-w-[220px] min-h-screen px-10 py-6 bg-primary_light flex flex-col gap-4">
       <div className="flex-shrink-0 mb-6 flex flex-col gap-3">
@@ -27,31 +37,33 @@ const Sidebar: React.FC = () => {
           <SidebarItem label="전체보기" isActive={isHome} to={"/"} />
         </div>
         {(() => {
-          const routeMap: Record<
-            string,
-            { slug: string; id: number; emoji: string }
-          > = {
-            학업: { slug: "study", id: 100, emoji: "🏫" },
-            과목: { slug: "subject", id: 200, emoji: "📚" },
-            대외활동: { slug: "activity", id: 300, emoji: "📢" },
-          };
-          return Object.entries(routeMap).map(([name, { slug, emoji, id }]) => {
-            const group = currentDirectories.find((dir) => dir.id === id);
-            if (!group) return null;
+          const grouped = currentDirectories.map((dir) => {
+            const routeMap: Record<string, { slug: string; emoji: string }> = {
+              학업: { slug: "study", emoji: "🏫" },
+              과목: { slug: "subject", emoji: "📚" },
+              대외활동: { slug: "activity", emoji: "📢" },
+            };
+
+            const route = routeMap[dir.name];
+            if (!route) return null;
+
+            const items = (dir.children ?? []).map((child) => ({
+              name: child.name,
+              slug: encodeURIComponent(child.name),
+            }));
 
             return (
               <SidebarGroup
-                key={group.id}
-                title={`${emoji} ${name}`}
-                items={group.children.map((child) => ({
-                  name: child.name,
-                  slug: encodeURIComponent(child.name),
-                }))}
-                basePath={`/${slug}`}
+                key={dir.id}
+                title={`${route.emoji} ${dir.name}`}
+                items={items}
+                basePath={`/${route.slug}`}
                 currentPath={location.pathname}
               />
             );
           });
+
+          return grouped;
         })()}
       </div>
 
@@ -70,7 +82,6 @@ const Sidebar: React.FC = () => {
             isActive={location.pathname === "/store"}
           />
         </div>
-        {/* todo : 저장용량 api 연동 물어봐야 함 */}
         <div className="text-xs font-pretendard text-font">
           <div className="h-2.5 w-full bg-[#d9d9d9] overflow-hidden">
             <div className="h-2.5 bg-[#61758f]" style={{ width: "55%" }}></div>
