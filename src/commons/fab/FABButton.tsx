@@ -3,17 +3,28 @@ import IconFAB from "../../assets/icon/icon_fab.svg?react";
 import { useNavigate } from "react-router-dom";
 
 const FABButton: React.FC<{
-  onGenerateProblem?: () => void;
-  onDelete?: () => void;
-}> = ({ onGenerateProblem, onDelete }) => {
+  isGenerating: boolean;
+  isSelecting: boolean;
+  onStartGenerating: () => void;
+  onCancelGenerating: () => void;
+  onSubmitGenerating: () => void;
+  onCancelSelecting: () => void;
+  onStartSelecting: () => void;
+}> = ({
+  isGenerating,
+  isSelecting,
+  onStartGenerating,
+  onCancelGenerating,
+  onSubmitGenerating,
+  onCancelSelecting,
+  onStartSelecting,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isSelecting, setIsSelecting] = useState(false);
   const actions = isGenerating
-    ? [{ label: "문제 생성 취소" }]
-    : isSelecting
-    ? [{ label: "선택 취소" }]
+    ? [{ label: "문제 생성" }, { label: "문제 생성 취소" }]
+    : isSelecting && !isGenerating
+    ? [{ label: "삭제" }, { label: "삭제 취소" }]
     : [
         { label: "업로드" },
         { label: "삭제" },
@@ -37,20 +48,25 @@ const FABButton: React.FC<{
             className="px-3 py-1 w-20 bg-secondary font-bold text-center text-white text-sm rounded-md shadow cursor-pointer"
             onClick={() => {
               if (action.label === "문제 생성") {
-                setIsGenerating(true);
-                onGenerateProblem?.();
+                if (!isGenerating) {
+                  onStartGenerating();
+                } else {
+                  onSubmitGenerating();
+                }
                 setIsOpen(false);
               } else if (action.label === "삭제") {
-                setIsSelecting(true);
-                onDelete?.();
+                if (!isSelecting) {
+                  onStartSelecting();
+                }
+                setIsOpen(false);
+              } else if (action.label === "삭제 취소") {
+                onCancelSelecting();
                 setIsOpen(false);
               } else if (action.label === "문제 생성 취소") {
-                setIsGenerating(false);
-                onGenerateProblem?.();
+                onCancelGenerating();
                 setIsOpen(false);
               } else if (action.label === "선택 취소") {
-                setIsSelecting(false);
-                onDelete?.();
+                onCancelSelecting();
                 setIsOpen(false);
               } else if (action.label === "문제 확인") {
                 navigate("/question");
@@ -68,21 +84,13 @@ const FABButton: React.FC<{
             : "bg-primary_light text-primary"
         }`}
         onClick={() => {
-          if (isGenerating) {
-            setIsGenerating(false);
-            onGenerateProblem?.();
-          } else if (isSelecting) {
-            setIsSelecting(false);
-            onDelete?.();
-          } else {
-            setIsOpen((prev) => !prev);
-          }
+          setIsOpen((prev) => !prev);
         }}
       >
         {isGenerating ? (
           <span className="text-sm font-bold">
-            문제 생성 <br />
-            취소
+            선택 완료
+            <br />
           </span>
         ) : isSelecting ? (
           <span className="text-sm font-bold">선택 취소</span>
