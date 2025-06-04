@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - chore/#20/infra-action
   workflow_dispatch:
 
 jobs:
