@@ -1,13 +1,24 @@
-﻿import React, { useState } from "react";
+﻿import React from "react";
 import TabBarItem from "./TabBarItem";
 
-const TabBar: React.FC = () => {
-  const tabs = [
-    { title: "필기 내용", colorClass: "bg-secondary", selectedColorClass: "bg-secondary" },
-    { title: "AI 요약", colorClass: "bg-primary", selectedColorClass: "bg-primary" },
-  ];
+interface TabBarProps {
+  selectedIndex: number;
+  setSelectedIndex: (index: number) => void;
+}
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
+const TabBar: React.FC<TabBarProps> = ({ selectedIndex, setSelectedIndex }) => {
+  const tabs = [
+    {
+      title: "필기 내용",
+      colorClass: "bg-secondary",
+      selectedColorClass: "bg-secondary",
+    },
+    {
+      title: "AI 요약",
+      colorClass: "bg-primary",
+      selectedColorClass: "bg-primary",
+    },
+  ];
 
   return (
     <div className="w-64 h-[70px] relative flex items-end">
