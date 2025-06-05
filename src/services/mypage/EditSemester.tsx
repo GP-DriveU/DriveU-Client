@@ -147,20 +147,24 @@ const EditSemester: React.FC<EditSemesterProps> = ({
         </div>
       ))}
 
-      <div className="w-full flex items-center gap-44 pl-6">
-        <input
-          className="flex-1 px-3 py-2 border border-dashed border-blue-400 bg-blue-50 rounded-lg text-base text-gray-800"
-          placeholder="예: 2025년 1학기"
-          value={newSemesterInput}
-          onChange={(e) => setNewSemesterInput(e.target.value)}
-        />
-        <Button
-          size="medium"
-          color="primary"
-          onClick={() => handleNewSemesterSubmit()}
-        >
-          항목 추가
-        </Button>
+      <div className="w-full flex items-center gap-6 pl-5">
+        <div className="w-72 flex ">
+          <input
+            className="flex-1 px-3 py-2 border border-dashed border-blue-400 bg-blue-50 rounded-lg text-base text-gray-800"
+            placeholder="예: 2025년 1학기"
+            value={newSemesterInput}
+            onChange={(e) => setNewSemesterInput(e.target.value)}
+          />
+        </div>
+        <div className="w-32 ml-auto flex justify-end">
+          <Button
+            size="medium"
+            color="primary"
+            onClick={() => handleNewSemesterSubmit()}
+          >
+            항목 추가
+          </Button>
+        </div>
       </div>
 
       <div className="w-32 ml-auto flex justify-end">
