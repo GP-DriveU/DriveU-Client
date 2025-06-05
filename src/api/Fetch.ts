@@ -7,13 +7,23 @@ const baseFetch = async (
   init?: RequestInit,
   retry: boolean = true
 ) => {
-  const accessToken = localStorage.getItem("access_token");
+  const accessToken = localStorage.getItem("auth-storage");
+  let parsedToken: string | null = null;
+
+  if (accessToken) {
+    try {
+      const parsed = JSON.parse(accessToken);
+      parsedToken = parsed.state?.accessToken ?? null;
+    } catch (e) {
+      console.error("Failed to parse auth-storage:", e);
+    }
+  }
 
   const res = await fetch(`${API_BASE_URL}${url}`, {
     ...init,
     headers: {
-      ...(accessToken && {
-        Authorization: `Bearer ${accessToken}`,
+      ...(parsedToken && {
+        Authorization: `Bearer ${parsedToken}`,
       }),
       "Content-Type": "application/json",
     },
