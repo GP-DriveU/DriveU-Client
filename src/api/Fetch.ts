@@ -61,6 +61,12 @@ const http = {
       body: JSON.stringify(body),
     }) as Promise<{ response: T }>;
   },
+  patch: async <T = any>(url: string, body?: any) => {
+    return baseFetch(url, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }) as Promise<{ response: T }>;
+  },
   delete: async <T = any>(url: string) => {
     return baseFetch(url, {
       method: "DELETE",
