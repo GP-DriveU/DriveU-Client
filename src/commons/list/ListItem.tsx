@@ -1,31 +1,10 @@
 ﻿import React from "react";
-import IconDocs from "../../assets/icon/icon_docs.svg?react";
-import IconNote from "../../assets/icon/icon_note.svg?react";
+import { type Item } from "../../types/Item";
+import { getIcon } from "../../utils/itemUtils";
 import IconFavorite from "../../assets/icon/icon_favorite.svg?react";
 import IconDownload from "../../assets/icon/icon_download.svg?react";
 import IconCheck from "../../assets/icon/icon_check.svg?react";
 import Button from "../inputs/Button";
-
-export interface Item {
-  id: string;
-  title: string;
-  description: string;
-  type: "resources" | "note" | "file";
-  categories: string[];
-  isSelected: boolean;
-  isFavorite: boolean;
-}
-
-const getIcon = (type: Item["type"]) => {
-  switch (type) {
-    case "file":
-      return <IconDocs />;
-    case "note":
-      return <IconNote />;
-    default:
-      return <IconDocs />;
-  }
-};
 
 const ListItem: React.FC<{
   item: Item;
@@ -96,9 +75,33 @@ const ListItem: React.FC<{
         <Button color="primary" size="small" onClick={() => {}}>
           요약
         </Button>
-        <div className="w-[30px] h-[30px] flex items-center justify-center">
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (item.type === "NOTE") {
+              const markdown = "# Example note content\n\nThis is a dummy markdown.";
+              const blob = new Blob([markdown], { type: "text/markdown" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `${item.title || "note"}.md`;
+              a.click();
+              URL.revokeObjectURL(url);
+            } else {
+              const dummyContent = "This is a dummy file from the server.";
+              const blob = new Blob([dummyContent], { type: "application/octet-stream" });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = `${item.title || "file"}.txt`; // TODO: replace `.txt` with actual extension from API
+              a.click();
+              URL.revokeObjectURL(url);
+            }
+          }}
+          className="w-[30px] h-[30px] flex items-center justify-center"
+        >
           <IconDownload className="w-5 h-5" />
-        </div>
+        </button>
       </div>
     </div>
   );

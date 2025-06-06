@@ -1,20 +1,41 @@
-﻿import { Routes, Route } from "react-router-dom";
+﻿import { Routes, Route, useParams } from "react-router-dom";
 import HomePage from "../services/home/HomePage";
 import LandingPage from "../services/landing/LandingPage";
 import { useAuthStore } from "../store/useAuthStore";
 import LoginPage from "../services/auth/LoginPage";
-import NotePage from "../services/note/NotePage";
 import OAuthCallback from "../services/auth/OauthPage";
 import AppLayout from "../services/AppLayout";
-import NoteDetailPage from "../services/note/NoteDetailPage";
-import NoteEditPage from "../services/note/NoteEditPage";
+import NoteDetailPage from "../services/contents/note/NoteDetailPage";
+import NoteEditPage from "../services/contents/note/NoteEditPage";
 import MyPage from "../services/mypage/MyPage";
 import QuestionListPage from "../services/question/QuestionListPage";
 import QuestionDetailPage from "../services/question/QuestionDetailPage";
+import FilePage from "../services/contents/FilePage";
+import FileDetailPage from "../services/contents/FileDetailPage";
 
 function Router() {
   const { user } = useAuthStore();
   const isLoggedIn = !!user;
+
+  const StudyDetailPage = () => {
+    const { slug } = useParams();
+
+    if (slug?.startsWith("강의필기")) {
+      return <NoteDetailPage />;
+    } else {
+      return <FileDetailPage />;
+    }
+  };
+
+  const StudyEditPage = () => {
+    const { slug } = useParams();
+
+    if (slug?.startsWith("강의필기")) {
+      return <NoteEditPage />;
+    }
+
+    return null;
+  };
 
   return (
     <Routes>
@@ -32,30 +53,71 @@ function Router() {
       />
       <Route path="/oauth/google" element={<OAuthCallback />} />
       <Route path="/login" element={<LoginPage />} />
-      <Route
-        path="/study/강의필기"
-        element={
-          <AppLayout>
-            <NotePage />
-          </AppLayout>
-        }
-      />
-      <Route
-        path="/study/강의필기/:id"
-        element={
-          <AppLayout>
-            <NoteDetailPage />
-          </AppLayout>
-        }
-      />
-      <Route
-        path="/study/강의필기/:id/edit"
-        element={
-          <AppLayout>
-            <NoteEditPage />
-          </AppLayout>
-        }
-      />
+      <Route path="activity">
+        <Route
+          path=":slug"
+          element={
+            <AppLayout>
+              <FilePage />
+            </AppLayout>
+          }
+        />
+        <Route
+          path=":slug/:id"
+          element={
+            <AppLayout>
+              <FileDetailPage />
+            </AppLayout>
+          }
+        />
+      </Route>
+      
+      <Route path="subject">
+        <Route
+          path=":slug"
+          element={
+            <AppLayout>
+              <FilePage />
+            </AppLayout>
+          }
+        />
+        <Route
+          path=":slug/:id"
+          element={
+            <AppLayout>
+              <FileDetailPage />
+            </AppLayout>
+          }
+        />
+      </Route>
+
+      <Route path="study">
+        <Route
+          path=":slug"
+          element={
+            <AppLayout>
+              <FilePage />
+            </AppLayout>
+          }
+        />
+        <Route
+          path=":slug/:id"
+          element={
+            <AppLayout>
+              <StudyDetailPage />
+            </AppLayout>
+          }
+        />
+        <Route
+          path=":slug/:id/edit"
+          element={
+            <AppLayout>
+              <StudyEditPage />
+            </AppLayout>
+          }
+        />
+      </Route>
+
       <Route
         path="/mypage"
         element={
@@ -64,6 +126,7 @@ function Router() {
           </AppLayout>
         }
       />
+
       <Route
         path="/question"
         element={

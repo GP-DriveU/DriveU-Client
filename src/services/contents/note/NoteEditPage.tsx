@@ -1,13 +1,13 @@
 ﻿import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import IconArrowLeft from "../../assets/icon/icon_arrow_left.svg?react";
-import TitleSection from "../../commons/section/TitleSection";
-import TextSection from "../../commons/section/TextSection";
+import IconArrowLeft from "../../../assets/icon/icon_arrow_left.svg?react";
+import TitleSection from "../../../commons/section/TitleSection";
+import TextSection from "../../../commons/section/TextSection";
 import MDEditor from "@uiw/react-md-editor";
 import { getCodeString } from "rehype-rewrite";
 import katex from "katex";
 import "katex/dist/katex.min.css";
-import Button from "../../commons/inputs/Button";
+import Button from "../../../commons/inputs/Button";
 
 function NoteEditPage() {
   const navigate = useNavigate();

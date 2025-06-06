@@ -5,7 +5,7 @@ interface AlertModalProps {
   title: string;
   description: string;
   onConfirm: () => void;
-  onCancel: () => void;
+  onCancel?: () => void;
   isDanger?: boolean;
   confirmText?: string;
   cancelText?: string;
@@ -37,14 +37,16 @@ const AlertModal: React.FC<AlertModalProps> = ({
           />
         </div>
         <div className="w-full flex justify-center gap-4">
-          <Button
-            color="primary"
-            size="medium"
-            onClick={onCancel}
-            className="w-[130px] h-[55px] rounded-[15px]"
-          >
-            {cancelText || "취소"}
-          </Button>
+          {onCancel && (
+            <Button
+              color="primary"
+              size="medium"
+              onClick={onCancel}
+              className="w-[130px] h-[55px] rounded-[15px]"
+            >
+              {cancelText || "취소"}
+            </Button>
+          )}
           <Button
             color={isDanger ? "danger" : "primary"}
             size="medium"

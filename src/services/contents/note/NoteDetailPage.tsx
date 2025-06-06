@@ -1,21 +1,20 @@
 ﻿import { useState, useEffect } from "react";
-import ProgressModal from "../../commons/modals/ProgressModal";
-import { useNavigate, useParams } from "react-router-dom";
-import TextSection from "../../commons/section/TextSection";
-import TitleSection from "../../commons/section/TitleSection";
-import Tag from "../../commons/tag/Tag";
-import TabBar from "../../commons/layout/tabbar/TabBar";
-import IconEdit from "../../assets/icon/icon_edit.svg?react";
-import IconArrowLeft from "../../assets/icon/icon_arrow_left.svg?react";
+import ProgressModal from "../../../commons/modals/ProgressModal";
+import { useNavigate } from "react-router-dom";
+import TextSection from "../../../commons/section/TextSection";
+import TitleSection from "../../../commons/section/TitleSection";
+import Tag from "../../../commons/tag/Tag";
+import TabBar from "../../../commons/layout/tabbar/TabBar";
+import IconEdit from "../../../assets/icon/icon_edit.svg?react";
+import IconArrowLeft from "../../../assets/icon/icon_arrow_left.svg?react";
 import MDEditor from "@uiw/react-md-editor";
 import { getCodeString } from "rehype-rewrite";
 import katex from "katex";
 import "katex/dist/katex.min.css";
-import Button from "../../commons/inputs/Button";
+import Button from "../../../commons/inputs/Button";
 
 function NoteDetailPage() {
   const iconItems = [{ id: "one", icon: <IconEdit /> }];
-  const { id } = useParams();
   const [selectedIconId] = useState<string>();
   const navigate = useNavigate();
   const dummyTags = [{ title: "객지프", color: "" }];
@@ -120,11 +119,11 @@ _끝._
         title={title}
         items={iconItems}
         selectedId={selectedIconId}
-        onIconClick={() => {
-          navigate(`/study/강의필기/${id}/edit`, {
+        onIconClick={() =>
+          navigate(`edit`, {
             state: { title, markdownContent },
-          });
-        }}
+          })
+        }
       />
       <TextSection
         title="태그"

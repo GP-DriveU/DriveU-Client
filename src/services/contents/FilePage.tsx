@@ -1,23 +1,31 @@
-﻿import { type Item } from "../../commons/gallery/GalleryItem";
+﻿import { type Item } from "../../types/Item";
 import Gallery from "../../commons/gallery/Gallery";
 import List from "../../commons/list/List";
 import { useState } from "react";
 import AlertModal from "../../commons/modals/AlertModal";
 import ProgressModal from "../../commons/modals/ProgressModal";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import FABButton from "../../commons/fab/FABButton";
 import TitleSection from "../../commons/section/TitleSection";
 import IconFilter from "../../assets/icon/icon_filter.svg?react";
 import IconGallery from "../../assets/icon/icon_grid.svg?react";
 import IconList from "../../assets/icon/icon_list.svg?react";
+import { useSemesterStore } from "../../store/useSemesterStore";
+import UploadOverlay from "../../commons/modals/UploadOverlay";
 
-function NotePage() {
+function FilePage() {
+  const params = useParams();
+  console.log(params);
+  const category = params.slug ?? "파일";
+
+  const { selectedSemesterKey } = useSemesterStore();
+
   const dummyItems: Item[] = [
     {
       id: "1",
       title: "운영체제_강의노트",
       description: "최근에 작성된 운영체제 강의노트입니다.",
-      type: "note",
+      type: "NOTE",
       categories: ["객지론"],
       isSelected: false,
       isFavorite: false,
@@ -26,7 +34,7 @@ function NotePage() {
       id: "2",
       title: "컴구_과제1",
       description: "컴퓨터구조 과제입니다.",
-      type: "note",
+      type: "NOTE",
       categories: ["객지론"],
       isSelected: false,
       isFavorite: true,
@@ -35,7 +43,7 @@ function NotePage() {
       id: "3",
       title: "알고리즘_정리",
       description: "알고리즘에 대한 정리입니다.",
-      type: "note",
+      type: "NOTE",
       categories: ["객지론"],
       isSelected: false,
       isFavorite: true,
@@ -49,6 +57,9 @@ function NotePage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [confirmType, setConfirmType] = useState<"upload" | "generate" | null>(null);
+
   const navigate = useNavigate();
 
   // Mock async function for generating questions
@@ -57,6 +68,7 @@ function NotePage() {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     setIsLoadingModalOpen(false);
     setIsConfirmModalOpen(true);
+    setConfirmType("generate");
   };
 
   const iconItems = [
@@ -87,14 +99,21 @@ function NotePage() {
   };
 
   const handleItemClick = (id: string) => {
-    navigate(`/study/강의필기/${id}`);
+    navigate(`${id}`);
   };
 
   return (
     <div className="w-full flex bg-white flex-col">
       <TitleSection
-        title="강의 필기"
-        semester="25년 1학기"
+        title={category.replace(/-\d+$/, "")}
+        semester={
+          selectedSemesterKey
+            ? (() => {
+                const [year, term] = selectedSemesterKey.split("-");
+                return `${year}년 ${term === "SPRING" ? "1" : "2"}학기`;
+              })()
+            : ""
+        }
         items={iconItems}
         selectedId={selectedIconId}
         onIconClick={(id) => {
@@ -150,31 +169,81 @@ function NotePage() {
             resetSelection();
             setSelectableMode(true);
           }}
+          onUploadClick={() => {
+            setIsUploadOpen(true);
+          }}
+          onStartDelete={() => {
+            console.log("삭제 클릭됨");
+            // TODO: 삭제 처리 로직 추가
+          }}
         />
       </div>
+      {isUploadOpen && (
+        <UploadOverlay
+          onClose={() => setIsUploadOpen(false)}
+          onUpload={async (files) => {
+            setIsUploadOpen(false);
+            setIsLoadingModalOpen(true);
+
+            try {
+              // TODO: Replace with actual API call
+              const uploaded = Array.from(files).map((file, idx) => ({
+                id: `${Date.now()}-${idx}`,
+                title: file.name,
+                description: "새로 업로드된 파일입니다.",
+                type: 'FILE' as Item["type"],
+                categories: [category.replace(/-\d+$/, "")],
+                isSelected: false,
+                isFavorite: false,
+              }));
+
+              await new Promise((resolve) => setTimeout(resolve, 1000)); // mock delay
+              setItems((prev) => [...uploaded, ...prev]);
+              setIsConfirmModalOpen(true);
+              setConfirmType("upload");
+            } catch (e) {
+              console.error("업로드 실패", e);
+              alert("파일 업로드에 실패했습니다.");
+            } finally {
+              setIsLoadingModalOpen(false);
+            }
+          }}
+        />
+      )}
       {isLoadingModalOpen && (
         <ProgressModal
           isOpen={isLoadingModalOpen}
-          title="문제 생성 중..."
-          description="잠시만 기다려주세요."
+          title={confirmType === "generate" ? "문제 생성 중..." : "파일 업로드 중..."}
+          description={confirmType === "generate" ? "잠시만 기다려주세요." : "업로드 중입니다. 잠시만 기다려주세요."}
         />
       )}
       {isConfirmModalOpen && (
         <AlertModal
-          title="문제 생성이 완료되었습니다."
-          description="선택한 노트를 기반으로 문제가 생성되었습니다. 생성된 문제를 확인하고 싶으시다면,
-이동 버튼을 클릭해주세요."
+          title={
+            confirmType === "generate"
+              ? "문제 생성이 완료되었습니다."
+              : "파일 업로드 완료"
+          }
+          description={
+            confirmType === "generate"
+              ? "선택한 노트를 기반으로 문제가 생성되었습니다. 생성된 문제를 확인하고 싶으시다면,\n이동 버튼을 클릭해주세요."
+              : "파일 업로드가 성공적으로 완료되었습니다."
+          }
           onConfirm={() => {
             setIsConfirmModalOpen(false);
-            navigate("/question/1"); // TODO: replace with real ID
+            if (confirmType === "generate") {
+              navigate("/question/1"); // TODO: replace with real ID
+            }
           }}
-          onCancel={() => setIsConfirmModalOpen(false)}
-          confirmText="이동"
-          cancelText="취소"
+          {...(confirmType !== "upload" && {
+            onCancel: () => setIsConfirmModalOpen(false),
+            cancelText: "취소",
+          })}
+          confirmText={confirmType === "generate" ? "이동" : "확인"}
         />
       )}
     </div>
   );
 }
 
-export default NotePage;
+export default FilePage;
