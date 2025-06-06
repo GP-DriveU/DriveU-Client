@@ -5,25 +5,36 @@ import HomeSection from "./HomeSection";
 import { useNavigate } from "react-router-dom";
 import { getMainPage } from "../../api/Home";
 import type { MainPageResponse } from "../../api/Home";
+import { useDirectoryStore } from "../../store/useDirectoryStore";
+import { useSemesterStore } from "../../store/useSemesterStore";
 
 function HomePage() {
   const navigate = useNavigate();
   const [recentItems, setRecentItems] = useState<Item[]>([]);
   const [favoriteItems, setFavoriteItems] = useState<Item[]>([]);
+  const { getCurrentSemester } = useSemesterStore();
 
   useEffect(() => {
     const fetchMainPage = async () => {
       try {
-        const userSemesterId = 1; // replace with real value from store later
+        const userSemesterId = getCurrentSemester()?.userSemesterId;
+        if (userSemesterId === undefined) return;
         const data: MainPageResponse = await getMainPage(userSemesterId);
 
+        const { setSemesterDirectories } = useDirectoryStore.getState();
+        setSemesterDirectories(
+          getCurrentSemester()?.year!,
+          getCurrentSemester()?.term!,
+          data.directories
+        );
+
         const convert = (files: MainPageResponse["recentFiles"]) =>
-          files.map((file) => ({
+          (files ?? []).map((file) => ({
             id: file.id.toString(),
             title: file.title,
             description: file.previewLine,
-            type: file.type as Item["type"],
-            categories: [file.tag?.tagName ?? ""],
+            type: (file.type ?? "FILE") as Item["type"],
+            categories: file.tag && file.tag.tagName ? [file.tag.tagName] : [],
             isFavorite: file.favorite,
             isSelected: false,
           }));
@@ -75,25 +86,33 @@ function HomePage() {
         <div className="px-4 justify-center text-black text-xl font-semibold font-pretendard">
           최근 업로드한 파일
         </div>
-        <List
-          items={recentItems}
-          onToggleSelect={handleToggleSelect}
-          onToggleFavorite={handleToggleFavorite}
-          selectable={false}
-          onClickItem={handleItemClick}
-        />
+        {recentItems.length === 0 ? (
+          <div className="px-4 py-2 text-gray-500">업로드한 파일이 없습니다.</div>
+        ) : (
+          <List
+            items={recentItems}
+            onToggleSelect={handleToggleSelect}
+            onToggleFavorite={handleToggleFavorite}
+            selectable={false}
+            onClickItem={handleItemClick}
+          />
+        )}
       </div>
       <div className="flex-1 px-6">
         <div className="px-4 justify-center text-black text-xl font-semibold font-pretendard">
           즐겨찾기한 파일
         </div>
-        <List
-          items={favoriteItems}
-          onToggleSelect={handleToggleSelect}
-          onToggleFavorite={handleToggleFavorite}
-          selectable={false}
-          onClickItem={handleItemClick}
-        />
+        {favoriteItems.length === 0 ? (
+          <div className="px-4 py-2 text-gray-500">즐겨찾기한 파일이 없습니다.</div>
+        ) : (
+          <List
+            items={favoriteItems}
+            onToggleSelect={handleToggleSelect}
+            onToggleFavorite={handleToggleFavorite}
+            selectable={false}
+            onClickItem={handleItemClick}
+          />
+        )}
       </div>
     </div>
   );
