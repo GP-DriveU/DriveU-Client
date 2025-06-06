@@ -1,13 +1,13 @@
 ﻿import { http } from "./Fetch";
 
 export interface UploadRequest {
-  filename: string | null;
+  filename: string;
   fileSize: number;
 }
 
 export interface UploadResponse {
-  url: string | null;
-  s3Path: string | null;
+  url: string;
+  s3Path: string;
 }
 
 export interface RegisterLinkRequest {
@@ -44,7 +44,7 @@ export interface DeleteResourceResponse {
 // GET: 파일 다운로드용 presigned URL
 export const getDownloadPresignedUrl = async (resourceId: number): Promise<string> => {
   const response = await http.get<{ url: string }>(
-    `/resources/${resourceId}/download`
+    `resources/${resourceId}/download`
   );
   return response.response.url;
 };
@@ -67,7 +67,7 @@ export const registerLink = async (
   data: RegisterLinkRequest
 ): Promise<RegisterLinkResponse> => {
   const response = await http.post<RegisterLinkResponse>(
-    `/directories/${directoryId}/links`,
+    `directories/${directoryId}/links`,
     data
   );
   return response.response;
@@ -79,7 +79,7 @@ export const registerFileMeta = async (
   data: RegisterFileMetaRequest
 ): Promise<RegisterFileMetaResponse> => {
   const response = await http.post<RegisterFileMetaResponse>(
-    `/directories/${directoryId}/files`,
+    `directories/${directoryId}/files`,
     data
   );
   return response.response;
@@ -90,7 +90,7 @@ export const toggleFavoriteResource = async (
   resourceId: number
 ): Promise<ToggleFavoriteResponse> => {
   const response = await http.patch<ToggleFavoriteResponse>(
-    `/resources/${resourceId}/favorite`
+    `resources/${resourceId}/favorite`
   );
   return response.response;
 };
@@ -99,7 +99,7 @@ export const toggleFavoriteResource = async (
 export const getLinkUrl = async (
   linkId: number
 ): Promise<{ url: string }> => {
-  const response = await http.get<{ url: string }>(`/links/${linkId}`);
+  const response = await http.get<{ url: string }>(`links/${linkId}`);
   return response.response;
 };
 
@@ -113,7 +113,7 @@ export const getResourcesByDirectory = async (
   if (params?.favoriteOnly) query.favoriteOnly = String(params.favoriteOnly);
 
   const response = await http.get<any[]>(
-    `/directories/${directoryId}/resources`,
+    `directories/${directoryId}/resources`,
     query
   );
   return response.response;
@@ -124,7 +124,7 @@ export const deleteResource = async (
   resourceId: number
 ): Promise<DeleteResourceResponse> => {
   const response = await http.delete<DeleteResourceResponse>(
-    `/resources/${resourceId}`
+    `resources/${resourceId}`
   );
   return response.response;
 };
