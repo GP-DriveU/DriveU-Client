@@ -34,7 +34,7 @@ function HomePage() {
             title: file.title,
             description: file.previewLine,
             type: (file.type ?? "FILE") as Item["type"],
-            categories: file.tag && file.tag.tagName ? [file.tag.tagName] : [],
+            category: file.tag.tagName,
             isFavorite: file.favorite,
             isSelected: false,
           }));

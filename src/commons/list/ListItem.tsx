@@ -58,15 +58,14 @@ const ListItem: React.FC<{
             className={item.isFavorite ? "text-danger" : "text-gray-300"}
           />
         </div>
-        {(item.categories || []).map((category, idx) => (
+        {item.category && item.category !== "" && (
           <span
-            key={idx}
             className="text-xs text-center outline outline-1 outline-offset-[-1px] outline-tag-yellow bg-tag-yellow/50 text-font px-3 py-0.5 rounded-[5px]"
             style={{ userSelect: "none" }}
           >
-            {category}
+            {item.category}
           </span>
-        ))}
+        )}
       </div>
       <div className="flex gap-2 min-w-[200px]">
         <Button color="secondary" size="small" onClick={() => {}}>

@@ -201,7 +201,7 @@ function FilePage() {
                   title: file.name,
                   description: "새로 업로드된 파일입니다.",
                   type: "FILE",
-                  categories: [category.replace(/-\d+$/, "")],
+                  category: "",
                   isSelected: false,
                   isFavorite: false,
                 });

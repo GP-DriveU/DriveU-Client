@@ -5,7 +5,7 @@ export interface Item {
   title: string;
   description: string;
   type: ItemType;
-  categories: string[];
+  category: string;
   isSelected: boolean;
   isFavorite: boolean;
 }
