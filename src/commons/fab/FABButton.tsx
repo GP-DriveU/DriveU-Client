@@ -10,6 +10,8 @@ const FABButton: React.FC<{
   onSubmitGenerating: () => void;
   onCancelSelecting: () => void;
   onStartSelecting: () => void;
+  onUploadClick: () => void;
+  onStartDelete: () => void;
 }> = ({
   isGenerating,
   isSelecting,
@@ -18,6 +20,8 @@ const FABButton: React.FC<{
   onSubmitGenerating,
   onCancelSelecting,
   onStartSelecting,
+  onUploadClick,
+  onStartDelete,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
@@ -54,9 +58,13 @@ const FABButton: React.FC<{
                   onSubmitGenerating();
                 }
                 setIsOpen(false);
+              } else if (action.label === "업로드") {
+                onUploadClick();
+                setIsOpen(false);
               } else if (action.label === "삭제") {
                 if (!isSelecting) {
                   onStartSelecting();
+                  onStartDelete();
                 }
                 setIsOpen(false);
               } else if (action.label === "삭제 취소") {

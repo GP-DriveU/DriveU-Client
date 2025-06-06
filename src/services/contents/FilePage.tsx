@@ -11,6 +11,7 @@ import IconFilter from "../../assets/icon/icon_filter.svg?react";
 import IconGallery from "../../assets/icon/icon_grid.svg?react";
 import IconList from "../../assets/icon/icon_list.svg?react";
 import { useSemesterStore } from "../../store/useSemesterStore";
+import UploadOverlay from "../../commons/modals/UploadOverlay";
 
 function FilePage() {
   const params = useParams();
@@ -56,6 +57,9 @@ function FilePage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [confirmType, setConfirmType] = useState<"upload" | "generate" | null>(null);
+
   const navigate = useNavigate();
 
   // Mock async function for generating questions
@@ -64,6 +68,7 @@ function FilePage() {
     await new Promise((resolve) => setTimeout(resolve, 2000));
     setIsLoadingModalOpen(false);
     setIsConfirmModalOpen(true);
+    setConfirmType("generate");
   };
 
   const iconItems = [
@@ -164,27 +169,77 @@ function FilePage() {
             resetSelection();
             setSelectableMode(true);
           }}
+          onUploadClick={() => {
+            setIsUploadOpen(true);
+          }}
+          onStartDelete={() => {
+            console.log("삭제 클릭됨");
+            // TODO: 삭제 처리 로직 추가
+          }}
         />
       </div>
+      {isUploadOpen && (
+        <UploadOverlay
+          onClose={() => setIsUploadOpen(false)}
+          onUpload={async (files) => {
+            setIsUploadOpen(false);
+            setIsLoadingModalOpen(true);
+
+            try {
+              // TODO: Replace with actual API call
+              const uploaded = Array.from(files).map((file, idx) => ({
+                id: `${Date.now()}-${idx}`,
+                title: file.name,
+                description: "새로 업로드된 파일입니다.",
+                type: 'FILE' as Item["type"],
+                categories: [category.replace(/-\d+$/, "")],
+                isSelected: false,
+                isFavorite: false,
+              }));
+
+              await new Promise((resolve) => setTimeout(resolve, 1000)); // mock delay
+              setItems((prev) => [...uploaded, ...prev]);
+              setIsConfirmModalOpen(true);
+              setConfirmType("upload");
+            } catch (e) {
+              console.error("업로드 실패", e);
+              alert("파일 업로드에 실패했습니다.");
+            } finally {
+              setIsLoadingModalOpen(false);
+            }
+          }}
+        />
+      )}
       {isLoadingModalOpen && (
         <ProgressModal
           isOpen={isLoadingModalOpen}
-          title="문제 생성 중..."
-          description="잠시만 기다려주세요."
+          title={confirmType === "generate" ? "문제 생성 중..." : "파일 업로드 중..."}
+          description={confirmType === "generate" ? "잠시만 기다려주세요." : "업로드 중입니다. 잠시만 기다려주세요."}
         />
       )}
       {isConfirmModalOpen && (
         <AlertModal
-          title="문제 생성이 완료되었습니다."
-          description="선택한 노트를 기반으로 문제가 생성되었습니다. 생성된 문제를 확인하고 싶으시다면,
-이동 버튼을 클릭해주세요."
+          title={
+            confirmType === "generate"
+              ? "문제 생성이 완료되었습니다."
+              : "파일 업로드 완료"
+          }
+          description={
+            confirmType === "generate"
+              ? "선택한 노트를 기반으로 문제가 생성되었습니다. 생성된 문제를 확인하고 싶으시다면,\n이동 버튼을 클릭해주세요."
+              : "파일 업로드가 성공적으로 완료되었습니다."
+          }
           onConfirm={() => {
             setIsConfirmModalOpen(false);
-            navigate("/question/1"); // TODO: replace with real ID
+            if (confirmType === "generate") {
+              navigate("/question/1"); // TODO: replace with real ID
+            }
           }}
-          onCancel={() => setIsConfirmModalOpen(false)}
-          confirmText="이동"
-          cancelText="취소"
+          {...(confirmType !== "upload" && {
+            onCancel: () => setIsConfirmModalOpen(false),
+            cancelText: "취소",
+          })}
+          confirmText={confirmType === "generate" ? "이동" : "확인"}
         />
       )}
     </div>
