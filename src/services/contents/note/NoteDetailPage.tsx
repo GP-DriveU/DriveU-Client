@@ -1,6 +1,6 @@
 ﻿import { useState, useEffect } from "react";
 import ProgressModal from "../../../commons/modals/ProgressModal";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import TextSection from "../../../commons/section/TextSection";
 import TitleSection from "../../../commons/section/TitleSection";
 import Tag from "../../../commons/tag/Tag";
@@ -15,7 +15,6 @@ import Button from "../../../commons/inputs/Button";
 
 function NoteDetailPage() {
   const iconItems = [{ id: "one", icon: <IconEdit /> }];
-  const { id } = useParams();
   const [selectedIconId] = useState<string>();
   const navigate = useNavigate();
   const dummyTags = [{ title: "객지프", color: "" }];
@@ -120,11 +119,11 @@ _끝._
         title={title}
         items={iconItems}
         selectedId={selectedIconId}
-        onIconClick={() => {
-          navigate(`/study/강의필기/${id}/edit`, {
+        onIconClick={() =>
+          navigate(`edit`, {
             state: { title, markdownContent },
-          });
-        }}
+          })
+        }
       />
       <TextSection
         title="태그"
