@@ -4,14 +4,17 @@ import List from "../../commons/list/List";
 import { useState } from "react";
 import AlertModal from "../../commons/modals/AlertModal";
 import ProgressModal from "../../commons/modals/ProgressModal";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import FABButton from "../../commons/fab/FABButton";
 import TitleSection from "../../commons/section/TitleSection";
 import IconFilter from "../../assets/icon/icon_filter.svg?react";
 import IconGallery from "../../assets/icon/icon_grid.svg?react";
 import IconList from "../../assets/icon/icon_list.svg?react";
 
-function NotePage() {
+function FilePage() {
+  const params = useParams();
+  const category = params.category ?? "파일";
+
   const dummyItems: Item[] = [
     {
       id: "1",
@@ -87,13 +90,13 @@ function NotePage() {
   };
 
   const handleItemClick = (id: string) => {
-    navigate(`/study/강의필기/${id}`);
+    navigate(`/study/${category}/${id}`);
   };
 
   return (
     <div className="w-full flex bg-white flex-col">
       <TitleSection
-        title="강의 필기"
+        title={category}
         semester="25년 1학기"
         items={iconItems}
         selectedId={selectedIconId}
@@ -177,4 +180,4 @@ function NotePage() {
   );
 }
 
-export default NotePage;
+export default FilePage;
