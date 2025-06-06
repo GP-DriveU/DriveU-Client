@@ -2,6 +2,8 @@
 import Gallery from "../../commons/gallery/Gallery";
 import List from "../../commons/list/List";
 import { useState } from "react";
+import { useEffect } from "react";
+import { getResourcesByDirectory, registerFileMeta } from "../../api/File";
 import AlertModal from "../../commons/modals/AlertModal";
 import ProgressModal from "../../commons/modals/ProgressModal";
 import { useNavigate, useParams } from "react-router-dom";
@@ -12,6 +14,7 @@ import IconGallery from "../../assets/icon/icon_grid.svg?react";
 import IconList from "../../assets/icon/icon_list.svg?react";
 import { useSemesterStore } from "../../store/useSemesterStore";
 import UploadOverlay from "../../commons/modals/UploadOverlay";
+import { getUploadPresignedUrl } from "../../api/File";
 
 function FilePage() {
   const params = useParams();
@@ -20,37 +23,7 @@ function FilePage() {
 
   const { selectedSemesterKey } = useSemesterStore();
 
-  const dummyItems: Item[] = [
-    {
-      id: "1",
-      title: "운영체제_강의노트",
-      description: "최근에 작성된 운영체제 강의노트입니다.",
-      type: "NOTE",
-      categories: ["객지론"],
-      isSelected: false,
-      isFavorite: false,
-    },
-    {
-      id: "2",
-      title: "컴구_과제1",
-      description: "컴퓨터구조 과제입니다.",
-      type: "NOTE",
-      categories: ["객지론"],
-      isSelected: false,
-      isFavorite: true,
-    },
-    {
-      id: "3",
-      title: "알고리즘_정리",
-      description: "알고리즘에 대한 정리입니다.",
-      type: "NOTE",
-      categories: ["객지론"],
-      isSelected: false,
-      isFavorite: true,
-    },
-  ];
-
-  const [items, setItems] = useState<Item[]>(dummyItems);
+  const [items, setItems] = useState<Item[]>([]);
   const [viewMode, setViewMode] = useState<"gallery" | "list">("list");
   const [selectedIconId, setSelectedIconId] = useState<string>("three");
   const [selectableMode, setSelectableMode] = useState(false);
@@ -61,6 +34,22 @@ function FilePage() {
   const [confirmType, setConfirmType] = useState<"upload" | "generate" | null>(null);
 
   const navigate = useNavigate();
+
+  // Extract directoryId from slug
+  const slugParts = (params.slug ?? "").split("-");
+  const directoryId = Number(slugParts[slugParts.length - 1]);
+
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const response = await getResourcesByDirectory(directoryId);
+        setItems(response);
+      } catch (error) {
+        console.error("Failed to fetch items:", error);
+      }
+    };
+    fetchResources();
+  }, [params.directoryId, params.slug, directoryId]);
 
   // Mock async function for generating questions
   const generateQuestions = async () => {
@@ -184,20 +173,39 @@ function FilePage() {
           onUpload={async (files) => {
             setIsUploadOpen(false);
             setIsLoadingModalOpen(true);
-
             try {
-              // TODO: Replace with actual API call
-              const uploaded = Array.from(files).map((file, idx) => ({
-                id: `${Date.now()}-${idx}`,
-                title: file.name,
-                description: "새로 업로드된 파일입니다.",
-                type: 'FILE' as Item["type"],
-                categories: [category.replace(/-\d+$/, "")],
-                isSelected: false,
-                isFavorite: false,
-              }));
-
-              await new Promise((resolve) => setTimeout(resolve, 1000)); // mock delay
+              const uploaded: Item[] = [];
+              for (const file of Array.from(files)) {
+                const filenameWithExtension = file.name;
+                const { url, s3Path } = await getUploadPresignedUrl({
+                  filename: decodeURIComponent(filenameWithExtension),
+                  fileSize: file.size,
+                });
+                // s3Path and extension extraction
+                const extension = filenameWithExtension.split(".").pop()?.toUpperCase() ?? "";
+                // Save metadata
+                await registerFileMeta(directoryId, {
+                  title: file.name,
+                  s3Path,
+                  extension,
+                  size: file.size,
+                  tagId: 0, // adjust if needed
+                });
+                
+                await fetch(url, {
+                  method: "PUT",
+                  body: file,
+                });
+                uploaded.push({
+                  id: `${Date.now()}-${file.name}`,
+                  title: file.name,
+                  description: "새로 업로드된 파일입니다.",
+                  type: "FILE",
+                  categories: [category.replace(/-\d+$/, "")],
+                  isSelected: false,
+                  isFavorite: false,
+                });
+              }
               setItems((prev) => [...uploaded, ...prev]);
               setIsConfirmModalOpen(true);
               setConfirmType("upload");

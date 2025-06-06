@@ -75,6 +75,7 @@ function HomePage() {
     );
   };
 
+  //todo : route 고쳐야 함
   const handleItemClick = (id: string) => {
     navigate(`/study/강의필기/${id}`);
   };
