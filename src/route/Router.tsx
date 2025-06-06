@@ -1,4 +1,4 @@
-﻿import { Routes, Route } from "react-router-dom";
+﻿import { Routes, Route, useParams } from "react-router-dom";
 import HomePage from "../services/home/HomePage";
 import LandingPage from "../services/landing/LandingPage";
 import { useAuthStore } from "../store/useAuthStore";
@@ -11,10 +11,16 @@ import NoteEditPage from "../services/note/NoteEditPage";
 import MyPage from "../services/mypage/MyPage";
 import QuestionListPage from "../services/question/QuestionListPage";
 import QuestionDetailPage from "../services/question/QuestionDetailPage";
+import FilePage from "../services/file/FilePage";
 
 function Router() {
   const { user } = useAuthStore();
   const isLoggedIn = !!user;
+
+  const StudySlugPage = () => {
+    const { slug } = useParams();
+    return slug?.includes("강의필기") ? <NotePage /> : <FilePage />;
+  };
 
   return (
     <Routes>
@@ -33,10 +39,26 @@ function Router() {
       <Route path="/oauth/google" element={<OAuthCallback />} />
       <Route path="/login" element={<LoginPage />} />
       <Route
-        path="/study/강의필기"
+        path="/activity/:slug"
         element={
           <AppLayout>
-            <NotePage />
+            <FilePage />
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/subject/:slug"
+        element={
+          <AppLayout>
+            <FilePage />
+          </AppLayout>
+        }
+      />
+      <Route
+        path="/study/:slug"
+        element={
+          <AppLayout>
+            <StudySlugPage />
           </AppLayout>
         }
       />

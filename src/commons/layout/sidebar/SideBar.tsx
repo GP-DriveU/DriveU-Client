@@ -49,7 +49,7 @@ const Sidebar: React.FC = () => {
 
             const items = (dir.children ?? []).map((child) => ({
               name: child.name,
-              slug: encodeURIComponent(child.name),
+              slug: `${encodeURIComponent(child.name)}-${child.id}`,
             }));
 
             return (
