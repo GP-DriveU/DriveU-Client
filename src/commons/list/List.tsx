@@ -1,4 +1,5 @@
-﻿import ListItem, { type Item } from "./ListItem";
+﻿import ListItem from "./ListItem";
+import { type Item } from "../../types/Item";
 
 interface ListProps {
   items: Item[];

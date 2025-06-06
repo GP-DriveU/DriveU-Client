@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState } from "react";
 import List from "../../commons/list/List";
-import { type Item } from "../../commons/list/ListItem";
+import type { Item } from "../../types/Item";
 import HomeSection from "./HomeSection";
 import { useNavigate } from "react-router-dom";
 import { getMainPage } from "../../api/Home";
@@ -22,11 +22,7 @@ function HomePage() {
             id: file.id.toString(),
             title: file.title,
             description: file.previewLine,
-            type: (["file", "note", "resources"].includes(
-              file.extension.toLowerCase()
-            )
-              ? file.extension.toLowerCase()
-              : "file") as "file" | "note" | "resources",
+            type: file.type as Item["type"],
             categories: [file.tag?.tagName ?? ""],
             isFavorite: file.favorite,
             isSelected: false,

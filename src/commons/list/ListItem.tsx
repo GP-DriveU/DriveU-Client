@@ -1,31 +1,10 @@
 ﻿import React from "react";
-import IconDocs from "../../assets/icon/icon_docs.svg?react";
-import IconNote from "../../assets/icon/icon_note.svg?react";
+import { type Item } from "../../types/Item";
+import { getIcon } from "../../utils/itemUtils";
 import IconFavorite from "../../assets/icon/icon_favorite.svg?react";
 import IconDownload from "../../assets/icon/icon_download.svg?react";
 import IconCheck from "../../assets/icon/icon_check.svg?react";
 import Button from "../inputs/Button";
-
-export interface Item {
-  id: string;
-  title: string;
-  description: string;
-  type: "resources" | "note" | "file";
-  categories: string[];
-  isSelected: boolean;
-  isFavorite: boolean;
-}
-
-const getIcon = (type: Item["type"]) => {
-  switch (type) {
-    case "file":
-      return <IconDocs />;
-    case "note":
-      return <IconNote />;
-    default:
-      return <IconDocs />;
-  }
-};
 
 const ListItem: React.FC<{
   item: Item;

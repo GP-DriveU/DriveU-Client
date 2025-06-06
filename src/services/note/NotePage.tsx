@@ -1,4 +1,4 @@
-﻿import { type Item } from "../../commons/gallery/GalleryItem";
+﻿import { type Item } from "../../types/Item";
 import Gallery from "../../commons/gallery/Gallery";
 import List from "../../commons/list/List";
 import { useState } from "react";
@@ -17,7 +17,7 @@ function NotePage() {
       id: "1",
       title: "운영체제_강의노트",
       description: "최근에 작성된 운영체제 강의노트입니다.",
-      type: "note",
+      type: "NOTE",
       categories: ["객지론"],
       isSelected: false,
       isFavorite: false,
@@ -26,7 +26,7 @@ function NotePage() {
       id: "2",
       title: "컴구_과제1",
       description: "컴퓨터구조 과제입니다.",
-      type: "note",
+      type: "NOTE",
       categories: ["객지론"],
       isSelected: false,
       isFavorite: true,
@@ -35,7 +35,7 @@ function NotePage() {
       id: "3",
       title: "알고리즘_정리",
       description: "알고리즘에 대한 정리입니다.",
-      type: "note",
+      type: "NOTE",
       categories: ["객지론"],
       isSelected: false,
       isFavorite: true,

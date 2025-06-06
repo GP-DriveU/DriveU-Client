@@ -1,5 +1,6 @@
 ﻿import React from "react";
-import GalleryItem, { type Item } from "./GalleryItem";
+import GalleryItem from "./GalleryItem";
+import { type Item } from "../../types/Item";
 
 interface GalleryProps {
   items: Item[];
