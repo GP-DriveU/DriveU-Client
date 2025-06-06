@@ -1,46 +1,54 @@
-﻿import { useState } from "react";
+﻿import { useEffect, useState } from "react";
 import List from "../../commons/list/List";
 import { type Item } from "../../commons/list/ListItem";
 import HomeSection from "./HomeSection";
 import { useNavigate } from "react-router-dom";
+import { getMainPage } from "../../api/Home";
+import type { MainPageResponse } from "../../api/Home";
 
 function HomePage() {
   const navigate = useNavigate();
+  const [recentItems, setRecentItems] = useState<Item[]>([]);
+  const [favoriteItems, setFavoriteItems] = useState<Item[]>([]);
 
-  const dummyItems: Item[] = [
-    {
-      id: "1",
-      title: "객체지향프로그래밍 1주차",
-      description: "오늘은 클래스와 객체를 배웠습니다.",
-      type: "doc",
-      categories: ["객지프"],
-      isSelected: false,
-      isFavorite: false,
-    },
-    {
-      id: "2",
-      title: "자료구조 정리노트",
-      description: "스택, 큐, 트리 기본 개념 정리",
-      type: "note",
-      categories: ["자료구조"],
-      isSelected: true,
-      isFavorite: false,
-    },
-    {
-      id: "3",
-      title: "분산시스템 발표자료",
-      description: "CAP 이론 및 사례 정리",
-      type: "doc",
-      categories: ["분산시"],
-      isSelected: false,
-      isFavorite: true,
-    },
-  ];
+  useEffect(() => {
+    const fetchMainPage = async () => {
+      try {
+        const userSemesterId = 1; // replace with real value from store later
+        const data: MainPageResponse = await getMainPage(userSemesterId);
 
-  const [items, setItems] = useState<Item[]>(dummyItems);
+        const convert = (files: MainPageResponse["recentFiles"]) =>
+          files.map((file) => ({
+            id: file.id.toString(),
+            title: file.title,
+            description: file.previewLine,
+            type: (["file", "note", "resources"].includes(
+              file.extension.toLowerCase()
+            )
+              ? file.extension.toLowerCase()
+              : "file") as "file" | "note" | "resources",
+            categories: [file.tag?.tagName ?? ""],
+            isFavorite: file.favorite,
+            isSelected: false,
+          }));
+
+        setRecentItems(convert(data.recentFiles));
+        setFavoriteItems(convert(data.favoriteFiles));
+      } catch (e) {
+        console.error("메인페이지 데이터를 불러오지 못했습니다:", e);
+      }
+    };
+
+    fetchMainPage();
+  }, []);
 
   const handleToggleSelect = (id: string) => {
-    setItems((prev) =>
+    setRecentItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, isSelected: !item.isSelected } : item
+      )
+    );
+    setFavoriteItems((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, isSelected: !item.isSelected } : item
       )
@@ -48,7 +56,12 @@ function HomePage() {
   };
 
   const handleToggleFavorite = (id: string) => {
-    setItems((prev) =>
+    setRecentItems((prev) =>
+      prev.map((item) =>
+        item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
+      )
+    );
+    setFavoriteItems((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
       )
@@ -67,7 +80,7 @@ function HomePage() {
           최근 업로드한 파일
         </div>
         <List
-          items={items}
+          items={recentItems}
           onToggleSelect={handleToggleSelect}
           onToggleFavorite={handleToggleFavorite}
           selectable={false}
@@ -79,7 +92,7 @@ function HomePage() {
           즐겨찾기한 파일
         </div>
         <List
-          items={items}
+          items={favoriteItems}
           onToggleSelect={handleToggleSelect}
           onToggleFavorite={handleToggleFavorite}
           selectable={false}
