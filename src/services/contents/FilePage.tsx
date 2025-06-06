@@ -10,10 +10,14 @@ import TitleSection from "../../commons/section/TitleSection";
 import IconFilter from "../../assets/icon/icon_filter.svg?react";
 import IconGallery from "../../assets/icon/icon_grid.svg?react";
 import IconList from "../../assets/icon/icon_list.svg?react";
+import { useSemesterStore } from "../../store/useSemesterStore";
 
 function FilePage() {
   const params = useParams();
-  const category = params.category ?? "파일";
+  console.log(params);
+  const category = params.slug ?? "파일";
+
+  const { selectedSemesterKey } = useSemesterStore();
 
   const dummyItems: Item[] = [
     {
@@ -90,14 +94,21 @@ function FilePage() {
   };
 
   const handleItemClick = (id: string) => {
-    navigate(`/study/${category}/${id}`);
+    navigate(`${id}`);
   };
 
   return (
     <div className="w-full flex bg-white flex-col">
       <TitleSection
-        title={category}
-        semester="25년 1학기"
+        title={category.replace(/-\d+$/, "")}
+        semester={
+          selectedSemesterKey
+            ? (() => {
+                const [year, term] = selectedSemesterKey.split("-");
+                return `${year}년 ${term === "SPRING" ? "1" : "2"}학기`;
+              })()
+            : ""
+        }
         items={iconItems}
         selectedId={selectedIconId}
         onIconClick={(id) => {
