@@ -1,4 +1,6 @@
-﻿import React from "react";
+﻿import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
 import Sidebar from "../commons/layout/sidebar/SideBar";
 
 interface AppLayoutProps {
@@ -6,6 +8,15 @@ interface AppLayoutProps {
 }
 
 const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+  const { user } = useAuthStore();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
+
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
