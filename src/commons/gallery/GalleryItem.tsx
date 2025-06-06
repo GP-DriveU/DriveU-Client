@@ -10,7 +10,7 @@ export interface Item {
   id: string;
   title: string;
   description: string;
-  type: "doc" | "note" | "etc";
+  type: "resources" | "note" | "file";
   categories: string[];
   isSelected: boolean;
   isFavorite: boolean;
@@ -18,7 +18,7 @@ export interface Item {
 
 const getIcon = (type: Item["type"]) => {
   switch (type) {
-    case "doc":
+    case "file":
       return <IconDocs />;
     case "note":
       return <IconNote />;
