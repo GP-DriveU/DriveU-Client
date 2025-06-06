@@ -1,11 +1,9 @@
-﻿import { refreshToken } from "./Login";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+﻿const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const baseFetch = async (
   url: RequestInfo,
-  init?: RequestInit,
-  retry: boolean = true
+  init?: RequestInit
+  // retry: boolean = true
 ) => {
   const accessToken = localStorage.getItem("auth-storage");
   let parsedToken: string | null = null;
@@ -30,22 +28,8 @@ const baseFetch = async (
   });
 
   if (!res.ok) {
-    if (res.status === 401 && retry) {
-      try {
-        const refresh_token = localStorage.getItem("refresh_token");
-        if (refresh_token) {
-          const newAccessToken = await refreshToken(refresh_token);
-          if (newAccessToken) {
-            localStorage.setItem("access_token", newAccessToken);
-            return baseFetch(url, init, false);
-          }
-        }
-      } catch (e) {
-        console.error("Refresh token failed", e);
-      }
-
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
+    if (res.status === 401) {
+      localStorage.removeItem("auth-storage");
       window.location.href = "/login";
       return Promise.reject(new Error("Unauthorized, redirected to login"));
     }
