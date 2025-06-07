@@ -4,10 +4,10 @@ import { type Item } from "../../types/Item";
 
 interface GalleryProps {
   items: Item[];
-  onToggleSelect: (id: string) => void;
-  onToggleFavorite: (id: string) => void;
+  onToggleSelect: (id: number) => void;
+  onToggleFavorite: (id: number) => void;
   selectable: boolean;
-  onClickItem: (id: string) => void;
+  onClickItem: (id: number) => void;
 }
 
 const Gallery: React.FC<GalleryProps> = ({

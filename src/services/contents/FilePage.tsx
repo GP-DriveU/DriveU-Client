@@ -66,7 +66,7 @@ function FilePage() {
     { id: "three", icon: <IconList /> },
   ];
 
-  const handleToggleSelect = (id: string) => {
+  const handleToggleSelect = (id: number) => {
     setItems((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, isSelected: !item.isSelected } : item
@@ -79,7 +79,7 @@ function FilePage() {
     setItems((prev) => prev.map((item) => ({ ...item, isSelected: false })));
   };
 
-  const handleToggleFavorite = (id: string) => {
+  const handleToggleFavorite = (id: number) => {
     setItems((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
@@ -87,7 +87,7 @@ function FilePage() {
     );
   };
 
-  const handleItemClick = (id: string) => {
+  const handleItemClick = (id: number) => {
     navigate(`${id}`);
   };
 
@@ -189,7 +189,6 @@ function FilePage() {
                   s3Path,
                   extension,
                   size: file.size,
-                  tagId: 0, // adjust if needed
                 });
                 
                 await fetch(url, {
@@ -197,11 +196,14 @@ function FilePage() {
                   body: file,
                 });
                 uploaded.push({
-                  id: `${Date.now()}-${file.name}`,
-                  title: file.name,
-                  description: "새로 업로드된 파일입니다.",
+                  id: 0,
                   type: "FILE",
-                  category: "",
+                  title: file.name,
+                  url,
+                  previewLine: "새로 업로드된 파일입니다.",
+                  description: "새로 업로드된 파일입니다.",
+                  extension,
+                  iconType: "FILE",
                   isSelected: false,
                   isFavorite: false,
                 });

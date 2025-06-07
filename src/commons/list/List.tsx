@@ -3,10 +3,10 @@ import { type Item } from "../../types/Item";
 
 interface ListProps {
   items: Item[];
-  onToggleSelect: (id: string) => void;
-  onToggleFavorite: (id: string) => void;
+  onToggleSelect: (id: number) => void;
+  onToggleFavorite: (id: number) => void;
   selectable: boolean;
-  onClickItem: (id: string) => void;
+  onClickItem: (id: number) => void;
 }
 
 const List: React.FC<ListProps> = ({

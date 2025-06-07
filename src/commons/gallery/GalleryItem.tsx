@@ -5,13 +5,14 @@ import IconFavorite from "../../assets/icon/icon_favorite.svg?react";
 import IconDownload from "../../assets/icon/icon_download.svg?react";
 import IconCheck from "../../assets/icon/icon_check.svg?react";
 import Button from "../inputs/Button";
+import { getDownloadPresignedUrl } from "../../api/File";
 
 const GalleryItem: React.FC<{
   item: Item;
-  onToggleSelect: (id: string) => void;
-  onToggleFavorite: (id: string) => void;
+  onToggleSelect: (id: number) => void;
+  onToggleFavorite: (id: number) => void;
   selectable: boolean;
-  onClickItem: (id: string) => void;
+  onClickItem: (id: number) => void;
 }> = ({ item, onToggleSelect, onToggleFavorite, selectable, onClickItem }) => {
   return (
     <div
@@ -71,9 +72,23 @@ const GalleryItem: React.FC<{
         <Button color="primary" size="small" onClick={() => {}}>
           요약
         </Button>
-        <div className="w-[30px] h-[30px] flex items-center justify-center">
+        <button
+          onClick={async (e) => {
+            e.stopPropagation();
+            try {
+              const url = await getDownloadPresignedUrl(Number(item.id));
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = item.title || "file";
+              a.click();
+            } catch (error) {
+              console.error("Download failed:", error);
+            }
+          }}
+          className="w-[30px] h-[30px] flex items-center justify-center"
+        >
           <IconDownload className="w-5 h-5" />
-        </div>
+        </button>
       </div>
     </div>
   );

@@ -28,16 +28,20 @@ function HomePage() {
           data.directories
         );
 
-        const convert = (files: MainPageResponse["recentFiles"]) =>
-          (files ?? []).map((file) => ({
-            id: file.id.toString(),
-            title: file.title,
-            description: file.previewLine,
-            type: (file.type ?? "FILE") as Item["type"],
-            category: file.tag.tagName,
-            isFavorite: file.favorite,
-            isSelected: false,
-          }));
+       const convert = (files: MainPageResponse["recentFiles"]) =>
+         (files ?? []).map((file) => ({
+           id: file.id,
+           title: file.title,
+           previewLine: file.previewLine,
+           description: file.previewLine,
+           type: (file.type ?? "FILE") as Item["type"],
+           category: file.tag?.tagName ?? "",
+           isFavorite: file.favorite,
+           isSelected: false,
+           url: file.url,
+           extension: file.extension,
+           iconType: file.iconType,
+         }));
 
         setRecentItems(convert(data.recentFiles));
         setFavoriteItems(convert(data.favoriteFiles));
@@ -49,7 +53,7 @@ function HomePage() {
     fetchMainPage();
   }, []);
 
-  const handleToggleSelect = (id: string) => {
+  const handleToggleSelect = (id: number) => {
     setRecentItems((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, isSelected: !item.isSelected } : item
@@ -62,7 +66,7 @@ function HomePage() {
     );
   };
 
-  const handleToggleFavorite = (id: string) => {
+  const handleToggleFavorite = (id: number) => {
     setRecentItems((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
@@ -76,14 +80,14 @@ function HomePage() {
   };
 
   //todo : route 고쳐야 함
-  const handleItemClick = (id: string) => {
+  const handleItemClick = (id: number) => {
     navigate(`/study/강의필기/${id}`);
   };
 
   return (
     <div className="w-full flex flex-col">
       <HomeSection />
-      <div className="flex-1 px-6">
+      <div className="flex-1 px-6 py-3">
         <div className="px-4 justify-center text-black text-xl font-semibold font-pretendard">
           최근 업로드한 파일
         </div>
