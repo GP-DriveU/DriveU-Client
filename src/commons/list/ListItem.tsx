@@ -82,10 +82,10 @@ const ListItem: React.FC<{
               const url = await getDownloadPresignedUrl(Number(item.id));
               const a = document.createElement("a");
               a.href = url;
-              const hasExtension = item.title?.endsWith("." + item.extension);
-              a.download = hasExtension
-                ? item.title
-                : `${item.title}.${item.extension}`;
+              const baseTitle = item.title.endsWith(`.${item.extension}`)
+                ? item.title.slice(0, -(item.extension.length + 1))
+                : item.title;
+              a.download = `${baseTitle}.${item.extension}`;
               a.click();
             } catch (error) {
               console.error("Download failed:", error);

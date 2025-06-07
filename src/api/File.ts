@@ -27,7 +27,7 @@ export interface RegisterFileMetaRequest {
   tagId?: string;
 }
 export interface RegisterFileMetaResponse {
-  fileId: string;
+  fileId: number;
 }
 
 export interface ToggleFavoriteResponse {

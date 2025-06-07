@@ -184,7 +184,7 @@ function FilePage() {
                 // s3Path and extension extraction
                 const extension = filenameWithExtension.split(".").pop()?.toUpperCase() ?? "";
                 // Save metadata
-                await registerFileMeta(directoryId, {
+                const { fileId } = await registerFileMeta(directoryId, {
                   title: file.name,
                   s3Path,
                   extension,
@@ -196,7 +196,7 @@ function FilePage() {
                   body: file,
                 });
                 uploaded.push({
-                  id: 0,
+                  id: fileId,
                   type: "FILE",
                   title: file.name,
                   url,
