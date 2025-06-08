@@ -4,6 +4,7 @@ import List from "../../commons/list/List";
 import { useState } from "react";
 import { useEffect } from "react";
 import { getResourcesByDirectory, registerFileMeta } from "../../api/File";
+import { deleteResource } from "../../api/File";
 import AlertModal from "../../commons/modals/AlertModal";
 import ProgressModal from "../../commons/modals/ProgressModal";
 import { useNavigate, useParams } from "react-router-dom";
@@ -31,7 +32,7 @@ function FilePage() {
   const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
-  const [confirmType, setConfirmType] = useState<"upload" | "generate" | null>(null);
+  const [confirmType, setConfirmType] = useState<"upload" | "generate" | "delete" | null>(null);
 
   const navigate = useNavigate();
 
@@ -51,7 +52,6 @@ function FilePage() {
     fetchResources();
   }, [params.directoryId, params.slug, directoryId]);
 
-  // Mock async function for generating questions
   const generateQuestions = async () => {
     setIsLoadingModalOpen(true);
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -74,7 +74,6 @@ function FilePage() {
     );
   };
 
-  // Helper to reset all selections
   const resetSelection = () => {
     setItems((prev) => prev.map((item) => ({ ...item, isSelected: false })));
   };
@@ -161,9 +160,22 @@ function FilePage() {
           onUploadClick={() => {
             setIsUploadOpen(true);
           }}
-          onStartDelete={() => {
-            console.log("삭제 클릭됨");
-            // TODO: 삭제 처리 로직 추가
+          onStartDelete={async () => {
+            const selectedIds = items.filter((item) => item.isSelected).map((item) => item.id);
+            if (selectedIds.length === 0) return;
+
+            setIsLoadingModalOpen(true);
+            try {
+              await Promise.all(selectedIds.map((id) => deleteResource(id)));
+              setItems((prev) => prev.filter((item) => !selectedIds.includes(item.id)));
+              setConfirmType("delete");
+              setIsConfirmModalOpen(true);
+            } catch (error) {
+              console.error("Failed to delete selected items:", error);
+              alert("일부 파일 삭제에 실패했습니다.");
+            } finally {
+              setIsLoadingModalOpen(false);
+            }
           }}
         />
       </div>
@@ -232,11 +244,15 @@ function FilePage() {
           title={
             confirmType === "generate"
               ? "문제 생성이 완료되었습니다."
+              : confirmType === "delete"
+              ? "파일 삭제 완료"
               : "파일 업로드 완료"
           }
           description={
             confirmType === "generate"
               ? "선택한 노트를 기반으로 문제가 생성되었습니다. 생성된 문제를 확인하고 싶으시다면,\n이동 버튼을 클릭해주세요."
+              : confirmType === "delete"
+              ? "선택한 파일이 성공적으로 삭제되었습니다."
               : "파일 업로드가 성공적으로 완료되었습니다."
           }
           onConfirm={() => {
@@ -249,7 +265,9 @@ function FilePage() {
             onCancel: () => setIsConfirmModalOpen(false),
             cancelText: "취소",
           })}
-          confirmText={confirmType === "generate" ? "이동" : "확인"}
+          confirmText={
+            confirmType === "generate" ? "이동" : "확인"
+          }
         />
       )}
     </div>

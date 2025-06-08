@@ -28,7 +28,7 @@ const FABButton: React.FC<{
   const actions = isGenerating
     ? [{ label: "문제 생성" }, { label: "문제 생성 취소" }]
     : isSelecting && !isGenerating
-    ? [{ label: "삭제" }, { label: "삭제 취소" }]
+    ? [{ label: "선택 항목 삭제" }, { label: "삭제 취소" }]
     : [
         { label: "업로드" },
         { label: "삭제" },
@@ -64,8 +64,11 @@ const FABButton: React.FC<{
               } else if (action.label === "삭제") {
                 if (!isSelecting) {
                   onStartSelecting();
-                  onStartDelete();
                 }
+                setIsOpen(false);
+              } else if (action.label === "선택 항목 삭제") {
+                onStartDelete();
+                onCancelSelecting();
                 setIsOpen(false);
               } else if (action.label === "삭제 취소") {
                 onCancelSelecting();
@@ -101,7 +104,7 @@ const FABButton: React.FC<{
             <br />
           </span>
         ) : isSelecting ? (
-          <span className="text-sm font-bold">선택 취소</span>
+          <span className="text-sm font-bold">선택 완료</span>
         ) : (
           <IconFAB />
         )}
