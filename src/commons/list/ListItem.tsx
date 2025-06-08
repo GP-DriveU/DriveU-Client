@@ -1,6 +1,5 @@
 ﻿import React from "react";
 import { getDownloadPresignedUrl } from "../../api/File";
-import { toggleFavoriteResource } from "../../api/File";
 import { type Item } from "../../types/Item";
 import { getIcon } from "../../utils/itemUtils";
 import IconFavorite from "../../assets/icon/icon_favorite.svg?react";
@@ -51,14 +50,9 @@ const ListItem: React.FC<{
           </div>
         </div>
         <div
-          onClick={async (e) => {
+          onClick={(e) => {
             e.stopPropagation();
-            try {
-              await toggleFavoriteResource(item.id);
-              onToggleFavorite(item.id);
-            } catch (error) {
-              console.error("Failed to toggle favorite:", error);
-            }
+            onToggleFavorite(item.id);
           }}
           className="cursor-pointer ml-2 flex-shrink-0 z-10 p-1"
           style={{ userSelect: "none" }}

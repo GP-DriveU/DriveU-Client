@@ -3,7 +3,11 @@ import Gallery from "../../commons/gallery/Gallery";
 import List from "../../commons/list/List";
 import { useState } from "react";
 import { useEffect } from "react";
-import { getResourcesByDirectory, registerFileMeta } from "../../api/File";
+import {
+  getResourcesByDirectory,
+  registerFileMeta,
+  toggleFavoriteResource,
+} from "../../api/File";
 import { deleteResource } from "../../api/File";
 import AlertModal from "../../commons/modals/AlertModal";
 import ProgressModal from "../../commons/modals/ProgressModal";
@@ -99,12 +103,17 @@ function FilePage() {
     setItems((prev) => prev.map((item) => ({ ...item, isSelected: false })));
   };
 
-  const handleToggleFavorite = (id: number) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
-      )
-    );
+  const handleToggleFavorite = async (id: number) => {
+    try {
+      await toggleFavoriteResource(id);
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
+        )
+      );
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error);
+    }
   };
 
   const handleItemClick = (id: number) => {
