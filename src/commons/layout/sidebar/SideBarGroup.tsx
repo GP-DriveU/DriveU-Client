@@ -3,7 +3,9 @@ import SidebarItem from "./SideBarItem";
 import IconAdd from "../../../assets/icon/icon_adddir.svg?react";
 import { createDirectory } from "../../../api/Directory";
 import { useSemesterStore } from "../../../store/useSemesterStore";
+import { useTagStore } from "../../../store/useTagStore";
 import DirectoryAddModal from "../../modals/DirectoryAddModal";
+import { useDirectoryStore } from "../../../store/useDirectoryStore";
 
 interface SidebarGroupProps {
   parent: number;
@@ -25,6 +27,8 @@ const SidebarGroup: React.FC<SidebarGroupProps> = ({
   const [newDirName, setNewDirName] = useState("");
   const currentSemesterId =
     useSemesterStore().getCurrentSemester()?.userSemesterId;
+  const { setSemesterDirectories } = useDirectoryStore.getState();
+  const currentSemester = useSemesterStore.getState();
 
   return (
     <>
@@ -61,12 +65,50 @@ const SidebarGroup: React.FC<SidebarGroupProps> = ({
           try {
             const userSemesterId = currentSemesterId ?? 0;
             const parentDirectoryId = parent;
-            await createDirectory(userSemesterId, {
+            const newDir = await createDirectory(userSemesterId, {
               parentDirectoryId,
               name,
             });
-            const newSlug = `${encodeURIComponent(name)}-temp`;
+
+            const newSlug = `${encodeURIComponent(name)}-${newDir.id}`;
             setItems([...items, { name, slug: newSlug }]);
+            const year = currentSemester.getCurrentSemester()?.year;
+            const term = currentSemester.getCurrentSemester()?.term;
+
+            if (year && term) {
+              setSemesterDirectories(year, term, (prev) =>
+                prev.map((dir) => {
+                  if (dir.id === parentDirectoryId) {
+                    return {
+                      ...dir,
+                      children: [
+                        ...(dir.children ?? []),
+                        {
+                          id: newDir.id,
+                          name: newDir.name,
+                          order: newDir.order,
+                          is_default: false,
+                          children: [],
+                        },
+                      ],
+                    };
+                  }
+                  return dir;
+                })
+              );
+            }
+
+            const { tags, setTags } = useTagStore.getState();
+            const updatedTags = [
+              ...tags,
+              {
+                id: newDir.id,
+                title: name,
+                color: "tag-yellow",
+                parentDirectoryId: parentDirectoryId,
+              },
+            ];
+            setTags(updatedTags);
           } catch (e) {
             console.error(e);
           } finally {

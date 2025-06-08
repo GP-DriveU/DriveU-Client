@@ -18,7 +18,7 @@ interface DirectoryStore {
   setSemesterDirectories: (
     year: number,
     term: string,
-    dirs: DirectoryItem[]
+    dirs: DirectoryItem[] | ((prev: DirectoryItem[]) => DirectoryItem[])
   ) => void;
   setDirectoriesFromServer: (
     semesterData: { year: number; term: string; directories: DirectoryItem[] }[]
@@ -36,12 +36,19 @@ export const useDirectoryStore = create<DirectoryStore>()(
         set({ selectedSemesterKey: key });
       },
       setSemesterDirectories: (year, term, dirs) =>
-        set((state) => ({
-          semesterDirectories: {
-            ...state.semesterDirectories,
-            [getSemesterKey(year, term)]: dirs,
-          },
-        })),
+        set((state) => {
+          const key = getSemesterKey(year, term);
+          const currentDirs = state.semesterDirectories[key] ?? [];
+          const updatedDirs =
+            typeof dirs === "function" ? dirs(currentDirs) : dirs;
+
+          return {
+            semesterDirectories: {
+              ...state.semesterDirectories,
+              [key]: updatedDirs,
+            },
+          };
+        }),
       setDirectoriesFromServer: (semesterData) => {
         const mapped: Record<string, DirectoryItem[]> = {};
 

@@ -13,7 +13,13 @@ export const useTagStore = create<TagState>()(
   persist(
     (set) => ({
       tags: [],
-      setTags: (tags) => set({ tags }),
+      setTags: (tags) =>
+        set((state) => {
+          const isDifferent =
+            tags.length !== state.tags.length ||
+            tags.some((tag, idx) => tag.id !== state.tags[idx]?.id);
+          return isDifferent ? { tags } : {};
+        }),
       disabledTagIds: [],
       setDisabledTagIds: (ids) => set({ disabledTagIds: ids }),
     }),
