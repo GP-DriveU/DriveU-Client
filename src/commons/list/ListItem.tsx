@@ -1,4 +1,6 @@
 ﻿import React from "react";
+import { getDownloadPresignedUrl } from "../../api/File";
+import { toggleFavoriteResource } from "../../api/File";
 import { type Item } from "../../types/Item";
 import { getIcon } from "../../utils/itemUtils";
 import IconFavorite from "../../assets/icon/icon_favorite.svg?react";
@@ -8,10 +10,10 @@ import Button from "../inputs/Button";
 
 const ListItem: React.FC<{
   item: Item;
-  onToggleSelect: (id: string) => void;
-  onToggleFavorite: (id: string) => void;
+  onToggleSelect: (id: number) => void;
+  onToggleFavorite: (id: number) => void;
   selectable: boolean;
-  onClickItem: (id: string) => void;
+  onClickItem: (id: number) => void;
 }> = ({ item, onToggleSelect, onToggleFavorite, selectable, onClickItem }) => {
   return (
     <div
@@ -43,13 +45,20 @@ const ListItem: React.FC<{
             getIcon(item.type)
           )}
         </div>
-        <div className="w-48 font-medium flex flex-col">
-          <div>{item.title}</div>
+        <div className="w-48 font-medium flex flex-col truncate">
+          <div className="truncate" title={item.title}>
+            {item.title}
+          </div>
         </div>
         <div
-          onClick={(e) => {
+          onClick={async (e) => {
             e.stopPropagation();
-            onToggleFavorite(item.id);
+            try {
+              await toggleFavoriteResource(item.id);
+              onToggleFavorite(item.id);
+            } catch (error) {
+              console.error("Failed to toggle favorite:", error);
+            }
           }}
           className="cursor-pointer ml-2 flex-shrink-0 z-10 p-1"
           style={{ userSelect: "none" }}
@@ -58,15 +67,14 @@ const ListItem: React.FC<{
             className={item.isFavorite ? "text-danger" : "text-gray-300"}
           />
         </div>
-        {item.categories.map((category, idx) => (
+        {item.tag && item.tag !== null && (
           <span
-            key={idx}
             className="text-xs text-center outline outline-1 outline-offset-[-1px] outline-tag-yellow bg-tag-yellow/50 text-font px-3 py-0.5 rounded-[5px]"
             style={{ userSelect: "none" }}
           >
-            {category}
+            {item.tag.tagName}
           </span>
-        ))}
+        )}
       </div>
       <div className="flex gap-2 min-w-[200px]">
         <Button color="secondary" size="small" onClick={() => {}}>
@@ -76,26 +84,19 @@ const ListItem: React.FC<{
           요약
         </Button>
         <button
-          onClick={(e) => {
+          onClick={async (e) => {
             e.stopPropagation();
-            if (item.type === "NOTE") {
-              const markdown = "# Example note content\n\nThis is a dummy markdown.";
-              const blob = new Blob([markdown], { type: "text/markdown" });
-              const url = URL.createObjectURL(blob);
+            try {
+              const url = await getDownloadPresignedUrl(Number(item.id));
               const a = document.createElement("a");
               a.href = url;
-              a.download = `${item.title || "note"}.md`;
+              const baseTitle = item.title.endsWith(`.${item.extension}`)
+                ? item.title.slice(0, -(item.extension.length + 1))
+                : item.title;
+              a.download = `${baseTitle}.${item.extension}`;
               a.click();
-              URL.revokeObjectURL(url);
-            } else {
-              const dummyContent = "This is a dummy file from the server.";
-              const blob = new Blob([dummyContent], { type: "application/octet-stream" });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = `${item.title || "file"}.txt`; // TODO: replace `.txt` with actual extension from API
-              a.click();
-              URL.revokeObjectURL(url);
+            } catch (error) {
+              console.error("Download failed:", error);
             }
           }}
           className="w-[30px] h-[30px] flex items-center justify-center"

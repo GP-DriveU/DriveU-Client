@@ -3,7 +3,7 @@ import IconX from "../../assets/icon/icon_x.svg?react";
 
 interface TagItemProps {
   title: string;
-  color: string;
+  color?: string;
   editable?: boolean;
   onRemove?: () => void;
 }

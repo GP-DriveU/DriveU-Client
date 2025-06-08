@@ -17,7 +17,7 @@ function NoteDetailPage() {
   const iconItems = [{ id: "one", icon: <IconEdit /> }];
   const [selectedIconId] = useState<string>();
   const navigate = useNavigate();
-  const dummyTags = [{ title: "객지프", color: "" }];
+  const [tags, _setTags] = useState([]);
 
   const [title, setTitle] = useState("");
   const [markdownContent, setMarkdownContent] = useState("");
@@ -127,7 +127,7 @@ _끝._
       />
       <TextSection
         title="태그"
-        rightElement={<Tag tags={dummyTags} onSave={() => {}} />}
+        rightElement={<Tag tags={tags} onSave={() => {}} />}
       />
       <div className="ml-auto px-10 pt-4">
         <TabBar

@@ -2,6 +2,9 @@
 import Gallery from "../../commons/gallery/Gallery";
 import List from "../../commons/list/List";
 import { useState } from "react";
+import { useEffect } from "react";
+import { getResourcesByDirectory, registerFileMeta } from "../../api/File";
+import { deleteResource } from "../../api/File";
 import AlertModal from "../../commons/modals/AlertModal";
 import ProgressModal from "../../commons/modals/ProgressModal";
 import { useNavigate, useParams } from "react-router-dom";
@@ -12,6 +15,9 @@ import IconGallery from "../../assets/icon/icon_grid.svg?react";
 import IconList from "../../assets/icon/icon_list.svg?react";
 import { useSemesterStore } from "../../store/useSemesterStore";
 import UploadOverlay from "../../commons/modals/UploadOverlay";
+import { getUploadPresignedUrl } from "../../api/File";
+import TagSelectModal from "../../commons/modals/TagSelectModal";
+import { useTagOptions } from "../../hooks/useTagOptions";
 
 function FilePage() {
   const params = useParams();
@@ -20,37 +26,7 @@ function FilePage() {
 
   const { selectedSemesterKey } = useSemesterStore();
 
-  const dummyItems: Item[] = [
-    {
-      id: "1",
-      title: "운영체제_강의노트",
-      description: "최근에 작성된 운영체제 강의노트입니다.",
-      type: "NOTE",
-      categories: ["객지론"],
-      isSelected: false,
-      isFavorite: false,
-    },
-    {
-      id: "2",
-      title: "컴구_과제1",
-      description: "컴퓨터구조 과제입니다.",
-      type: "NOTE",
-      categories: ["객지론"],
-      isSelected: false,
-      isFavorite: true,
-    },
-    {
-      id: "3",
-      title: "알고리즘_정리",
-      description: "알고리즘에 대한 정리입니다.",
-      type: "NOTE",
-      categories: ["객지론"],
-      isSelected: false,
-      isFavorite: true,
-    },
-  ];
-
-  const [items, setItems] = useState<Item[]>(dummyItems);
+  const [items, setItems] = useState<Item[]>([]);
   const [viewMode, setViewMode] = useState<"gallery" | "list">("list");
   const [selectedIconId, setSelectedIconId] = useState<string>("three");
   const [selectableMode, setSelectableMode] = useState(false);
@@ -58,11 +34,32 @@ function FilePage() {
   const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
-  const [confirmType, setConfirmType] = useState<"upload" | "generate" | null>(null);
+  const [confirmType, setConfirmType] = useState<
+    "upload" | "generate" | "delete" | null
+  >(null);
+  const [isTagModalOpen, setIsTagModalOpen] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<FileList | null>(null);
 
   const navigate = useNavigate();
 
-  // Mock async function for generating questions
+  const tagOptions = useTagOptions();
+
+  // Extract directoryId from slug
+  const slugParts = (params.slug ?? "").split("-");
+  const directoryId = Number(slugParts[slugParts.length - 1]);
+
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const response = await getResourcesByDirectory(directoryId);
+        setItems(response);
+      } catch (error) {
+        console.error("Failed to fetch items:", error);
+      }
+    };
+    fetchResources();
+  }, [params.directoryId, params.slug, directoryId]);
+
   const generateQuestions = async () => {
     setIsLoadingModalOpen(true);
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -77,7 +74,7 @@ function FilePage() {
     { id: "three", icon: <IconList /> },
   ];
 
-  const handleToggleSelect = (id: string) => {
+  const handleToggleSelect = (id: number) => {
     setItems((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, isSelected: !item.isSelected } : item
@@ -85,12 +82,11 @@ function FilePage() {
     );
   };
 
-  // Helper to reset all selections
   const resetSelection = () => {
     setItems((prev) => prev.map((item) => ({ ...item, isSelected: false })));
   };
 
-  const handleToggleFavorite = (id: string) => {
+  const handleToggleFavorite = (id: number) => {
     setItems((prev) =>
       prev.map((item) =>
         item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
@@ -98,7 +94,7 @@ function FilePage() {
     );
   };
 
-  const handleItemClick = (id: string) => {
+  const handleItemClick = (id: number) => {
     navigate(`${id}`);
   };
 
@@ -172,32 +168,72 @@ function FilePage() {
           onUploadClick={() => {
             setIsUploadOpen(true);
           }}
-          onStartDelete={() => {
-            console.log("삭제 클릭됨");
-            // TODO: 삭제 처리 로직 추가
+          onStartDelete={async () => {
+            const selectedIds = items
+              .filter((item) => item.isSelected)
+              .map((item) => item.id);
+            if (selectedIds.length === 0) return;
+
+            setIsLoadingModalOpen(true);
+            try {
+              await Promise.all(selectedIds.map((id) => deleteResource(id)));
+              setItems((prev) =>
+                prev.filter((item) => !selectedIds.includes(item.id))
+              );
+              setConfirmType("delete");
+              setIsConfirmModalOpen(true);
+            } catch (error) {
+              console.error("Failed to delete selected items:", error);
+              alert("일부 파일 삭제에 실패했습니다.");
+            } finally {
+              setIsLoadingModalOpen(false);
+            }
           }}
         />
       </div>
-      {isUploadOpen && (
-        <UploadOverlay
-          onClose={() => setIsUploadOpen(false)}
-          onUpload={async (files) => {
-            setIsUploadOpen(false);
+      {isTagModalOpen && (
+        <TagSelectModal
+          isOpen={isTagModalOpen}
+          onClose={() => {
+            setIsTagModalOpen(false);
+            setPendingFiles(null);
+          }}
+          availableTags={tagOptions}
+          onSave={async (selectedTags) => {
+            setIsTagModalOpen(false);
+            if (!pendingFiles || selectedTags.length === 0) return;
             setIsLoadingModalOpen(true);
-
             try {
-              // TODO: Replace with actual API call
-              const uploaded = Array.from(files).map((file, idx) => ({
-                id: `${Date.now()}-${idx}`,
-                title: file.name,
-                description: "새로 업로드된 파일입니다.",
-                type: 'FILE' as Item["type"],
-                categories: [category.replace(/-\d+$/, "")],
-                isSelected: false,
-                isFavorite: false,
-              }));
-
-              await new Promise((resolve) => setTimeout(resolve, 1000)); // mock delay
+              const uploaded: Item[] = [];
+              for (const file of Array.from(pendingFiles)) {
+                const filenameWithExtension = file.name;
+                const { url, s3Path } = await getUploadPresignedUrl({
+                  filename: decodeURIComponent(filenameWithExtension),
+                  fileSize: file.size,
+                });
+                const extension =
+                  filenameWithExtension.split(".").pop()?.toUpperCase() ?? "";
+                const { fileId } = await registerFileMeta(directoryId, {
+                  title: file.name,
+                  s3Path,
+                  extension,
+                  size: file.size,
+                  tagId: selectedTags[0].id,
+                });
+                await fetch(url, { method: "PUT", body: file });
+                uploaded.push({
+                  id: fileId,
+                  type: "FILE",
+                  title: file.name,
+                  url,
+                  previewLine: "새로 업로드된 파일입니다.",
+                  description: "새로 업로드된 파일입니다.",
+                  extension,
+                  iconType: "FILE",
+                  isSelected: false,
+                  isFavorite: false,
+                });
+              }
               setItems((prev) => [...uploaded, ...prev]);
               setIsConfirmModalOpen(true);
               setConfirmType("upload");
@@ -210,11 +246,28 @@ function FilePage() {
           }}
         />
       )}
+      {isUploadOpen && (
+        <UploadOverlay
+          onClose={() => setIsUploadOpen(false)}
+          onUpload={async (files) => {
+            if (!files) return;
+            setIsUploadOpen(false);
+            setPendingFiles(files);
+            setIsTagModalOpen(true);
+          }}
+        />
+      )}
       {isLoadingModalOpen && (
         <ProgressModal
           isOpen={isLoadingModalOpen}
-          title={confirmType === "generate" ? "문제 생성 중..." : "파일 업로드 중..."}
-          description={confirmType === "generate" ? "잠시만 기다려주세요." : "업로드 중입니다. 잠시만 기다려주세요."}
+          title={
+            confirmType === "generate" ? "문제 생성 중..." : "파일 업로드 중..."
+          }
+          description={
+            confirmType === "generate"
+              ? "잠시만 기다려주세요."
+              : "업로드 중입니다. 잠시만 기다려주세요."
+          }
         />
       )}
       {isConfirmModalOpen && (
@@ -222,11 +275,15 @@ function FilePage() {
           title={
             confirmType === "generate"
               ? "문제 생성이 완료되었습니다."
+              : confirmType === "delete"
+              ? "파일 삭제 완료"
               : "파일 업로드 완료"
           }
           description={
             confirmType === "generate"
               ? "선택한 노트를 기반으로 문제가 생성되었습니다. 생성된 문제를 확인하고 싶으시다면,\n이동 버튼을 클릭해주세요."
+              : confirmType === "delete"
+              ? "선택한 파일이 성공적으로 삭제되었습니다."
               : "파일 업로드가 성공적으로 완료되었습니다."
           }
           onConfirm={() => {

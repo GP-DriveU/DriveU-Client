@@ -28,7 +28,7 @@ const baseFetch = async (
   });
 
   if (!res.ok) {
-    if (res.status === 401) {
+    if (res.status === 403) {
       localStorage.removeItem("auth-storage");
       window.location.href = "/login";
       return Promise.reject(new Error("Unauthorized, redirected to login"));
@@ -58,6 +58,12 @@ const http = {
   put: async <T = any>(url: string, body?: any) => {
     return baseFetch(url, {
       method: "PUT",
+      body: JSON.stringify(body),
+    }) as Promise<{ response: T }>;
+  },
+  patch: async <T = any>(url: string, body?: any) => {
+    return baseFetch(url, {
+      method: "PATCH",
       body: JSON.stringify(body),
     }) as Promise<{ response: T }>;
   },

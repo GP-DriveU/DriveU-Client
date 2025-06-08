@@ -2,8 +2,9 @@
 import TagItem from "./TagItem";
 
 interface Tag {
+  id: number;
   title: string;
-  color: string;
+  color?: string;
 }
 
 interface TagGroupProps {
@@ -25,18 +26,27 @@ const Tag: React.FC<TagGroupProps> = ({ tags, onSave }) => {
       "lightblue",
     ];
 
-    const getRandomColor = (usedColors: string[]) => {
-      const filtered = availableColorKeys.filter((c) => !usedColors.includes(c));
-      const pool = filtered.length > 0 ? filtered : availableColorKeys;
-      return pool[Math.floor(Math.random() * pool.length)];
+    const colorMap = new Map<number, string>();
+    const usedColors = new Set<string>();
+
+    const getColorForId = (id: number) => {
+      if (colorMap.has(id)) return colorMap.get(id)!;
+      const available = availableColorKeys.filter((c) => !usedColors.has(c));
+      const color =
+        available.length > 0
+          ? available[Math.floor(Math.random() * available.length)]
+          : availableColorKeys[
+              Math.floor(Math.random() * availableColorKeys.length)
+            ];
+      colorMap.set(id, color);
+      usedColors.add(color);
+      return color;
     };
 
-    const usedColors: string[] = [];
-    const assignedTags = tags.map((tag) => {
-      const color = tag.color || getRandomColor(usedColors);
-      usedColors.push(color);
-      return { ...tag, color };
-    });
+    const assignedTags = tags.map((tag) => ({
+      ...tag,
+      color: tag.color ?? getColorForId(tag.id),
+    }));
 
     setLocalTags(assignedTags);
   }, [tags]);
@@ -55,7 +65,7 @@ const Tag: React.FC<TagGroupProps> = ({ tags, onSave }) => {
       <div className="flex flex-wrap gap-2 items-center">
         {localTags.map((tag, index) => (
           <TagItem
-            key={index}
+            key={tag.id ?? index}
             title={tag.title}
             color={tag.color}
             editable={editMode}
