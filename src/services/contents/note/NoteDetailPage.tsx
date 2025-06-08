@@ -1,9 +1,11 @@
 ﻿import { useState, useEffect } from "react";
+import type { TagData } from "../../../types/tag";
+import { useParams } from "react-router-dom";
+import { getNote } from "../../../api/Note";
 import ProgressModal from "../../../commons/modals/ProgressModal";
 import { useNavigate } from "react-router-dom";
 import TextSection from "../../../commons/section/TextSection";
 import TitleSection from "../../../commons/section/TitleSection";
-import Tag from "../../../commons/tag/Tag";
 import TabBar from "../../../commons/layout/tabbar/TabBar";
 import IconEdit from "../../../assets/icon/icon_edit.svg?react";
 import IconArrowLeft from "../../../assets/icon/icon_arrow_left.svg?react";
@@ -12,12 +14,14 @@ import { getCodeString } from "rehype-rewrite";
 import katex from "katex";
 import "katex/dist/katex.min.css";
 import Button from "../../../commons/inputs/Button";
+import { useTagStore } from "../../../store/useTagStore";
+import TagItem from "../../../commons/tag/TagItem";
 
 function NoteDetailPage() {
   const iconItems = [{ id: "one", icon: <IconEdit /> }];
   const [selectedIconId] = useState<string>();
   const navigate = useNavigate();
-  const [tags, _setTags] = useState([]);
+  const [tags, setTags] = useState<TagData[]>([]);
 
   const [title, setTitle] = useState("");
   const [markdownContent, setMarkdownContent] = useState("");
@@ -25,65 +29,27 @@ function NoteDetailPage() {
   const [aiSummary, setAiSummary] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const { id } = useParams<{ id: string }>();
+
   useEffect(() => {
-    // Simulate API fetch
-    setTitle("객체지향프로그래밍 1주차");
-    const dummyMarkdown = `
-# 객체지향프로그래밍 요약
+    const fetchNote = async () => {
+      try {
+        if (!id) return;
+        const { title, content, tag } = await getNote(Number(id));
+        setTitle(title);
+        setMarkdownContent(content);
+        const allTags = useTagStore.getState().tags;
+        const matchedTag = allTags.find((t) => t.id === Number(tag.tagId));
+        if (matchedTag) {
+          setTags([matchedTag]);
+        }
+      } catch (error) {
+        console.error("노트 불러오기 실패:", error);
+      }
+    };
 
-## 개념 요약
-
-**클래스**는 객체를 생성하기 위한 설계도이며, **객체**는 클래스의 인스턴스입니다.
-
-### 주요 특징
-
-1. **캡슐화 (Encapsulation)**
-   - 내부 구현을 숨기고 인터페이스만 공개합니다.
-
-2. **상속 (Inheritance)**
-   - 기존 클래스를 확장하여 새로운 클래스를 생성합니다.
-
-3. **다형성 (Polymorphism)**
-   - 동일한 인터페이스로 다양한 동작을 구현합니다.
-
----
-
-> 💡 **참고**: 상속을 사용할 때는 의존성 관계를 주의해야 합니다.
-
-This is to display the 
-\`\$\$\c = \\pm\\sqrt{a^2 + b^2}\$\$\`
- in one line
-
-\`\`\`KaTeX
-c = \\pm\\sqrt{a^2 + b^2}
-\`\`\`
-
-\`\`\`ts
-class Animal {
-  speak() {
-    console.log("Animal sound");
-  }
-}
-
-class Dog extends Animal {
-  speak() {
-    console.log("Bark!");
-  }
-}
-\`\`\`
-
-| 개념 | 설명 |
-|------|------|
-| 클래스 | 객체를 만들기 위한 청사진 |
-| 객체 | 클래스로부터 생성된 인스턴스 |
-
-- [x] 상속 예제 확인
-- [ ] 추상 클래스 예제 작성 필요
-
-_끝._
-    `;
-    setMarkdownContent(dummyMarkdown);
-  }, []);
+    fetchNote();
+  }, [id]);
 
   useEffect(() => {
     if (selectedIndex === 1) {
@@ -127,7 +93,13 @@ _끝._
       />
       <TextSection
         title="태그"
-        rightElement={<Tag tags={tags} onSave={() => {}} />}
+        rightElement={
+          tags.length > 0 ? (
+            <TagItem title={tags[0].title} color={tags[0].color} />
+          ) : (
+            <div className="text-font text-md">설정된 태그가 없습니다.</div>
+          )
+        }
       />
       <div className="ml-auto px-10 pt-4">
         <TabBar

@@ -1,5 +1,6 @@
 ﻿import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { createNote } from "../../../api/Note";
+import { useNavigate, useParams } from "react-router-dom";
 import IconArrowLeft from "../../../assets/icon/icon_arrow_left.svg?react";
 import TextSection from "../../../commons/section/TextSection";
 import MDEditor from "@uiw/react-md-editor";
@@ -12,10 +13,12 @@ import { useTagStore } from "../../../store/useTagStore";
 
 function NoteWritePage() {
   const navigate = useNavigate();
-  const location = useLocation();
+  const { slug } = useParams();
+  const directoryId = Number(slug?.split("-").pop());
   const [content, setContent] = useState("");
-  const [title, setTitle] = useState(location.state?.title || "");
-  const { tags } = useTagStore();
+  const [title, setTitle] = useState("");
+  const allTags = useTagStore((state) => state.tags);
+  const tags = allTags.filter((tag) => tag.id !== directoryId);
 
   return (
     <div className="w-full flex bg-white flex-col">
@@ -34,7 +37,6 @@ function NoteWritePage() {
           />
         }
       />
-
       <TextSection
         title="태그"
         rightElement={<Tag tags={tags} onSave={() => {}} />}
@@ -102,9 +104,19 @@ function NoteWritePage() {
           size="medium"
           color="primary"
           onClick={async () => {
-            // TODO: replace with actual API call
-            alert("필기 노트 작성이 완료되었습니다.");
-            navigate(-1);
+            try {
+              const selectedTag = tags[0];
+              await createNote(directoryId, {
+                title,
+                content,
+                tagId: selectedTag?.id,
+              });
+              alert("필기 노트 작성이 완료되었습니다.");
+              navigate(-1);
+            } catch (error) {
+              console.error("노트 생성 실패:", error);
+              alert("노트 생성에 실패했습니다.");
+            }
           }}
         >
           작성 완료
