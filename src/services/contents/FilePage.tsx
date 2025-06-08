@@ -46,10 +46,20 @@ function FilePage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const tagOptions = useTagOptions();
+  useEffect(() => {
+    if (location.state?.openFab) {
+      resetSelection();
+      setIsGenerating(true);
+      setSelectableMode(true);
+    }
+  }, [location.state]);
 
   const slugParts = (params.slug ?? "").split("-");
   const directoryId = Number(slugParts[slugParts.length - 1]);
+  const allTags = useTagOptions();
+  const tagOptions = allTags.filter(
+    (tag) => tag.parentDirectoryId !== directoryId
+  );
 
   useEffect(() => {
     const fetchResources = async () => {

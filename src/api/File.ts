@@ -24,7 +24,7 @@ export interface RegisterFileMetaRequest {
   s3Path: string;
   extension: string;
   size: number;
-  tagId?: number;
+  tagId?: number | null;
 }
 export interface RegisterFileMetaResponse {
   fileId: number;
