@@ -51,14 +51,16 @@ function OAuthCallback() {
         ];
         const tagItems = directories
           .filter((dir) => dir.name === "학업" || dir.name === "과목")
-          .flatMap((dir) => dir.children ?? [])
-          .map((child, index) => ({
-            id: child.id,
-            title: child.name,
-            color: `tag-${
-              availableColorKeys[index % availableColorKeys.length]
-            }`,
-          }));
+          .flatMap((dir) =>
+            (dir.children ?? []).map((child, index) => ({
+              id: child.id,
+              title: child.name,
+              color: `tag-${
+                availableColorKeys[index % availableColorKeys.length]
+              }`,
+              parentDirectoryId: dir.id,
+            }))
+          );
         useTagStore.getState().setTags(tagItems);
         navigate("/", { replace: true });
       })
