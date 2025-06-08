@@ -41,15 +41,25 @@ function OAuthCallback() {
             directories,
           },
         ]);
-        useTagStore.getState().setTags(
-          directories
-            .flatMap((dir) => dir.children ?? [])
-            .map((child) => ({
-              id: child.id,
-              title: child.name,
-              color: "#A1A1AA",
-            }))
-        );
+        const availableColorKeys = [
+          "yellow",
+          "green",
+          "orange",
+          "red",
+          "gray",
+          "lightblue",
+        ];
+        const tagItems = directories
+          .filter((dir) => dir.name === "학업" || dir.name === "과목")
+          .flatMap((dir) => dir.children ?? [])
+          .map((child, index) => ({
+            id: child.id,
+            title: child.name,
+            color: `tag-${
+              availableColorKeys[index % availableColorKeys.length]
+            }`,
+          }));
+        useTagStore.getState().setTags(tagItems);
         navigate("/", { replace: true });
       })
       .catch(() => {

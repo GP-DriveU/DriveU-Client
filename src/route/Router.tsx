@@ -12,6 +12,7 @@ import QuestionListPage from "../services/question/QuestionListPage";
 import QuestionDetailPage from "../services/question/QuestionDetailPage";
 import FilePage from "../services/contents/FilePage";
 import FileDetailPage from "../services/contents/FileDetailPage";
+import NoteWritePage from "../services/contents/note/NoteWritePage";
 
 function Router() {
   const { user } = useAuthStore();
@@ -71,7 +72,7 @@ function Router() {
           }
         />
       </Route>
-      
+
       <Route path="subject">
         <Route
           path=":slug"
@@ -113,6 +114,14 @@ function Router() {
           element={
             <AppLayout>
               <StudyEditPage />
+            </AppLayout>
+          }
+        />
+        <Route
+          path=":slug/new"
+          element={
+            <AppLayout>
+              <NoteWritePage />
             </AppLayout>
           }
         />

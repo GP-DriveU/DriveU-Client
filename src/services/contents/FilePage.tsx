@@ -7,7 +7,7 @@ import { getResourcesByDirectory, registerFileMeta } from "../../api/File";
 import { deleteResource } from "../../api/File";
 import AlertModal from "../../commons/modals/AlertModal";
 import ProgressModal from "../../commons/modals/ProgressModal";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import FABButton from "../../commons/fab/FABButton";
 import TitleSection from "../../commons/section/TitleSection";
 import IconFilter from "../../assets/icon/icon_filter.svg?react";
@@ -21,7 +21,6 @@ import { useTagOptions } from "../../hooks/useTagOptions";
 
 function FilePage() {
   const params = useParams();
-  console.log(params);
   const category = params.slug ?? "파일";
 
   const { selectedSemesterKey } = useSemesterStore();
@@ -41,10 +40,10 @@ function FilePage() {
   const [pendingFiles, setPendingFiles] = useState<FileList | null>(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   const tagOptions = useTagOptions();
 
-  // Extract directoryId from slug
   const slugParts = (params.slug ?? "").split("-");
   const directoryId = Number(slugParts[slugParts.length - 1]);
 
@@ -188,6 +187,9 @@ function FilePage() {
             } finally {
               setIsLoadingModalOpen(false);
             }
+          }}
+          onWriteNoteClick={() => {
+            navigate(`${location.pathname}/new`);
           }}
         />
       </div>
