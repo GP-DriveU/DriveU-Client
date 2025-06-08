@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect } from "react";
+import { createNoteSummary, getNoteSummary } from "../../../api/Summary";
 import type { TagData } from "../../../types/tag";
 import { useParams } from "react-router-dom";
 import { getNote } from "../../../api/Note";
@@ -38,10 +39,14 @@ function NoteDetailPage() {
         const { title, content, tag } = await getNote(Number(id));
         setTitle(title);
         setMarkdownContent(content);
+
         const allTags = useTagStore.getState().tags;
-        const matchedTag = allTags.find((t) => t.id === Number(tag.tagId));
-        if (matchedTag) {
-          setTags([matchedTag]);
+
+        if (tag && tag.tagId !== undefined && tag.tagId !== null) {
+          const matchedTag = allTags.find((t) => t.id === Number(tag.tagId));
+          if (matchedTag) {
+            setTags([matchedTag]);
+          }
         }
       } catch (error) {
         console.error("노트 불러오기 실패:", error);
@@ -59,21 +64,25 @@ function NoteDetailPage() {
 
   const fetchAiSummary = async () => {
     try {
-      // TODO: Replace with real API call from src/api/note.ts or similar
-      // const response = await getAiSummary(id);
-      // setAiSummary(response.data.content);
-      setAiSummary(""); // temporary placeholder
+      if (!id) return;
+      const response = await getNoteSummary(Number(id));
+      setAiSummary(response.summary);
     } catch (error) {
       console.error("AI 요약 불러오기 실패:", error);
     }
   };
 
-  const handleGenerateAiSummary = () => {
+  const handleGenerateAiSummary = async () => {
+    if (!id) return;
     setLoading(true);
-    setTimeout(() => {
-      setAiSummary("이것은 서버에서 받아온 AI 요약입니다."); // TODO: Replace with API result
+    try {
+      const response = await createNoteSummary(Number(id));
+      setAiSummary(response.summary);
+    } catch (error) {
+      console.error("AI 요약 생성 실패:", error);
+    } finally {
       setLoading(false);
-    }, 2000); // simulate API delay
+    }
   };
 
   return (
@@ -101,7 +110,9 @@ function NoteDetailPage() {
           tags.length > 0 ? (
             <TagItem title={tags[0].title} color={tags[0].color} />
           ) : (
-            <div className="text-font text-md">설정된 태그가 없습니다.</div>
+            <div className="py-1 text-font text-md">
+              설정된 태그가 없습니다.
+            </div>
           )
         }
       />
@@ -116,7 +127,7 @@ function NoteDetailPage() {
           title="내용"
           rightElement={
             <div
-              className="prose prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded max-w-none font-pretendard rounded-[10px] outline outline-[0.80px] outline-offset-[-0.80px] outline-font p-4 bg-white"
+              className="prose prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded max-w-none font-pretendard text-black rounded-[10px] outline outline-[0.80px] outline-offset-[-0.80px] outline-font p-4 bg-white"
               data-color-mode="light"
             >
               <div className="wmde-markdown-var [&_.wmde-markdown]:bg-white">
@@ -178,9 +189,64 @@ function NoteDetailPage() {
           title="내용"
           rightElement={
             <>
-              <div className="p-4 bg-white outline outline-[0.80px] outline-offset-[-0.80px] outline-font rounded-[10px]">
+              <div
+                className="prose prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-1 prose-code:rounded max-w-none font-pretendard text-black rounded-[10px] outline outline-[0.80px] outline-offset-[-0.80px] outline-font p-4 bg-white"
+                data-color-mode="light"
+              >
                 {aiSummary ? (
-                  <p>{aiSummary}</p>
+                  <div className="wmde-markdown-var [&_.wmde-markdown]:bg-white">
+                    <MDEditor.Markdown
+                      source={aiSummary}
+                      components={{
+                        code({ children = [], className, ...props }) {
+                          const code =
+                            props.node && props.node.children
+                              ? getCodeString(props.node.children)
+                              : children;
+
+                          if (
+                            typeof code === "string" &&
+                            /^\$\$(.*)\$\$/.test(code)
+                          ) {
+                            const html = katex.renderToString(
+                              code.replace(/^\$\$(.*)\$\$/, "$1"),
+                              {
+                                throwOnError: false,
+                              }
+                            );
+                            return (
+                              <code
+                                dangerouslySetInnerHTML={{ __html: html }}
+                                style={{ background: "transparent" }}
+                              />
+                            );
+                          }
+
+                          if (
+                            typeof code === "string" &&
+                            typeof className === "string" &&
+                            /^language-katex/.test(className.toLowerCase())
+                          ) {
+                            const html = katex.renderToString(code, {
+                              throwOnError: false,
+                            });
+                            return (
+                              <code
+                                dangerouslySetInnerHTML={{ __html: html }}
+                                style={{ fontSize: "150%" }}
+                              />
+                            );
+                          }
+
+                          return (
+                            <code className={String(className)}>
+                              {children}
+                            </code>
+                          );
+                        },
+                      }}
+                    />
+                  </div>
                 ) : (
                   <p className="h-24 flex flex-col font-bold justify-center items-center">
                     아직 생성된 AI 요약이 없습니다
