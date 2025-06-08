@@ -28,7 +28,7 @@ const baseFetch = async (
   });
 
   if (!res.ok) {
-    if (res.status === 401) {
+    if (res.status === 403) {
       localStorage.removeItem("auth-storage");
       window.location.href = "/login";
       return Promise.reject(new Error("Unauthorized, redirected to login"));
