@@ -3,11 +3,15 @@ import Gallery from "../../commons/gallery/Gallery";
 import List from "../../commons/list/List";
 import { useState } from "react";
 import { useEffect } from "react";
-import { getResourcesByDirectory, registerFileMeta } from "../../api/File";
+import {
+  getResourcesByDirectory,
+  registerFileMeta,
+  toggleFavoriteResource,
+} from "../../api/File";
 import { deleteResource } from "../../api/File";
 import AlertModal from "../../commons/modals/AlertModal";
 import ProgressModal from "../../commons/modals/ProgressModal";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import FABButton from "../../commons/fab/FABButton";
 import TitleSection from "../../commons/section/TitleSection";
 import IconFilter from "../../assets/icon/icon_filter.svg?react";
@@ -21,7 +25,6 @@ import { useTagOptions } from "../../hooks/useTagOptions";
 
 function FilePage() {
   const params = useParams();
-  console.log(params);
   const category = params.slug ?? "파일";
 
   const { selectedSemesterKey } = useSemesterStore();
@@ -41,18 +44,42 @@ function FilePage() {
   const [pendingFiles, setPendingFiles] = useState<FileList | null>(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const tagOptions = useTagOptions();
+  useEffect(() => {
+    if (location.state?.openFab) {
+      resetSelection();
+      setIsGenerating(true);
+      setSelectableMode(true);
+    }
+  }, [location.state]);
 
-  // Extract directoryId from slug
   const slugParts = (params.slug ?? "").split("-");
   const directoryId = Number(slugParts[slugParts.length - 1]);
+  const allTags = useTagOptions();
+  const tagOptions = allTags.filter(
+    (tag) => tag.parentDirectoryId !== directoryId
+  );
 
   useEffect(() => {
     const fetchResources = async () => {
       try {
         const response = await getResourcesByDirectory(directoryId);
-        setItems(response);
+        setItems(
+          response.map((item: any) => ({
+            id: item.id,
+            type: item.type,
+            title: item.title,
+            url: item.url,
+            previewLine: item.previewLine,
+            description: item.previewLine,
+            extension: item.extension ?? "",
+            iconType: item.iconType ?? item.type,
+            isSelected: false,
+            isFavorite: item.favorite ?? false,
+            tag: item.tag ?? null,
+          }))
+        );
       } catch (error) {
         console.error("Failed to fetch items:", error);
       }
@@ -86,12 +113,17 @@ function FilePage() {
     setItems((prev) => prev.map((item) => ({ ...item, isSelected: false })));
   };
 
-  const handleToggleFavorite = (id: number) => {
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
-      )
-    );
+  const handleToggleFavorite = async (id: number) => {
+    try {
+      await toggleFavoriteResource(id);
+      setItems((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
+        )
+      );
+    } catch (error) {
+      console.error("Failed to toggle favorite:", error);
+    }
   };
 
   const handleItemClick = (id: number) => {
@@ -188,6 +220,9 @@ function FilePage() {
             } finally {
               setIsLoadingModalOpen(false);
             }
+          }}
+          onWriteNoteClick={() => {
+            navigate(`${location.pathname}/new`);
           }}
         />
       </div>

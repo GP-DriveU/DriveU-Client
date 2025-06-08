@@ -12,38 +12,7 @@ const Tag: React.FC<TagGroupProps> = ({ tags, onSave }) => {
   const [localTags, setLocalTags] = useState<TagData[]>([]);
 
   useEffect(() => {
-    const availableColorKeys = [
-      "yellow",
-      "green",
-      "orange",
-      "red",
-      "gray",
-      "lightblue",
-    ];
-
-    const colorMap = new Map<number, string>();
-    const usedColors = new Set<string>();
-
-    const getColorForId = (id: number) => {
-      if (colorMap.has(id)) return colorMap.get(id)!;
-      const available = availableColorKeys.filter((c) => !usedColors.has(c));
-      const color =
-        available.length > 0
-          ? available[Math.floor(Math.random() * available.length)]
-          : availableColorKeys[
-              Math.floor(Math.random() * availableColorKeys.length)
-            ];
-      colorMap.set(id, color);
-      usedColors.add(color);
-      return color;
-    };
-
-    const assignedTags = tags.map((tag) => ({
-      ...tag,
-      color: tag.color ?? getColorForId(tag.id),
-    }));
-
-    setLocalTags(assignedTags);
+    setLocalTags(tags);
   }, [tags]);
 
   const handleRemove = (index: number) => {

@@ -1,5 +1,6 @@
 ﻿import { useState } from "react";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { createNote } from "../../../api/Note";
+import { useNavigate, useParams } from "react-router-dom";
 import IconArrowLeft from "../../../assets/icon/icon_arrow_left.svg?react";
 import TextSection from "../../../commons/section/TextSection";
 import MDEditor from "@uiw/react-md-editor";
@@ -7,39 +8,18 @@ import { getCodeString } from "rehype-rewrite";
 import katex from "katex";
 import "katex/dist/katex.min.css";
 import Button from "../../../commons/inputs/Button";
-import {
-  updateNoteTitle,
-  updateNoteTag,
-  updateNoteContent,
-} from "../../../api/Note";
 import { useTagStore } from "../../../store/useTagStore";
-import type { TagData } from "../../../types/tag";
 import TagItem from "../../../commons/tag/TagItem";
+import type { TagData } from "../../../types/tag";
 
-function NoteEditPage() {
+function NoteWritePage() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { id } = useParams<{ id: string }>();
-  const { slug } = useParams<{ slug: string }>();
+  const { slug } = useParams();
   const directoryId = Number(slug?.split("-").pop());
-  const noteId = Number(id);
+  const [content, setContent] = useState("");
+  const [title, setTitle] = useState("");
   const allTags = useTagStore((state) => state.tags);
-
-  const originalTitle = location.state?.title || "";
-  const originalContent = location.state?.markdownContent || "";
-  const originalTagId = location.state?.tagId ?? null;
-
-  const [title, setTitle] = useState(originalTitle);
-  const [content, setContent] = useState(originalContent);
-  const [selectedTag, setSelectedTag] = useState<TagData | null>(() => {
-    console.log("originalTagId:", originalTagId);
-    console.log(
-      "matched tag:",
-      allTags.find((t) => t.id === originalTagId)
-    );
-    if (originalTagId === null) return null;
-    return allTags.find((t) => t.id === originalTagId) ?? null;
-  });
+  const [selectedTag, setSelectedTag] = useState<TagData | null>(null);
 
   return (
     <div className="w-full flex bg-white flex-col">
@@ -54,7 +34,7 @@ function NoteEditPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="shadow appearance-none border bg-[#ffffff] rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-            placeholder={title}
+            placeholder="제목을 입력하세요"
           />
         }
       />
@@ -157,34 +137,24 @@ function NoteEditPage() {
           color="primary"
           onClick={async () => {
             try {
-              if (!noteId) return;
-              const id = Number(noteId);
-              if (title !== originalTitle) {
-                await updateNoteTitle(id, title);
-              }
-              if ((originalTagId ?? null) !== (selectedTag?.id ?? null)) {
-                await updateNoteTag(
-                  id,
-                  originalTagId ?? null,
-                  selectedTag?.id ?? null
-                );
-              }
-              if (content !== originalContent) {
-                await updateNoteContent(id, content);
-              }
-              alert("필기 수정이 완료되었습니다.");
+              await createNote(directoryId, {
+                title,
+                content,
+                tagId: selectedTag?.id ?? null,
+              });
+              alert("필기 노트 작성이 완료되었습니다.");
               navigate(-1);
             } catch (error) {
-              console.error("수정 실패:", error);
-              alert("수정에 실패했습니다.");
+              console.error("노트 생성 실패:", error);
+              alert("노트 생성에 실패했습니다.");
             }
           }}
         >
-          필기 수정 완료
+          작성 완료
         </Button>
       </div>
     </div>
   );
 }
 
-export default NoteEditPage;
+export default NoteWritePage;

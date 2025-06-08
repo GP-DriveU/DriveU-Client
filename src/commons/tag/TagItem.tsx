@@ -16,7 +16,7 @@ const TagItem: React.FC<TagItemProps> = ({
 }) => {
   return (
     <div
-      className={`inline-flex items-center h-[27px] px-3 rounded-[10px] outline outline-1 outline-offset-[-1px] bg-tag-${color}/50 outline-tag-${color}`}
+      className={`inline-flex items-center h-[27px] px-3 rounded-[10px] outline outline-1 outline-offset-[-1px] bg-${color}/50 outline-${color}`}
     >
       <span className="text-font text-sm font-normal font-['Inter'] whitespace-nowrap">
         {title}

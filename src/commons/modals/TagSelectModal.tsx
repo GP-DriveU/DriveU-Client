@@ -15,8 +15,11 @@ const TagSelectModal: React.FC<TagSelectModalProps> = ({
   onClose,
   onSave,
   availableTags,
+  initialTags,
 }) => {
-  const [selectedTags, setSelectedTags] = useState<TagData[]>([]);
+  const [selectedTags, setSelectedTags] = useState<TagData[]>(
+    initialTags ?? []
+  );
 
   if (!isOpen) return null;
 

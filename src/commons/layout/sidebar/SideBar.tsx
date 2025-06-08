@@ -55,8 +55,9 @@ const Sidebar: React.FC = () => {
             return (
               <SidebarGroup
                 key={dir.id}
+                parent={dir.id}
                 title={`${route.emoji} ${dir.name}`}
-                items={items}
+                initialItems={items}
                 basePath={`/${route.slug}`}
                 currentPath={location.pathname}
               />
