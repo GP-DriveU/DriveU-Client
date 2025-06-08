@@ -51,7 +51,21 @@ function FilePage() {
     const fetchResources = async () => {
       try {
         const response = await getResourcesByDirectory(directoryId);
-        setItems(response);
+        setItems(
+          response.map((item: any) => ({
+            id: item.id,
+            type: item.type,
+            title: item.title,
+            url: item.url,
+            previewLine: item.previewLine,
+            description: item.previewLine,
+            extension: item.extension ?? "",
+            iconType: item.iconType ?? item.type,
+            isSelected: false,
+            isFavorite: item.favorite ?? false,
+            tag: item.tag ?? null,
+          }))
+        );
       } catch (error) {
         console.error("Failed to fetch items:", error);
       }
