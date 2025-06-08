@@ -55,12 +55,9 @@ function HomeSection() {
         <Button
           size="medium"
           color="secondary"
-          onClick={() => {
-            setIsDirectoryModalOpen(true);
-            setConfirmType("generate");
-          }}
+          onClick={() => navigate("/question")}
         >
-          AI 문제 만들기
+          생성된 AI 문제
         </Button>
       </div>
       {isUploadOpen && (
@@ -98,26 +95,9 @@ function HomeSection() {
                         color="primary"
                         size="small"
                         onClick={() => {
-                          if (confirmType === "upload") {
-                            setSelectedDirectoryId(childDir.id);
-                            setIsDirectoryModalOpen(false);
-                            setIsUploadOpen(true);
-                          } else {
-                            setSelectedDirectoryId(childDir.id);
-                            setIsDirectoryModalOpen(false);
-                            navigate(
-                              `/${
-                                parentDir.name === "학업"
-                                  ? "study"
-                                  : parentDir.name === "과목"
-                                  ? "subject"
-                                  : parentDir.name
-                              }/${childDir.name}-${childDir.id}`,
-                              {
-                                state: { openFab: true },
-                              }
-                            );
-                          }
+                          setSelectedDirectoryId(childDir.id);
+                          setIsDirectoryModalOpen(false);
+                          setIsUploadOpen(true);
                         }}
                       >
                         {childDir.name}

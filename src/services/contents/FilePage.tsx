@@ -22,6 +22,8 @@ import UploadOverlay from "../../commons/modals/UploadOverlay";
 import { getUploadPresignedUrl } from "../../api/File";
 import TagSelectModal from "../../commons/modals/TagSelectModal";
 import { useTagOptions } from "../../hooks/useTagOptions";
+import { generateQuestions as generateQuestionsApi } from "../../api/Question";
+import { useDirectoryStore } from "../../store/useDirectoryStore";
 
 function FilePage() {
   const params = useParams();
@@ -38,7 +40,7 @@ function FilePage() {
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [confirmType, setConfirmType] = useState<
-    "upload" | "generate" | "delete" | null
+    "upload" | "generateQuestion" | "delete" | null
   >(null);
   const [isTagModalOpen, setIsTagModalOpen] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<FileList | null>(null);
@@ -54,11 +56,42 @@ function FilePage() {
     }
   }, [location.state]);
 
-  const slugParts = (params.slug ?? "").split("-");
-  const directoryId = Number(slugParts[slugParts.length - 1]);
+  const { pathname } = useLocation();
+  const pathSegments = pathname.split("/").filter(Boolean);
+  const slug = params.slug ?? "";
+  const slugParts = slug.split("-");
+  const slugPrefix = pathSegments[pathSegments.length - 2];
+
+  const { getCurrentDirectories } = useDirectoryStore.getState();
+  const currentDirs = getCurrentDirectories();
+
+  const resolveDirectoryId = (prefix: string, id: number): number => {
+    const map: Record<string, string> = {
+      study: "학업",
+      subject: "과목",
+    };
+    const translated = map[prefix];
+    if (!translated) return id;
+
+    const baseDir = currentDirs.find((dir) => dir.name === translated);
+    if (!baseDir) return id;
+
+    const subDir = baseDir.children?.find((child) => child.id === id);
+    return subDir ? subDir.id : id;
+  };
+
+  const directoryId = resolveDirectoryId(slugPrefix, Number(slugParts[1]));
   const allTags = useTagOptions();
+  const baseDir = currentDirs.find((dir) => {
+    const map: Record<string, string> = {
+      study: "학업",
+      subject: "과목",
+    };
+    return dir.name === map[slugPrefix];
+  });
+
   const tagOptions = allTags.filter(
-    (tag) => tag.parentDirectoryId !== directoryId
+    (tag) => tag.parentDirectoryId !== baseDir?.id
   );
 
   useEffect(() => {
@@ -89,10 +122,29 @@ function FilePage() {
 
   const generateQuestions = async () => {
     setIsLoadingModalOpen(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsLoadingModalOpen(false);
-    setIsConfirmModalOpen(true);
-    setConfirmType("generate");
+    setConfirmType("generateQuestion");
+    try {
+      const selectedItems = items.filter(
+        (item) =>
+          item.isSelected && (item.type === "FILE" || item.type === "NOTE")
+      );
+      const requestPayload = selectedItems.map((item) => ({
+        resourceId: item.id,
+        type: item.type as "FILE" | "NOTE",
+        tagId: Number(item.tag?.tagId),
+      }));
+      const res = await generateQuestionsApi(directoryId, requestPayload);
+      setConfirmType("generateQuestion");
+      setIsConfirmModalOpen(true);
+
+      // Save questionId temporarily for navigation later
+      sessionStorage.setItem("generatedQuestionId", String(res.questionId));
+    } catch (e) {
+      console.error("문제 생성 실패", e);
+      alert("문제 생성에 실패했습니다.");
+    } finally {
+      setIsLoadingModalOpen(false);
+    }
   };
 
   const iconItems = [
@@ -201,12 +253,13 @@ function FilePage() {
             setIsUploadOpen(true);
           }}
           onStartDelete={async () => {
+            setConfirmType("delete");
+            setIsLoadingModalOpen(true);
             const selectedIds = items
               .filter((item) => item.isSelected)
               .map((item) => item.id);
             if (selectedIds.length === 0) return;
 
-            setIsLoadingModalOpen(true);
             try {
               await Promise.all(selectedIds.map((id) => deleteResource(id)));
               setItems((prev) =>
@@ -235,9 +288,10 @@ function FilePage() {
           }}
           availableTags={tagOptions}
           onSave={async (selectedTags) => {
+            setConfirmType("upload");
+            setIsLoadingModalOpen(true);
             setIsTagModalOpen(false);
             if (!pendingFiles || selectedTags.length === 0) return;
-            setIsLoadingModalOpen(true);
             try {
               const uploaded: Item[] = [];
               for (const file of Array.from(pendingFiles)) {
@@ -296,11 +350,17 @@ function FilePage() {
         <ProgressModal
           isOpen={isLoadingModalOpen}
           title={
-            confirmType === "generate" ? "문제 생성 중..." : "파일 업로드 중..."
+            confirmType === "generateQuestion"
+              ? "문제 생성 중..."
+              : confirmType === "delete"
+              ? "파일 삭제 중..."
+              : "파일 업로드 중..."
           }
           description={
-            confirmType === "generate"
-              ? "잠시만 기다려주세요."
+            confirmType === "generateQuestion"
+              ? "잠시만 기다려주세요. AI가 문제를 생성하고 있어요."
+              : confirmType === "delete"
+              ? "삭제 중입니다. 잠시만 기다려주세요."
               : "업로드 중입니다. 잠시만 기다려주세요."
           }
         />
@@ -308,30 +368,40 @@ function FilePage() {
       {isConfirmModalOpen && (
         <AlertModal
           title={
-            confirmType === "generate"
+            confirmType === "generateQuestion"
               ? "문제 생성이 완료되었습니다."
               : confirmType === "delete"
               ? "파일 삭제 완료"
               : "파일 업로드 완료"
           }
           description={
-            confirmType === "generate"
+            confirmType === "generateQuestion"
               ? "선택한 노트를 기반으로 문제가 생성되었습니다. 생성된 문제를 확인하고 싶으시다면,\n이동 버튼을 클릭해주세요."
               : confirmType === "delete"
               ? "선택한 파일이 성공적으로 삭제되었습니다."
               : "파일 업로드가 성공적으로 완료되었습니다."
           }
-          onConfirm={() => {
-            setIsConfirmModalOpen(false);
-            if (confirmType === "generate") {
-              navigate("/question/1"); // TODO: replace with real ID
-            }
-          }}
+          onConfirm={
+            confirmType === "generateQuestion"
+              ? () => {
+                  setIsConfirmModalOpen(false);
+                  const questionId = sessionStorage.getItem(
+                    "generatedQuestionId"
+                  );
+                  if (questionId) {
+                    navigate(`/question/${questionId}`);
+                    sessionStorage.removeItem("generatedQuestionId");
+                  }
+                }
+              : () => {
+                  setIsConfirmModalOpen(false);
+                }
+          }
           {...(confirmType !== "upload" && {
             onCancel: () => setIsConfirmModalOpen(false),
             cancelText: "취소",
           })}
-          confirmText={confirmType === "generate" ? "이동" : "확인"}
+          confirmText={confirmType === "generateQuestion" ? "이동" : "확인"}
         />
       )}
     </div>
