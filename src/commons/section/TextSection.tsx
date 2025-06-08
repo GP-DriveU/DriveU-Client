@@ -7,7 +7,7 @@ interface TextSectionProps {
 
 const TextSection: React.FC<TextSectionProps> = ({ title, rightElement }) => {
   return (
-    <div className="flex gap-6 w-full px-10 pb-6 items-center">
+    <div className="flex gap-6 w-full px-10 pb-6 items-start">
       <div className="text-font text-2xl items-start font-semibold font-pretendard">
         {title}
       </div>

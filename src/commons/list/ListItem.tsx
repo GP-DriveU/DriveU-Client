@@ -81,14 +81,28 @@ const ListItem: React.FC<{
           onClick={async (e) => {
             e.stopPropagation();
             try {
-              const url = await getDownloadPresignedUrl(Number(item.id));
-              const a = document.createElement("a");
-              a.href = url;
-              const baseTitle = item.title.endsWith(`.${item.extension}`)
-                ? item.title.slice(0, -(item.extension.length + 1))
-                : item.title;
-              a.download = `${baseTitle}.${item.extension}`;
-              a.click();
+              if (item.type === "NOTE") {
+                const blob = new Blob(
+                  [item.previewLine || "내용이 없습니다."],
+                  {
+                    type: "text/markdown",
+                  }
+                );
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = `${item.title}.md`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+              } else {
+                const url = await getDownloadPresignedUrl(Number(item.id));
+                const a = document.createElement("a");
+                a.href = url;
+                const baseTitle = item.title.endsWith(`.${item.extension}`)
+                  ? item.title.slice(0, -(item.extension.length + 1))
+                  : item.title;
+                a.download = `${baseTitle}.${item.extension}`;
+                a.click();
+              }
             } catch (error) {
               console.error("Download failed:", error);
             }
