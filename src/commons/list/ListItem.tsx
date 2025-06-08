@@ -44,8 +44,10 @@ const ListItem: React.FC<{
             getIcon(item.type)
           )}
         </div>
-        <div className="w-48 font-medium flex flex-col">
-          <div>{item.title}</div>
+        <div className="w-48 font-medium flex flex-col truncate">
+          <div className="truncate" title={item.title}>
+            {item.title}
+          </div>
         </div>
         <div
           onClick={(e) => {
