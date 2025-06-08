@@ -20,7 +20,7 @@ const DirectoryAddModal: React.FC<DirectoryAddModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 font-pretendard">
       <div className="bg-white p-6 rounded shadow-md w-80">
         <h2 className="text-lg font-semibold mb-4">새 디렉토리 추가</h2>
         <input
