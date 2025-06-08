@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "../store/useAuthStore";
 import Sidebar from "../commons/layout/sidebar/SideBar";
+import ScrollToTop from "../commons/layout/ScrollToTop";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -20,7 +21,10 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   return (
     <div className="flex min-h-screen bg-white">
       <Sidebar />
-      <div className="flex-1">{children}</div>
+      <div className="flex-1">
+        <ScrollToTop />
+        {children}
+      </div>
     </div>
   );
 };
