@@ -4,6 +4,7 @@ import { exchangeGoogleCode } from "../../api/Login";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useSemesterStore } from "../../store/useSemesterStore";
 import { useDirectoryStore } from "../../store/useDirectoryStore";
+import { useTagStore } from "../../store/useTagStore";
 
 function OAuthCallback() {
   const redirectUri = `${window.location.origin}/oauth/google`;
@@ -40,6 +41,15 @@ function OAuthCallback() {
             directories,
           },
         ]);
+        useTagStore.getState().setTags(
+          directories
+            .flatMap((dir) => dir.children ?? [])
+            .map((child) => ({
+              id: child.id,
+              title: child.name,
+              color: "#A1A1AA",
+            }))
+        );
         navigate("/", { replace: true });
       })
       .catch(() => {

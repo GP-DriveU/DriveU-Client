@@ -1,17 +1,12 @@
-﻿import React, { useState, useEffect } from "react";
-import { useDirectoryStore } from "../../store/useDirectoryStore";
+﻿import React, { useState } from "react";
 import Button from "../inputs/Button";
-
-interface TagData {
-  id: number;
-  title: string;
-  color: string;
-}
+import { type TagData } from "../../types/tag";
 
 interface TagSelectModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (selectedTags: TagData[]) => void;
+  availableTags: TagData[];
   initialTags?: TagData[];
 }
 
@@ -19,25 +14,9 @@ const TagSelectModal: React.FC<TagSelectModalProps> = ({
   isOpen,
   onClose,
   onSave,
+  availableTags,
 }) => {
-  const [availableTags, setAvailableTags] = useState<TagData[]>([]);
   const [selectedTags, setSelectedTags] = useState<TagData[]>([]);
-  const userDirectories = useDirectoryStore((state) =>
-    state.getCurrentDirectories()
-  );
-  useEffect(() => {
-    if (isOpen) {
-      const tags = userDirectories
-        .flatMap((dir) => dir.children ?? [])
-        .map((child) => ({
-          id: child.id,
-          title: child.name,
-          color: "#A1A1AA", // default color
-        }));
-      setAvailableTags(tags);
-      setSelectedTags([]);
-    }
-  }, [isOpen, userDirectories]);
 
   if (!isOpen) return null;
 

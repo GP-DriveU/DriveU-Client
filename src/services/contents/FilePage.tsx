@@ -17,6 +17,7 @@ import { useSemesterStore } from "../../store/useSemesterStore";
 import UploadOverlay from "../../commons/modals/UploadOverlay";
 import { getUploadPresignedUrl } from "../../api/File";
 import TagSelectModal from "../../commons/modals/TagSelectModal";
+import { useTagOptions } from "../../hooks/useTagOptions";
 
 function FilePage() {
   const params = useParams();
@@ -40,6 +41,8 @@ function FilePage() {
   const [pendingFiles, setPendingFiles] = useState<FileList | null>(null);
 
   const navigate = useNavigate();
+
+  const tagOptions = useTagOptions();
 
   // Extract directoryId from slug
   const slugParts = (params.slug ?? "").split("-");
@@ -195,6 +198,7 @@ function FilePage() {
             setIsTagModalOpen(false);
             setPendingFiles(null);
           }}
+          availableTags={tagOptions}
           onSave={async (selectedTags) => {
             setIsTagModalOpen(false);
             if (!pendingFiles || selectedTags.length === 0) return;
