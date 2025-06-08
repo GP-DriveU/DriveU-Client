@@ -16,6 +16,7 @@ import IconList from "../../assets/icon/icon_list.svg?react";
 import { useSemesterStore } from "../../store/useSemesterStore";
 import UploadOverlay from "../../commons/modals/UploadOverlay";
 import { getUploadPresignedUrl } from "../../api/File";
+import TagSelectModal from "../../commons/modals/TagSelectModal";
 
 function FilePage() {
   const params = useParams();
@@ -32,7 +33,11 @@ function FilePage() {
   const [isLoadingModalOpen, setIsLoadingModalOpen] = useState(false);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
-  const [confirmType, setConfirmType] = useState<"upload" | "generate" | "delete" | null>(null);
+  const [confirmType, setConfirmType] = useState<
+    "upload" | "generate" | "delete" | null
+  >(null);
+  const [isTagModalOpen, setIsTagModalOpen] = useState(false);
+  const [pendingFiles, setPendingFiles] = useState<FileList | null>(null);
 
   const navigate = useNavigate();
 
@@ -161,13 +166,17 @@ function FilePage() {
             setIsUploadOpen(true);
           }}
           onStartDelete={async () => {
-            const selectedIds = items.filter((item) => item.isSelected).map((item) => item.id);
+            const selectedIds = items
+              .filter((item) => item.isSelected)
+              .map((item) => item.id);
             if (selectedIds.length === 0) return;
 
             setIsLoadingModalOpen(true);
             try {
               await Promise.all(selectedIds.map((id) => deleteResource(id)));
-              setItems((prev) => prev.filter((item) => !selectedIds.includes(item.id)));
+              setItems((prev) =>
+                prev.filter((item) => !selectedIds.includes(item.id))
+              );
               setConfirmType("delete");
               setIsConfirmModalOpen(true);
             } catch (error) {
@@ -179,34 +188,35 @@ function FilePage() {
           }}
         />
       </div>
-      {isUploadOpen && (
-        <UploadOverlay
-          onClose={() => setIsUploadOpen(false)}
-          onUpload={async (files) => {
-            setIsUploadOpen(false);
+      {isTagModalOpen && (
+        <TagSelectModal
+          isOpen={isTagModalOpen}
+          onClose={() => {
+            setIsTagModalOpen(false);
+            setPendingFiles(null);
+          }}
+          onSave={async (selectedTags) => {
+            setIsTagModalOpen(false);
+            if (!pendingFiles || selectedTags.length === 0) return;
             setIsLoadingModalOpen(true);
             try {
               const uploaded: Item[] = [];
-              for (const file of Array.from(files)) {
+              for (const file of Array.from(pendingFiles)) {
                 const filenameWithExtension = file.name;
                 const { url, s3Path } = await getUploadPresignedUrl({
                   filename: decodeURIComponent(filenameWithExtension),
                   fileSize: file.size,
                 });
-                // s3Path and extension extraction
-                const extension = filenameWithExtension.split(".").pop()?.toUpperCase() ?? "";
-                // Save metadata
+                const extension =
+                  filenameWithExtension.split(".").pop()?.toUpperCase() ?? "";
                 const { fileId } = await registerFileMeta(directoryId, {
                   title: file.name,
                   s3Path,
                   extension,
                   size: file.size,
+                  tagId: selectedTags[0].id,
                 });
-                
-                await fetch(url, {
-                  method: "PUT",
-                  body: file,
-                });
+                await fetch(url, { method: "PUT", body: file });
                 uploaded.push({
                   id: fileId,
                   type: "FILE",
@@ -232,11 +242,28 @@ function FilePage() {
           }}
         />
       )}
+      {isUploadOpen && (
+        <UploadOverlay
+          onClose={() => setIsUploadOpen(false)}
+          onUpload={async (files) => {
+            if (!files) return;
+            setIsUploadOpen(false);
+            setPendingFiles(files);
+            setIsTagModalOpen(true);
+          }}
+        />
+      )}
       {isLoadingModalOpen && (
         <ProgressModal
           isOpen={isLoadingModalOpen}
-          title={confirmType === "generate" ? "문제 생성 중..." : "파일 업로드 중..."}
-          description={confirmType === "generate" ? "잠시만 기다려주세요." : "업로드 중입니다. 잠시만 기다려주세요."}
+          title={
+            confirmType === "generate" ? "문제 생성 중..." : "파일 업로드 중..."
+          }
+          description={
+            confirmType === "generate"
+              ? "잠시만 기다려주세요."
+              : "업로드 중입니다. 잠시만 기다려주세요."
+          }
         />
       )}
       {isConfirmModalOpen && (
@@ -265,9 +292,7 @@ function FilePage() {
             onCancel: () => setIsConfirmModalOpen(false),
             cancelText: "취소",
           })}
-          confirmText={
-            confirmType === "generate" ? "이동" : "확인"
-          }
+          confirmText={confirmType === "generate" ? "이동" : "확인"}
         />
       )}
     </div>

@@ -24,7 +24,7 @@ export interface RegisterFileMetaRequest {
   s3Path: string;
   extension: string;
   size: number;
-  tagId?: string;
+  tagId?: number;
 }
 export interface RegisterFileMetaResponse {
   fileId: number;
@@ -42,7 +42,9 @@ export interface DeleteResourceResponse {
 }
 
 // GET: 파일 다운로드용 presigned URL
-export const getDownloadPresignedUrl = async (resourceId: number): Promise<string> => {
+export const getDownloadPresignedUrl = async (
+  resourceId: number
+): Promise<string> => {
   const response = await http.get<{ url: string }>(
     `resources/${resourceId}/download`
   );
@@ -50,16 +52,13 @@ export const getDownloadPresignedUrl = async (resourceId: number): Promise<strin
 };
 
 // GET: 파일 업로드용 presigned URL
-export const getUploadPresignedUrl = async (
-  data: UploadRequest
-) => {
+export const getUploadPresignedUrl = async (data: UploadRequest) => {
   const response = await http.get<UploadResponse>("file/upload", {
     filename: data.filename ?? "",
     fileSize: data.fileSize.toString(),
   });
   return response.response;
 };
-
 
 // POST: 링크 등록
 export const registerLink = async (
@@ -96,9 +95,7 @@ export const toggleFavoriteResource = async (
 };
 
 // GET: 링크 바로가기
-export const getLinkUrl = async (
-  linkId: number
-): Promise<{ url: string }> => {
+export const getLinkUrl = async (linkId: number): Promise<{ url: string }> => {
   const response = await http.get<{ url: string }>(`links/${linkId}`);
   return response.response;
 };
