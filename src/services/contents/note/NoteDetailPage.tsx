@@ -87,7 +87,11 @@ function NoteDetailPage() {
         selectedId={selectedIconId}
         onIconClick={() =>
           navigate(`edit`, {
-            state: { title, markdownContent },
+            state: {
+              title,
+              markdownContent,
+              tagId: tags.length > 0 ? tags[0].id : null,
+            },
           })
         }
       />

@@ -8,8 +8,9 @@ import { getCodeString } from "rehype-rewrite";
 import katex from "katex";
 import "katex/dist/katex.min.css";
 import Button from "../../../commons/inputs/Button";
-import Tag from "../../../commons/tag/Tag";
 import { useTagStore } from "../../../store/useTagStore";
+import TagItem from "../../../commons/tag/TagItem";
+import type { TagData } from "../../../types/tag";
 
 function NoteWritePage() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ function NoteWritePage() {
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const allTags = useTagStore((state) => state.tags);
-  const tags = allTags.filter((tag) => tag.id !== directoryId);
+  const [selectedTag, setSelectedTag] = useState<TagData | null>(null);
 
   return (
     <div className="w-full flex bg-white flex-col">
@@ -39,7 +40,38 @@ function NoteWritePage() {
       />
       <TextSection
         title="태그"
-        rightElement={<Tag tags={tags} onSave={() => {}} />}
+        rightElement={
+          <div className="flex flex-col gap-2">
+            {selectedTag ? (
+              <div className="flex justify-between items-center gap-2">
+                <TagItem title={selectedTag.title} color={selectedTag.color} />
+                <button
+                  className="text-sm text-red-500 underline"
+                  onClick={() => setSelectedTag(null)}
+                >
+                  태그 제거
+                </button>
+              </div>
+            ) : (
+              <div className="text-gray-400 text-sm">선택된 태그 없음</div>
+            )}
+            <div className="flex flex-wrap gap-2 pt-2">
+              {allTags
+                .filter(
+                  (t) => t.id !== directoryId && t.parentDirectoryId !== 50
+                )
+                .map((tag) => (
+                  <div
+                    key={tag.id}
+                    onClick={() => setSelectedTag(tag)}
+                    className="cursor-pointer"
+                  >
+                    <TagItem title={tag.title} color={tag.color} />
+                  </div>
+                ))}
+            </div>
+          </div>
+        }
       />
       <TextSection
         title="내용"
@@ -105,11 +137,10 @@ function NoteWritePage() {
           color="primary"
           onClick={async () => {
             try {
-              const selectedTag = tags[0];
               await createNote(directoryId, {
                 title,
                 content,
-                tagId: selectedTag?.id,
+                tagId: selectedTag?.id ?? null,
               });
               alert("필기 노트 작성이 완료되었습니다.");
               navigate(-1);

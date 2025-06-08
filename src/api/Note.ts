@@ -13,7 +13,7 @@ export interface GetNoteResponse {
 export interface CreateNoteRequest {
   title: string;
   content: string;
-  tagId: number;
+  tagId: number | null;
 }
 
 export interface CreateNoteResponse {

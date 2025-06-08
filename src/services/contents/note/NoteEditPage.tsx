@@ -31,9 +31,15 @@ function NoteEditPage() {
 
   const [title, setTitle] = useState(originalTitle);
   const [content, setContent] = useState(originalContent);
-  const [selectedTag, _setSelectedTag] = useState<TagData | null>(
-    allTags.find((t) => t.id === originalTagId) ?? null
-  );
+  const [selectedTag, setSelectedTag] = useState<TagData | null>(() => {
+    console.log("originalTagId:", originalTagId);
+    console.log(
+      "matched tag:",
+      allTags.find((t) => t.id === originalTagId)
+    );
+    if (originalTagId === null) return null;
+    return allTags.find((t) => t.id === originalTagId) ?? null;
+  });
 
   return (
     <div className="w-full flex bg-white flex-col">
@@ -61,7 +67,7 @@ function NoteEditPage() {
                 <TagItem title={selectedTag.title} color={selectedTag.color} />
                 <button
                   className="text-sm text-red-500 underline"
-                  onClick={() => _setSelectedTag(null)}
+                  onClick={() => setSelectedTag(null)}
                 >
                   태그 제거
                 </button>
@@ -77,7 +83,7 @@ function NoteEditPage() {
                 .map((tag) => (
                   <div
                     key={tag.id}
-                    onClick={() => _setSelectedTag(tag)}
+                    onClick={() => setSelectedTag(tag)}
                     className="cursor-pointer"
                   >
                     <TagItem title={tag.title} color={tag.color} />
@@ -160,7 +166,7 @@ function NoteEditPage() {
                 await updateNoteTag(
                   id,
                   originalTagId ?? null,
-                  selectedTag ? selectedTag.id : null
+                  selectedTag?.id ?? null
                 );
               }
               if (content !== originalContent) {
