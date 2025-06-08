@@ -1,20 +1,15 @@
 ﻿import React, { useState, useEffect } from "react";
 import TagItem from "./TagItem";
-
-interface Tag {
-  id: number;
-  title: string;
-  color?: string;
-}
+import { type TagData } from "../../types/tag";
 
 interface TagGroupProps {
-  tags: Tag[];
-  onSave: (updatedTags: Tag[]) => void;
+  tags: TagData[];
+  onSave: (updatedTags: TagData[]) => void;
 }
 
 const Tag: React.FC<TagGroupProps> = ({ tags, onSave }) => {
   const [editMode, setEditMode] = useState(false);
-  const [localTags, setLocalTags] = useState<Tag[]>([]);
+  const [localTags, setLocalTags] = useState<TagData[]>([]);
 
   useEffect(() => {
     const availableColorKeys = [

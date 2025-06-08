@@ -2,13 +2,13 @@
 import IconMenu from "../../assets/icon/icon_menu.svg?react";
 import IconQuestion from "../../assets/icon/icon_question.svg?react";
 import TagItem from "../tag/TagItem";
-import type Tag from "../tag/Tag";
+import { type TagData } from "../../types/tag";
 
 interface GalleryQuestionItemProps {
   id: string;
   version: string;
   title: string;
-  tag: Tag;
+  tag: TagData;
   date: string;
   onClick?: () => void;
 }

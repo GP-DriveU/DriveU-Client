@@ -1,13 +1,13 @@
 ﻿import React from "react";
 import GalleryQuestionItem from "./GalleryQuestionItem";
-import type Tag from "../tag/Tag";
+import { type TagData } from "../../types/tag";
 import { useNavigate } from "react-router-dom";
 
 export interface GalleryQuestionItemProps {
   id: string;
   version: string;
   title: string;
-  tag: Tag;
+  tag: TagData;
   date: string;
 }
 
