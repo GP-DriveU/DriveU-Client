@@ -1,13 +1,11 @@
 ﻿import React from "react";
 import GalleryQuestionItem from "./GalleryQuestionItem";
-import { type TagData } from "../../types/tag";
 import { useNavigate } from "react-router-dom";
 
 export interface GalleryQuestionItemProps {
   id: string;
   version: string;
   title: string;
-  tag: TagData;
   date: string;
 }
 
@@ -26,7 +24,6 @@ const GalleryQuestion: React.FC<GalleryQuestionGridProps> = ({ items }) => {
             id={item.id}
             version={item.version}
             title={item.title}
-            tag={item.tag}
             date={item.date}
             onClick={() => navigate(`/question/${item.id}`)}
           />
