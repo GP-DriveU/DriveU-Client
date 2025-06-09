@@ -168,6 +168,44 @@ function FilePage() {
     navigate(`${id}`);
   };
 
+  const uploadFiles = async (
+    files: FileList,
+    directoryId: number,
+    selectedTags?: { id: number }[]
+  ): Promise<Item[]> => {
+    const uploaded: Item[] = [];
+    for (const file of Array.from(files)) {
+      const filenameWithExtension = file.name;
+      const { url, s3Path } = await getUploadPresignedUrl({
+        filename: decodeURIComponent(filenameWithExtension),
+        fileSize: file.size,
+      });
+      const extension =
+        filenameWithExtension.split(".").pop()?.toUpperCase() ?? "";
+      const { fileId } = await registerFileMeta(directoryId, {
+        title: file.name,
+        s3Path,
+        extension,
+        size: file.size,
+        tagId: selectedTags?.[0]?.id,
+      });
+      await fetch(url, { method: "PUT", body: file });
+      uploaded.push({
+        id: fileId,
+        type: "FILE",
+        title: file.name,
+        url,
+        previewLine: "새로 업로드된 파일입니다.",
+        description: "새로 업로드된 파일입니다.",
+        extension,
+        iconType: "FILE",
+        isSelected: false,
+        favorite: false,
+      });
+    }
+    return uploaded;
+  };
+
   return (
     <div className="w-full flex bg-white flex-col">
       <TitleSection
@@ -279,36 +317,11 @@ function FilePage() {
             setIsTagModalOpen(false);
             if (!pendingFiles || selectedTags.length === 0) return;
             try {
-              const uploaded: Item[] = [];
-              for (const file of Array.from(pendingFiles)) {
-                const filenameWithExtension = file.name;
-                const { url, s3Path } = await getUploadPresignedUrl({
-                  filename: decodeURIComponent(filenameWithExtension),
-                  fileSize: file.size,
-                });
-                const extension =
-                  filenameWithExtension.split(".").pop()?.toUpperCase() ?? "";
-                const { fileId } = await registerFileMeta(directoryId, {
-                  title: file.name,
-                  s3Path,
-                  extension,
-                  size: file.size,
-                  tagId: selectedTags[0].id,
-                });
-                await fetch(url, { method: "PUT", body: file });
-                uploaded.push({
-                  id: fileId,
-                  type: "FILE",
-                  title: file.name,
-                  url,
-                  previewLine: "새로 업로드된 파일입니다.",
-                  description: "새로 업로드된 파일입니다.",
-                  extension,
-                  iconType: "FILE",
-                  isSelected: false,
-                  favorite: false,
-                });
-              }
+              const uploaded = await uploadFiles(
+                pendingFiles,
+                directoryId,
+                selectedTags
+              );
               setItems((prev) => [...uploaded, ...prev]);
               setIsConfirmModalOpen(true);
               setConfirmType("upload");
@@ -327,6 +340,23 @@ function FilePage() {
           onUpload={async (files) => {
             if (!files) return;
             setIsUploadOpen(false);
+            // If no tag options, skip tag modal and upload directly
+            if (tagOptions.length === 0) {
+              setConfirmType("upload");
+              setIsLoadingModalOpen(true);
+              try {
+                const uploaded = await uploadFiles(files, directoryId);
+                setItems((prev) => [...uploaded, ...prev]);
+                setIsConfirmModalOpen(true);
+                setConfirmType("upload");
+              } catch (e) {
+                console.error("업로드 실패", e);
+                alert("파일 업로드에 실패했습니다.");
+              } finally {
+                setIsLoadingModalOpen(false);
+              }
+              return;
+            }
             setPendingFiles(files);
             setIsTagModalOpen(true);
           }}
