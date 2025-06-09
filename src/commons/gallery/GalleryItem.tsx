@@ -21,7 +21,7 @@ const GalleryItem: React.FC<{
         borderTop: "0.5px solid #4B5563",
         borderBottom: "0.5px solid #4B5563",
       }}
-      onClick={() => onClickItem(item.id)}
+      onClick={() => item.type === "NOTE" && onClickItem(item.id)}
     >
       <div className="w-full relative flex items-center">
         <div className="ml-8 flex-1 text-black text-xl font-normal truncate whitespace-nowrap overflow-hidden">
@@ -66,12 +66,16 @@ const GalleryItem: React.FC<{
       </div>
 
       <div className="w-full max-w-[200px] ml-auto flex justify-end items-center gap-4">
-        <Button color="secondary" size="small" onClick={() => {}}>
-          수정
-        </Button>
-        <Button color="primary" size="small" onClick={() => {}}>
-          요약
-        </Button>
+        {item.type === "NOTE" && (
+          <>
+            <Button color="secondary" size="small" onClick={() => {}}>
+              수정
+            </Button>
+            <Button color="primary" size="small" onClick={() => {}}>
+              요약
+            </Button>
+          </>
+        )}
         <button
           onClick={async (e) => {
             e.stopPropagation();
@@ -87,7 +91,7 @@ const GalleryItem: React.FC<{
           }}
           className="w-[30px] h-[30px] flex items-center justify-center"
         >
-          <IconDownload className="w-5 h-5" />
+          <IconDownload />
         </button>
       </div>
     </div>

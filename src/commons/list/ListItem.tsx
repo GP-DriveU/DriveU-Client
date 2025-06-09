@@ -22,7 +22,7 @@ const ListItem: React.FC<{
         borderTop: "0.5px solid #4B5563",
         borderBottom: "0.5px solid #4B5563",
       }}
-      onClick={() => onClickItem(item.id)}
+      onClick={() => item.type === "NOTE" && onClickItem(item.id)}
     >
       <div className="flex items-center gap-2">
         <div className="cursor-pointer">
