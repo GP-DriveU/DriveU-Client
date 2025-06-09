@@ -15,7 +15,6 @@ const ListItem: React.FC<{
   selectable: boolean;
   onClickItem: (id: number) => void;
 }> = ({ item, onToggleSelect, onToggleFavorite, selectable, onClickItem }) => {
-  console.log(item);
   return (
     <div
       className="flex items-center justify-between px-4 py-2 bg-white shadow-sm mb-2"
