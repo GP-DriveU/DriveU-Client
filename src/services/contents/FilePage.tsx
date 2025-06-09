@@ -175,6 +175,10 @@ function FilePage() {
   ): Promise<Item[]> => {
     const uploaded: Item[] = [];
     for (const file of Array.from(files)) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => {
+        controller.abort();
+      }, 90000); // 2 minutes
       const filenameWithExtension = file.name;
       const { url, s3Path } = await getUploadPresignedUrl({
         filename: decodeURIComponent(filenameWithExtension),
@@ -189,7 +193,21 @@ function FilePage() {
         size: file.size,
         tagId: selectedTags?.[0]?.id,
       });
-      await fetch(url, { method: "PUT", body: file });
+      try {
+        await fetch(url, {
+          method: "PUT",
+          body: file,
+          signal: controller.signal,
+        });
+      } catch (e) {
+        if (controller.signal.aborted) {
+          alert(`${file.name} 업로드가 2분을 초과하여 취소되었습니다.`);
+        } else {
+          throw e;
+        }
+      } finally {
+        clearTimeout(timeoutId);
+      }
       uploaded.push({
         id: fileId,
         type: "FILE",
