@@ -16,11 +16,11 @@ function Header() {
       className="relative w-full mx-auto p-5 shadow-2xl border-b border-gray_1 bg-background font-sans"
       style={{ boxShadow: "0px 4px 10px rgba(0,0,0,0.3)" }}
     >
-      <div
-        className="flex items-center justify-between"
-        onClick={() => navigate("/")}
-      >
-        <h1 className="text-primary text-2xl sm:text-3xl font-extrabold">
+      <div className="flex items-center justify-between">
+        <h1
+          className="text-primary text-2xl sm:text-3xl font-extrabold"
+          onClick={() => navigate("/")}
+        >
           DriveU
         </h1>
 
