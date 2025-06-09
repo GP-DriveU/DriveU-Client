@@ -1,4 +1,5 @@
-﻿import { http } from "./Fetch";
+﻿import type { Item } from "../types/Item";
+import { http } from "./Fetch";
 
 export interface Directory {
   id: number;
@@ -8,27 +9,10 @@ export interface Directory {
   children: Directory[];
 }
 
-export interface FileItem {
-  id: number;
-  type: string;
-  title: string;
-  url: string;
-  previewLine: string;
-  extension: string;
-  iconType: string;
-  createdAt: string;
-  updatedAt: string;
-  tag: {
-    tagId: number;
-    tagName: string;
-  };
-  favorite: boolean;
-}
-
 export interface MainPageResponse {
   directories: Directory[];
-  recentFiles: FileItem[];
-  favoriteFiles: FileItem[];
+  recentFiles: Item[];
+  favoriteFiles: Item[];
 }
 
 export const getMainPage = async (

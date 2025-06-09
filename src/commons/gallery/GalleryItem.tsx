@@ -56,7 +56,7 @@ const GalleryItem: React.FC<{
           }}
         >
           <IconFavorite
-            className={item.isFavorite ? "text-danger" : "text-gray-300"}
+            className={item.favorite ? "text-danger" : "text-gray-300"}
           />
         </div>
       </div>

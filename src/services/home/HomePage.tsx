@@ -29,23 +29,8 @@ function HomePage() {
           data.directories
         );
 
-        const convert = (files: MainPageResponse["recentFiles"]) =>
-          (files ?? []).map((file) => ({
-            id: file.id,
-            title: file.title,
-            previewLine: file.previewLine,
-            description: file.previewLine,
-            type: (file.type ?? "FILE") as Item["type"],
-            category: file.tag?.tagName ?? "",
-            isFavorite: file.favorite,
-            isSelected: false,
-            url: file.url,
-            extension: file.extension,
-            iconType: file.iconType,
-          }));
-
-        setRecentItems(convert(data.recentFiles));
-        setFavoriteItems(convert(data.favoriteFiles));
+        setRecentItems(data.recentFiles);
+        setFavoriteItems(data.favoriteFiles);
       } catch (e) {
         console.error("메인페이지 데이터를 불러오지 못했습니다:", e);
       }
@@ -72,12 +57,12 @@ function HomePage() {
       await toggleFavoriteResource(id);
       setRecentItems((prev) =>
         prev.map((item) =>
-          item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
+          item.id === id ? { ...item, favorite: !item.favorite } : item
         )
       );
       setFavoriteItems((prev) =>
         prev.map((item) =>
-          item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
+          item.id === id ? { ...item, favorite: !item.favorite } : item
         )
       );
     } catch (e) {

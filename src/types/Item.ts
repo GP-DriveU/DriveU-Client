@@ -9,7 +9,7 @@ export interface Item {
   description: string;
   extension: string;
   isSelected: boolean;
-  isFavorite: boolean;
+  favorite: boolean;
   iconType: string;
   tag?: {
     tagId: number;

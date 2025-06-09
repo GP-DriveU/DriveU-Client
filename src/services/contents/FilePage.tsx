@@ -98,21 +98,7 @@ function FilePage() {
     const fetchResources = async () => {
       try {
         const response = await getResourcesByDirectory(directoryId);
-        setItems(
-          response.map((item: any) => ({
-            id: item.id,
-            type: item.type,
-            title: item.title,
-            url: item.url,
-            previewLine: item.previewLine,
-            description: item.previewLine,
-            extension: item.extension ?? "",
-            iconType: item.iconType ?? item.type,
-            isSelected: false,
-            isFavorite: item.favorite ?? false,
-            tag: item.tag ?? null,
-          }))
-        );
+        setItems(response);
       } catch (error) {
         console.error("Failed to fetch items:", error);
       }
@@ -170,7 +156,7 @@ function FilePage() {
       await toggleFavoriteResource(id);
       setItems((prev) =>
         prev.map((item) =>
-          item.id === id ? { ...item, isFavorite: !item.isFavorite } : item
+          item.id === id ? { ...item, favorite: !item.favorite } : item
         )
       );
     } catch (error) {
@@ -320,7 +306,7 @@ function FilePage() {
                   extension,
                   iconType: "FILE",
                   isSelected: false,
-                  isFavorite: false,
+                  favorite: false,
                 });
               }
               setItems((prev) => [...uploaded, ...prev]);
