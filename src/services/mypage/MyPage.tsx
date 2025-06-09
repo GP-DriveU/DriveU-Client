@@ -10,6 +10,8 @@ import TitleSection from "../../commons/section/TitleSection";
 import MyPageSection from "./MyPageSection";
 import EditSemester from "./EditSemester";
 import AlertModal from "../../commons/modals/AlertModal";
+import Button from "../../commons/inputs/Button";
+import { useAuthStore } from "../../store/useAuthStore";
 
 const formatSemester = (s: { year: number; term: string }) =>
   `${String(s.year).slice(2)}년 ${s.term === "SPRING" ? "1학기" : "2학기"}`;
@@ -21,6 +23,7 @@ function MyPage() {
   >([]);
   const [isEditingSemester, setIsEditingSemester] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+  const logout = useAuthStore((state) => state.logout);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
@@ -138,6 +141,11 @@ function MyPage() {
           }
           onEdit={toggleSemesterEdit}
         />
+        <div className="w-64 my-16 mx-auto flex justify-center">
+          <Button size="medium" color="primary" onClick={logout}>
+            로그아웃
+          </Button>
+        </div>
       </div>
     </div>
   );
