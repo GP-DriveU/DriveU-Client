@@ -155,7 +155,7 @@ function HomeSection() {
                     extension,
                     iconType: "FILE",
                     isSelected: false,
-                    isFavorite: false,
+                    favorite: false,
                   });
                 }
               }

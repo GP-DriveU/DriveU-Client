@@ -14,6 +14,7 @@ const ListItem: React.FC<{
   selectable: boolean;
   onClickItem: (id: number) => void;
 }> = ({ item, onToggleSelect, onToggleFavorite, selectable, onClickItem }) => {
+  console.log(item);
   return (
     <div
       className="flex items-center justify-between px-4 py-2 bg-white shadow-sm mb-2"
@@ -21,7 +22,7 @@ const ListItem: React.FC<{
         borderTop: "0.5px solid #4B5563",
         borderBottom: "0.5px solid #4B5563",
       }}
-      onClick={() => onClickItem(item.id)}
+      onClick={() => item.type === "NOTE" && onClickItem(item.id)}
     >
       <div className="flex items-center gap-2">
         <div className="cursor-pointer">
@@ -58,7 +59,7 @@ const ListItem: React.FC<{
           style={{ userSelect: "none" }}
         >
           <IconFavorite
-            className={item.isFavorite ? "text-danger" : "text-gray-300"}
+            className={item.favorite ? "text-danger" : "text-gray-300"}
           />
         </div>
         {item.tag && item.tag !== null && (
@@ -70,13 +71,17 @@ const ListItem: React.FC<{
           </span>
         )}
       </div>
-      <div className="flex gap-2 min-w-[200px]">
-        <Button color="secondary" size="small" onClick={() => {}}>
-          수정
-        </Button>
-        <Button color="primary" size="small" onClick={() => {}}>
-          요약
-        </Button>
+      <div className="flex gap-2 min-w-[200px] justify-end">
+        {item.type === "NOTE" && (
+          <>
+            <Button color="secondary" size="small" onClick={() => {}}>
+              수정
+            </Button>
+            <Button color="primary" size="small" onClick={() => {}}>
+              요약
+            </Button>
+          </>
+        )}
         <button
           onClick={async (e) => {
             e.stopPropagation();
@@ -109,7 +114,7 @@ const ListItem: React.FC<{
           }}
           className="w-[30px] h-[30px] flex items-center justify-center"
         >
-          <IconDownload className="w-5 h-5" />
+          <IconDownload />
         </button>
       </div>
     </div>

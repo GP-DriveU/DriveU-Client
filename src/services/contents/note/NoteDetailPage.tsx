@@ -253,15 +253,17 @@ function NoteDetailPage() {
                   </p>
                 )}
               </div>
-              <div className="w-56 flex justify-end gap-3 mx-auto mt-5">
-                <Button
-                  size="medium"
-                  color="primary"
-                  onClick={handleGenerateAiSummary}
-                >
-                  AI 요약 생성하기
-                </Button>
-              </div>
+              {!aiSummary && (
+                <div className="w-56 flex justify-end gap-3 mx-auto mt-5">
+                  <Button
+                    size="medium"
+                    color="primary"
+                    onClick={handleGenerateAiSummary}
+                  >
+                    AI 요약 생성하기
+                  </Button>
+                </div>
+              )}
             </>
           }
         />

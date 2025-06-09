@@ -35,7 +35,7 @@ const FABButton: React.FC<{
       : isSelecting && !isGenerating
       ? [{ label: "선택 항목 삭제" }, { label: "삭제 취소" }]
       : [
-          { label: "업로드" },
+          !showWriteNote ? { label: "업로드" } : null,
           showWriteNote ? { label: "노트 작성" } : null,
           { label: "삭제" },
           { label: "문제 생성" },

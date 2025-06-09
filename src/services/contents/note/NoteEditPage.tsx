@@ -13,6 +13,7 @@ import {
   updateNoteContent,
 } from "../../../api/Note";
 import { useTagStore } from "../../../store/useTagStore";
+import { useDirectoryStore } from "../../../store/useDirectoryStore";
 import type { TagData } from "../../../types/tag";
 import TagItem from "../../../commons/tag/TagItem";
 
@@ -24,6 +25,12 @@ function NoteEditPage() {
   const directoryId = Number(slug?.split("-").pop());
   const noteId = Number(id);
   const allTags = useTagStore((state) => state.tags);
+
+  const studyDirectory = useDirectoryStore
+    .getState()
+    .getCurrentDirectories()
+    .find((dir) => dir.name === "학업");
+  const studyDirectoryId = studyDirectory?.id;
 
   const originalTitle = location.state?.title || "";
   const originalContent = location.state?.markdownContent || "";
@@ -73,22 +80,36 @@ function NoteEditPage() {
                 </button>
               </div>
             ) : (
-              <div className="text-gray-400 text-sm">선택된 태그 없음</div>
+              <div className="text-gray-400 text-sm">
+                선택된 태그가 없습니다.
+              </div>
             )}
             <div className="flex flex-wrap gap-2 pt-2">
-              {allTags
-                .filter(
-                  (t) => t.id !== directoryId && t.parentDirectoryId !== 50
-                )
-                .map((tag) => (
-                  <div
-                    key={tag.id}
-                    onClick={() => setSelectedTag(tag)}
-                    className="cursor-pointer"
-                  >
-                    <TagItem title={tag.title} color={tag.color} />
-                  </div>
-                ))}
+              {allTags.filter(
+                (t) =>
+                  t.id !== directoryId &&
+                  t.parentDirectoryId !== studyDirectoryId
+              ).length === 0 ? (
+                <div className="text-font text-sm">
+                  선택 가능한 태그가 없습니다.
+                </div>
+              ) : (
+                allTags
+                  .filter(
+                    (t) =>
+                      t.id !== directoryId &&
+                      t.parentDirectoryId !== studyDirectoryId
+                  )
+                  .map((tag) => (
+                    <div
+                      key={tag.id}
+                      onClick={() => setSelectedTag(tag)}
+                      className="cursor-pointer"
+                    >
+                      <TagItem title={tag.title} color={tag.color} />
+                    </div>
+                  ))
+              )}
             </div>
           </div>
         }
