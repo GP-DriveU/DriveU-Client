@@ -6,6 +6,7 @@ import IconDownload from "../../assets/icon/icon_download.svg?react";
 import IconCheck from "../../assets/icon/icon_check.svg?react";
 import Button from "../inputs/Button";
 import { getDownloadPresignedUrl } from "../../api/File";
+import { getNote } from "../../api/Note";
 
 const GalleryItem: React.FC<{
   item: Item;
@@ -80,11 +81,26 @@ const GalleryItem: React.FC<{
           onClick={async (e) => {
             e.stopPropagation();
             try {
-              const url = await getDownloadPresignedUrl(Number(item.id));
-              const a = document.createElement("a");
-              a.href = url;
-              a.download = item.title || "file";
-              a.click();
+              if (item.type === "NOTE") {
+                const note = await getNote(item.id);
+                const blob = new Blob([note.content || "내용이 없습니다."], {
+                  type: "text/markdown",
+                });
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = `${item.title}.md`;
+                a.click();
+                URL.revokeObjectURL(a.href);
+              } else {
+                const url = await getDownloadPresignedUrl(Number(item.id));
+                const a = document.createElement("a");
+                a.href = url;
+                const baseTitle = item.title.endsWith(`.${item.extension}`)
+                  ? item.title.slice(0, -(item.extension.length + 1))
+                  : item.title;
+                a.download = `${baseTitle}.${item.extension}`;
+                a.click();
+              }
             } catch (error) {
               console.error("Download failed:", error);
             }

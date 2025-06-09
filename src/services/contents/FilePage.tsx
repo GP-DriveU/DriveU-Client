@@ -86,6 +86,7 @@ function FilePage() {
     const map: Record<string, string> = {
       study: "학업",
       subject: "과목",
+      activity: "대외활동",
     };
     return dir.name === map[slugPrefix];
   });
@@ -165,7 +166,7 @@ function FilePage() {
   };
 
   const handleItemClick = (id: number) => {
-    navigate(`${id}`);
+    navigate(`/study/강의필기-${directoryId}/${id}`);
   };
 
   const uploadFiles = async (
@@ -358,8 +359,7 @@ function FilePage() {
           onUpload={async (files) => {
             if (!files) return;
             setIsUploadOpen(false);
-            // If no tag options, skip tag modal and upload directly
-            if (tagOptions.length === 0) {
+            if (tagOptions.length === 0 || baseDir?.name === "대외활동") {
               setConfirmType("upload");
               setIsLoadingModalOpen(true);
               try {

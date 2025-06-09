@@ -1,5 +1,6 @@
 ﻿import React from "react";
 import { getDownloadPresignedUrl } from "../../api/File";
+import { getNote } from "../../api/Note";
 import { type Item } from "../../types/Item";
 import { getIcon } from "../../utils/itemUtils";
 import IconFavorite from "../../assets/icon/icon_favorite.svg?react";
@@ -87,12 +88,10 @@ const ListItem: React.FC<{
             e.stopPropagation();
             try {
               if (item.type === "NOTE") {
-                const blob = new Blob(
-                  [item.previewLine || "내용이 없습니다."],
-                  {
-                    type: "text/markdown",
-                  }
-                );
+                const note = await getNote(item.id);
+                const blob = new Blob([note.content || "내용이 없습니다."], {
+                  type: "text/markdown",
+                });
                 const a = document.createElement("a");
                 a.href = URL.createObjectURL(blob);
                 a.download = `${item.title}.md`;
