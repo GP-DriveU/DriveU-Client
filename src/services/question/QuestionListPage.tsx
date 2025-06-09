@@ -35,7 +35,7 @@ function QuestionListPage() {
       </div>
       <TitleSection
         title="예상 문제"
-        semester="다운로드 버튼을 클릭하여 직접 문제를 해결해보세요!"
+        semester="시험에 자주 나오는 유형만 쏙쏙! AI가 뽑은 핵심 예상문제"
       />
       <div className="w-full px-10">
         <GalleryQuestion
