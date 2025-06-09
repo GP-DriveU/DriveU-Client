@@ -73,22 +73,32 @@ function NoteEditPage() {
                 </button>
               </div>
             ) : (
-              <div className="text-gray-400 text-sm">선택된 태그 없음</div>
+              <div className="text-gray-400 text-sm">
+                선택된 태그가 없습니다.
+              </div>
             )}
             <div className="flex flex-wrap gap-2 pt-2">
-              {allTags
-                .filter(
-                  (t) => t.id !== directoryId && t.parentDirectoryId !== 50
-                )
-                .map((tag) => (
-                  <div
-                    key={tag.id}
-                    onClick={() => setSelectedTag(tag)}
-                    className="cursor-pointer"
-                  >
-                    <TagItem title={tag.title} color={tag.color} />
-                  </div>
-                ))}
+              {allTags.filter(
+                (t) => t.id !== directoryId && t.parentDirectoryId !== 50
+              ).length === 0 ? (
+                <div className="text-font text-sm">
+                  선택 가능한 태그가 없습니다.
+                </div>
+              ) : (
+                allTags
+                  .filter(
+                    (t) => t.id !== directoryId && t.parentDirectoryId !== 50
+                  )
+                  .map((tag) => (
+                    <div
+                      key={tag.id}
+                      onClick={() => setSelectedTag(tag)}
+                      className="cursor-pointer"
+                    >
+                      <TagItem title={tag.title} color={tag.color} />
+                    </div>
+                  ))
+              )}
             </div>
           </div>
         }

@@ -28,24 +28,30 @@ const TagSelectModal: React.FC<TagSelectModalProps> = ({
       <div className="bg-white p-6 rounded-md w-[500px]">
         <div className="text-lg font-semibold mb-4">태그 선택</div>
         <div className="flex flex-wrap gap-2">
-          {availableTags.map((tag) => {
-            const isSelected = selectedTags.some((t) => t.title === tag.title);
-            return (
-              <button
-                key={tag.title}
-                onClick={() => {
-                  setSelectedTags(isSelected ? [] : [tag]);
-                }}
-                className={`px-3 py-1 rounded-full border ${
-                  isSelected
-                    ? "bg-secondary text-white"
-                    : "bg-gray-200 text-black"
-                }`}
-              >
-                {tag.title}
-              </button>
-            );
-          })}
+          {availableTags.length === 0 ? (
+            <p className="text-sm text-font">선택 가능한 태그가 없습니다.</p>
+          ) : (
+            availableTags.map((tag) => {
+              const isSelected = selectedTags.some(
+                (t) => t.title === tag.title
+              );
+              return (
+                <button
+                  key={tag.title}
+                  onClick={() => {
+                    setSelectedTags(isSelected ? [] : [tag]);
+                  }}
+                  className={`px-3 py-1 rounded-full border ${
+                    isSelected
+                      ? "bg-secondary text-white"
+                      : "bg-gray-200 text-black"
+                  }`}
+                >
+                  {tag.title}
+                </button>
+              );
+            })
+          )}
         </div>
         <div className="flex w-48 ml-auto justify-end gap-2 mt-4">
           <Button size="medium" color="primary" onClick={onClose}>

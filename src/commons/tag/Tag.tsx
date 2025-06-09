@@ -27,15 +27,19 @@ const Tag: React.FC<TagGroupProps> = ({ tags, onSave }) => {
   return (
     <div className="w-full flex flex-row justify-between items-center">
       <div className="flex flex-wrap gap-2 items-center">
-        {localTags.map((tag, index) => (
-          <TagItem
-            key={tag.id ?? index}
-            title={tag.title}
-            color={tag.color}
-            editable={editMode}
-            onRemove={() => handleRemove(index)}
-          />
-        ))}
+        {localTags.length > 0 ? (
+          localTags.map((tag, index) => (
+            <TagItem
+              key={tag.id ?? index}
+              title={tag.title}
+              color={tag.color}
+              editable={editMode}
+              onRemove={() => handleRemove(index)}
+            />
+          ))
+        ) : (
+          <div className="text-font text-sm">선택 가능한 태그가 없습니다.</div>
+        )}
       </div>
       <div className="flex justify-end gap-2">
         <div
