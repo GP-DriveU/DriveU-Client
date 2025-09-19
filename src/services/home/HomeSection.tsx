@@ -44,7 +44,7 @@ function HomeSection() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
         controller.abort();
-      }, 90000); // 90 seconds timeout
+      }, 90000);
       const filenameWithExtension = file.name;
       const { url, s3Path } = await getUploadPresignedUrl({
         filename: decodeURIComponent(filenameWithExtension),

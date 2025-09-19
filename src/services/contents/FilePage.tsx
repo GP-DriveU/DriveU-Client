@@ -123,8 +123,6 @@ function FilePage() {
       const res = await generateQuestionsApi(directoryId, requestPayload);
       setConfirmType("generateQuestion");
       setIsConfirmModalOpen(true);
-
-      // Save questionId temporarily for navigation later
       sessionStorage.setItem("generatedQuestionId", String(res.questionId));
     } catch (e) {
       console.error("문제 생성 실패", e);
@@ -179,7 +177,7 @@ function FilePage() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
         controller.abort();
-      }, 90000); // 2 minutes
+      }, 90000);
       const filenameWithExtension = file.name;
       const { url, s3Path } = await getUploadPresignedUrl({
         filename: decodeURIComponent(filenameWithExtension),

@@ -30,7 +30,7 @@ const ListItem: React.FC<{
             <div
               className="w-5 h-5 min-w-[20px] min-h-[20px] flex items-center bg-primary_light justify-center rounded-sm"
               style={{
-                border: "0.5px solid #4B5563", // Tailwind gray-600 equivalent
+                border: "0.5px solid #4B5563",
               }}
               onClick={(e) => {
                 e.stopPropagation();

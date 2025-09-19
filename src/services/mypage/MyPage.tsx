@@ -84,8 +84,7 @@ function MyPage() {
                   onRequestDelete={(semester) => setDeleteTarget(semester)}
                   setSemesters={(updatedArray) => {
                     if (!Array.isArray(updatedArray)) return;
-
-                    // Always set full edited string array directly as semesterData for now
+                    
                     const mapped = updatedArray
                       .map((s) => {
                         const trimmed = s.trim();

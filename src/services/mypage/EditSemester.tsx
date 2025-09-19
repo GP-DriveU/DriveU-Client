@@ -48,14 +48,12 @@ const EditSemester: React.FC<EditSemesterProps> = ({
       return;
     }
 
-    // Format validation: 2025년 1학기 or 2025년 2학기
     const formatRegex = /^\d{4}년 [12]학기$/;
     if (!formatRegex.test(editedSemester.trim())) {
       alert("형식은 예: 2025년 1학기 처럼 입력해주세요.");
       return;
     }
 
-    // Duplicate check (ignore self)
     if (
       semesters.some(
         (s, i) => i !== index && s.trim() === editedSemester.trim()

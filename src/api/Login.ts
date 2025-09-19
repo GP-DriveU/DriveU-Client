@@ -26,7 +26,7 @@ interface OAuthResponse {
       name: string;
       order: number;
       is_default: boolean;
-      children: any[]; // Assuming no deeper nesting
+      children: any[];
     }[];
   }[];
 }

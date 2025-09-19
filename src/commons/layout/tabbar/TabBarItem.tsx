@@ -2,8 +2,8 @@
 
 interface TabBarItemProps {
   title: string;
-  colorClass: string; // tailwind bg color class like "bg-primary"
-  selectedColorClass: string; // tailwind bg color class when selected
+  colorClass: string;
+  selectedColorClass: string;
   selected: boolean;
   onClick?: () => void;
 }
