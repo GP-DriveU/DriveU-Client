@@ -1,22 +1,21 @@
 ﻿import { useState, useEffect } from "react";
-import { createNoteSummary, getNoteSummary } from "../../../api/Summary";
-import type { TagData } from "../../../types/tag";
-import { useParams } from "react-router-dom";
-import { getNote } from "../../../api/Note";
-import ProgressModal from "../../../commons/modals/ProgressModal";
-import { useNavigate } from "react-router-dom";
-import TextSection from "../../../commons/section/TextSection";
-import TitleSection from "../../../commons/section/TitleSection";
-import TabBar from "../../../commons/layout/tabbar/TabBar";
-import IconEdit from "../../../assets/icon/icon_edit.svg?react";
-import IconArrowLeft from "../../../assets/icon/icon_arrow_left.svg?react";
+import { useParams, useNavigate } from "react-router-dom";
 import MDEditor from "@uiw/react-md-editor";
 import { getCodeString } from "rehype-rewrite";
 import katex from "katex";
-import "katex/dist/katex.min.css";
-import Button from "../../../commons/inputs/Button";
-import { useTagStore } from "../../../store/useTagStore";
-import TagItem from "../../../commons/tag/TagItem";
+
+import ProgressModal from "@/commons/modals/ProgressModal";
+import TextSection from "@/commons/section/TextSection";
+import TitleSection from "@/commons/section/TitleSection";
+import TabBar from "@/commons/layout/tabbar/TabBar";
+import Button from "@/commons/inputs/Button";
+import TagItem from "@/commons/tag/TagItem";
+
+import { getNote } from "@/api/Note";
+import { createNoteSummary, getNoteSummary } from "@/api/Summary";
+import type { TagData } from "@/types/tag";
+import { useTagStore } from "@/store/useTagStore";
+import { IconArrowLeft, IconEdit } from "@/assets";
 
 function NoteDetailPage() {
   const iconItems = [{ id: "one", icon: <IconEdit /> }];

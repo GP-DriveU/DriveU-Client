@@ -1,13 +1,13 @@
-﻿import { useNavigate } from "react-router-dom";
-import IconArrowLeft from "../../assets/icon/icon_arrow_left.svg?react";
-import TitleSection from "../../commons/section/TitleSection";
-import GalleryQuestion from "../../commons/gallery/GalleryQuestion";
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import TitleSection from "@/commons/section/TitleSection";
+import GalleryQuestion from "@/commons/gallery/GalleryQuestion";
 import {
   fetchSemesterQuestions,
   type SemesterQuestionSummary,
-} from "../../api/Question";
-import { useSemesterStore } from "../../store/useSemesterStore";
+} from "@/api/Question";
+import { useSemesterStore } from "@/store/useSemesterStore";
+import { IconArrowLeft } from "@/assets";
 
 function QuestionListPage() {
   const navigate = useNavigate();

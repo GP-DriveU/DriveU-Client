@@ -1,5 +1,4 @@
-﻿import React from "react";
-import IconX from "../../assets/icon/icon_x.svg?react";
+﻿import { IconX } from "@/assets";
 
 interface TagItemProps {
   title: string;

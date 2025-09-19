@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import Button from "../../commons/inputs/Button";
+import Button from "@/commons/inputs/Button";
 
 interface MyPageSectionProps {
   label: string;

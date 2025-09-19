@@ -1,6 +1,5 @@
-﻿import IconDocs from "../assets/icon/icon_docs.svg?react";
-import IconNote from "../assets/icon/icon_note.svg?react";
-import { type ItemType } from "../types/Item";
+﻿import { IconDocs, IconNote } from "@/assets";
+import { type ItemType } from "@/types/Item";
 
 export const getIcon = (type: ItemType) => {
   switch (type) {

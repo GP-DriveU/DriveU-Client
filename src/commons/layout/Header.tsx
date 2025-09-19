@@ -1,9 +1,8 @@
-﻿import Button from "../inputs/Button";
-import { useAuthStore } from "../../store/useAuthStore";
-import { useSemesterStore } from "../../store/useSemesterStore";
-import UserIcon from "../../assets/icon/icon_user.svg?react";
-import ChevronDownIcon from "../../assets/icon/icon_chevron_down.svg?react";
-import { useNavigate } from "react-router-dom";
+﻿import { useNavigate } from "react-router-dom";
+import { IconChevronDown, IconUser } from "@/assets";
+import Button from "@/commons/inputs/Button";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useSemesterStore } from "@/store/useSemesterStore";
 
 function Header() {
   const { user } = useAuthStore();
@@ -51,9 +50,9 @@ function Header() {
                     })()
                   : ""}
               </span>
-              <ChevronDownIcon />
+              <IconChevronDown />
             </div>
-            <UserIcon
+            <IconUser
               onClick={() => {
                 navigate("/mypage");
               }}

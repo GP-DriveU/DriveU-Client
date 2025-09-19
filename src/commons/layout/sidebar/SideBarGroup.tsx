@@ -1,11 +1,11 @@
 ﻿import React, { useState } from "react";
-import SidebarItem from "./SideBarItem";
-import IconAdd from "../../../assets/icon/icon_adddir.svg?react";
-import { createDirectory } from "../../../api/Directory";
-import { useSemesterStore } from "../../../store/useSemesterStore";
-import { useTagStore } from "../../../store/useTagStore";
-import DirectoryAddModal from "../../modals/DirectoryAddModal";
-import { useDirectoryStore } from "../../../store/useDirectoryStore";
+import { createDirectory } from "@/api/Directory";
+import { useSemesterStore } from "@/store/useSemesterStore";
+import { useTagStore } from "@/store/useTagStore";
+import { useDirectoryStore } from "@/store/useDirectoryStore";
+import DirectoryAddModal from "@/commons/modals/DirectoryAddModal";
+import SidebarItem from "@/commons/layout/sidebar/SideBarItem";
+import { IconAdd } from "@/assets";
 
 interface SidebarGroupProps {
   parent: number;

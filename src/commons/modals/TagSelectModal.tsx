@@ -1,6 +1,6 @@
 ﻿import React, { useState } from "react";
-import Button from "../inputs/Button";
-import { type TagData } from "../../types/tag";
+import Button from "@/commons/inputs/Button";
+import { type TagData } from "@/types/tag";
 
 interface TagSelectModalProps {
   isOpen: boolean;

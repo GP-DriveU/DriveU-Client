@@ -1,6 +1,6 @@
-import Router from "./route/Router";
-import Header from "./commons/layout/Header";
-import Footer from "./commons/layout/Footer";
+import Router from "@/route/Router";
+import Header from "@/commons/layout/Header";
+import Footer from "@/commons/layout/Footer";
 import { BrowserRouter } from "react-router-dom";
 
 function App() {

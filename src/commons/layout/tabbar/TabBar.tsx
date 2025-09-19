@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import TabBarItem from "./TabBarItem";
+import TabBarItem from "@/commons/layout/tabbar/TabBarItem";
 
 interface TabBarProps {
   selectedIndex: number;

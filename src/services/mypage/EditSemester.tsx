@@ -1,7 +1,6 @@
 ﻿import React, { useState } from "react";
-import Button from "../../commons/inputs/Button";
-import IconDeletion from "../../assets/icon/icon_delete.svg?react";
-import IconEdit from "../../assets/icon/icon_edit_mypage.svg?react";
+import Button from "@/commons/inputs/Button";
+import { IconDeletion, IconEdit } from "@/assets";
 
 interface EditSemesterProps {
   semesters: string[];

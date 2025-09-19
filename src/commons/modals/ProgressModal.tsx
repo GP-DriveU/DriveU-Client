@@ -1,5 +1,5 @@
-﻿import Lottie from "lottie-react";
-import loadingAnimation from "../../assets/animation/loading.json";
+﻿import { loadingAnimation } from "@/assets";
+import Lottie from "lottie-react";
 
 interface ProgressModalProps {
   isOpen: boolean;

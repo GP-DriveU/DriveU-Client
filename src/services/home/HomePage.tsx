@@ -1,13 +1,12 @@
 ﻿import { useEffect, useState } from "react";
-import List from "../../commons/list/List";
-import type { Item } from "../../types/Item";
-import HomeSection from "./HomeSection";
 import { useNavigate } from "react-router-dom";
-import { getMainPage } from "../../api/Home";
-import type { MainPageResponse } from "../../api/Home";
-import { useDirectoryStore } from "../../store/useDirectoryStore";
-import { useSemesterStore } from "../../store/useSemesterStore";
-import { toggleFavoriteResource } from "../../api/File";
+import List from "@/commons/list/List";
+import type { Item } from "@/types/Item";
+import { type MainPageResponse, getMainPage } from "@/api/Home";
+import { toggleFavoriteResource } from "@/api/File";
+import { useDirectoryStore } from "@/store/useDirectoryStore";
+import { useSemesterStore } from "@/store/useSemesterStore";
+import HomeSection from "@/services/home/HomeSection";
 
 function HomePage() {
   const navigate = useNavigate();

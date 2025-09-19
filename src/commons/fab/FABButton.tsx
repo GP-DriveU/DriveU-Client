@@ -1,5 +1,5 @@
-﻿import React, { useState } from "react";
-import IconFAB from "../../assets/icon/icon_fab.svg?react";
+﻿import { IconFAB } from "@/assets/index";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 const FABButton: React.FC<{

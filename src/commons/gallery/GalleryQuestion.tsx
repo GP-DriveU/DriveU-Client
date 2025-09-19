@@ -1,6 +1,6 @@
 ﻿import React from "react";
-import GalleryQuestionItem from "./GalleryQuestionItem";
 import { useNavigate } from "react-router-dom";
+import GalleryQuestionItem from "@/commons/gallery/GalleryQuestionItem";
 
 export interface GalleryQuestionItemProps {
   id: string;

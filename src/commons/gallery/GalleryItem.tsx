@@ -1,12 +1,10 @@
 ﻿import React from "react";
-import { type Item } from "../../types/Item";
-import { getIcon } from "../../utils/itemUtils";
-import IconFavorite from "../../assets/icon/icon_favorite.svg?react";
-import IconDownload from "../../assets/icon/icon_download.svg?react";
-import IconCheck from "../../assets/icon/icon_check.svg?react";
-import Button from "../inputs/Button";
-import { getDownloadPresignedUrl } from "../../api/File";
-import { getNote } from "../../api/Note";
+import { type Item } from "@/types/Item";
+import { getIcon } from "@/utils/itemUtils";
+import Button from "@/commons/inputs/Button";
+import { getDownloadPresignedUrl } from "@/api/File";
+import { getNote } from "@/api/Note";
+import { IconCheck, IconDownload, IconFavorite } from "@/assets";
 
 const GalleryItem: React.FC<{
   item: Item;

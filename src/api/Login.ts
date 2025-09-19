@@ -1,5 +1,5 @@
-﻿import type { User } from "../store/useAuthStore";
-import { http } from "./Fetch";
+﻿import type { User } from "@/store/useAuthStore";
+import { http } from "@/api/Fetch";
 
 interface OAuthResponse {
   user: {

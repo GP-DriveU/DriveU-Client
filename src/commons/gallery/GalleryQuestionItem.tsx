@@ -1,6 +1,6 @@
-﻿import React from "react";
-import IconMenu from "../../assets/icon/icon_menu.svg?react";
-import IconQuestion from "../../assets/icon/icon_question.svg?react";
+﻿import { IconMenu, IconQuestion } from "@/assets";
+import React from "react";
+
 
 interface GalleryQuestionItemProps {
   id: string;
