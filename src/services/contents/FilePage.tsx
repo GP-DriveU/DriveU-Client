@@ -1,29 +1,29 @@
-﻿import { type Item } from "../../types/Item";
-import Gallery from "../../commons/gallery/Gallery";
-import List from "../../commons/list/List";
-import { useState } from "react";
-import { useEffect } from "react";
+﻿import { useState, useEffect } from "react";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
+
+import AlertModal from "@/commons/modals/AlertModal";
+import ProgressModal from "@/commons/modals/ProgressModal";
+import TagSelectModal from "@/commons/modals/TagSelectModal";
+import UploadOverlay from "@/commons/modals/UploadOverlay";
+
+import FABButton from "@/commons/fab/FABButton";
+import TitleSection from "@/commons/section/TitleSection";
+import Gallery from "@/commons/gallery/Gallery";
+import List from "@/commons/list/List";
+
 import {
   getResourcesByDirectory,
   registerFileMeta,
   toggleFavoriteResource,
-} from "../../api/File";
-import { deleteResource } from "../../api/File";
-import AlertModal from "../../commons/modals/AlertModal";
-import ProgressModal from "../../commons/modals/ProgressModal";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
-import FABButton from "../../commons/fab/FABButton";
-import TitleSection from "../../commons/section/TitleSection";
-import IconFilter from "../../assets/icon/icon_filter.svg?react";
-import IconGallery from "../../assets/icon/icon_grid.svg?react";
-import IconList from "../../assets/icon/icon_list.svg?react";
-import { useSemesterStore } from "../../store/useSemesterStore";
-import UploadOverlay from "../../commons/modals/UploadOverlay";
-import { getUploadPresignedUrl } from "../../api/File";
-import TagSelectModal from "../../commons/modals/TagSelectModal";
-import { useTagOptions } from "../../hooks/useTagOptions";
-import { generateQuestions as generateQuestionsApi } from "../../api/Question";
-import { useDirectoryStore } from "../../store/useDirectoryStore";
+  deleteResource,
+  getUploadPresignedUrl,
+} from "@/api/File";
+import { generateQuestions as generateQuestionsApi } from "@/api/Question";
+import { useTagOptions } from "@/hooks/useTagOptions";
+import { useDirectoryStore } from "@/store/useDirectoryStore";
+import { useSemesterStore } from "@/store/useSemesterStore";
+import { IconFilter, IconGallery, IconList } from "@/assets";
+import { type Item } from "@/types/Item";
 
 function FilePage() {
   const params = useParams();
@@ -123,8 +123,6 @@ function FilePage() {
       const res = await generateQuestionsApi(directoryId, requestPayload);
       setConfirmType("generateQuestion");
       setIsConfirmModalOpen(true);
-
-      // Save questionId temporarily for navigation later
       sessionStorage.setItem("generatedQuestionId", String(res.questionId));
     } catch (e) {
       console.error("문제 생성 실패", e);
@@ -179,7 +177,7 @@ function FilePage() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
         controller.abort();
-      }, 90000); // 2 minutes
+      }, 90000);
       const filenameWithExtension = file.name;
       const { url, s3Path } = await getUploadPresignedUrl({
         filename: decodeURIComponent(filenameWithExtension),

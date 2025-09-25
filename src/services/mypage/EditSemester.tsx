@@ -1,7 +1,6 @@
 ﻿import React, { useState } from "react";
-import Button from "../../commons/inputs/Button";
-import IconDeletion from "../../assets/icon/icon_delete.svg?react";
-import IconEdit from "../../assets/icon/icon_edit_mypage.svg?react";
+import Button from "@/commons/inputs/Button";
+import { IconDeletion, IconEdit } from "@/assets";
 
 interface EditSemesterProps {
   semesters: string[];
@@ -48,14 +47,12 @@ const EditSemester: React.FC<EditSemesterProps> = ({
       return;
     }
 
-    // Format validation: 2025년 1학기 or 2025년 2학기
     const formatRegex = /^\d{4}년 [12]학기$/;
     if (!formatRegex.test(editedSemester.trim())) {
       alert("형식은 예: 2025년 1학기 처럼 입력해주세요.");
       return;
     }
 
-    // Duplicate check (ignore self)
     if (
       semesters.some(
         (s, i) => i !== index && s.trim() === editedSemester.trim()

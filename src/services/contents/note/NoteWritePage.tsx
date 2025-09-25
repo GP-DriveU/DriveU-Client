@@ -1,17 +1,18 @@
 ﻿import { useState } from "react";
-import { createNote } from "../../../api/Note";
-import { useNavigate, useParams } from "react-router-dom";
-import IconArrowLeft from "../../../assets/icon/icon_arrow_left.svg?react";
-import TextSection from "../../../commons/section/TextSection";
+import { useParams, useNavigate } from "react-router-dom";
 import MDEditor from "@uiw/react-md-editor";
 import { getCodeString } from "rehype-rewrite";
 import katex from "katex";
-import "katex/dist/katex.min.css";
-import Button from "../../../commons/inputs/Button";
-import { useTagStore } from "../../../store/useTagStore";
-import TagItem from "../../../commons/tag/TagItem";
-import type { TagData } from "../../../types/tag";
-import { useDirectoryStore } from "../../../store/useDirectoryStore";
+
+import TextSection from "@/commons/section/TextSection";
+import Button from "@/commons/inputs/Button";
+import TagItem from "@/commons/tag/TagItem";
+
+import type { TagData } from "@/types/tag";
+import { useTagStore } from "@/store/useTagStore";
+import { IconArrowLeft } from "@/assets";
+import { useDirectoryStore } from "@/store/useDirectoryStore";
+import { createNote } from "@/api/Note";
 
 function NoteWritePage() {
   const navigate = useNavigate();

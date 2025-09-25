@@ -1,5 +1,5 @@
-﻿import ListItem from "./ListItem";
-import { type Item } from "../../types/Item";
+﻿import ListItem from "@/commons/list/ListItem";
+import { type Item } from "@/types/Item";
 
 interface ListProps {
   items: Item[];

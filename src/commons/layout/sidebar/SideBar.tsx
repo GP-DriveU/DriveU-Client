@@ -1,11 +1,9 @@
 ﻿import React from "react";
 import { useLocation } from "react-router-dom";
-import SidebarItem from "./SideBarItem";
-import SidebarGroup from "./SideBarGroup";
-import { useDirectoryStore } from "../../../store/useDirectoryStore";
-import IconHome from "../../../assets/icon/icon_home.svg?react";
-import IconTrash from "../../../assets/icon/icon_trash.svg?react";
-import IconStore from "../../../assets/icon/icon_store.svg?react";
+import { useDirectoryStore } from "@/store/useDirectoryStore";
+import { IconHome, IconStore, IconTrash } from "@/assets";
+import SidebarItem from "@/commons/layout/sidebar/SideBarItem";
+import SidebarGroup from "@/commons/layout/sidebar/SideBarGroup";
 
 const Sidebar: React.FC = () => {
   const location = useLocation();

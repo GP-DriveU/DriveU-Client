@@ -1,5 +1,5 @@
-﻿import { startGoogleLogin } from "../../api/Login";
-import OauthIcon from "../../assets/icon/icon_google.svg?react";
+﻿import { IconOauth } from "@/assets";
+import { startGoogleLogin } from "@/api/Login";
 
 function LoginSection() {
   const handleGoogleLogin = () => {
@@ -13,7 +13,7 @@ function LoginSection() {
         <div className="self-stretch text-center justify-center text-primary text-3xl font-extrabold font-['Pretendard']">
           Login
         </div>
-        <OauthIcon onClick={handleGoogleLogin} />
+        <IconOauth onClick={handleGoogleLogin} />
       </div>
     </div>
   );

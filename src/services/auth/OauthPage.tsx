@@ -1,10 +1,10 @@
 ﻿import { useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { exchangeGoogleCode } from "../../api/Login";
-import { useAuthStore } from "../../store/useAuthStore";
-import { useSemesterStore } from "../../store/useSemesterStore";
-import { useDirectoryStore } from "../../store/useDirectoryStore";
-import { useTagStore } from "../../store/useTagStore";
+import { exchangeGoogleCode } from "@/api/Login";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useSemesterStore } from "@/store/useSemesterStore";
+import { useDirectoryStore } from "@/store/useDirectoryStore";
+import { useTagStore } from "@/store/useTagStore";
 
 function OAuthCallback() {
   const redirectUri = `${window.location.origin}/oauth/google`;

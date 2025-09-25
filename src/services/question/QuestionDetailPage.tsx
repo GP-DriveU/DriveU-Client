@@ -1,11 +1,11 @@
 ﻿import { useNavigate, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { fetchQuestionDetail } from "../../api/Question";
-import IconArrowLeft from "../../assets/icon/icon_arrow_left.svg?react";
-import TextSection from "../../commons/section/TextSection";
-import TitleSection from "../../commons/section/TitleSection";
-import MultipleChoiceQuestion from "./MultipleChoiceQuestion";
-import ShortAnswerQuestion from "./ShortAnswerQuestion";
+import { fetchQuestionDetail } from "@/api/Question";
+import TextSection from "@/commons/section/TextSection";
+import TitleSection from "@/commons/section/TitleSection";
+import MultipleChoiceQuestion from "@/services/question/MultipleChoiceQuestion";
+import ShortAnswerQuestion from "@/services/question//ShortAnswerQuestion";
+import { IconArrowLeft } from "@/assets";
 
 function QuestionDetailPage() {
   const navigate = useNavigate();

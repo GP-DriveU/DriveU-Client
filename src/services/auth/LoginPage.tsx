@@ -1,4 +1,4 @@
-﻿import LoginSection from "./LoginSection";
+﻿import LoginSection from "@/services/auth/LoginSection";
 
 function LoginPage() {
   return (

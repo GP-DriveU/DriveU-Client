@@ -1,5 +1,5 @@
-﻿import type { Item } from "../types/Item";
-import { http } from "./Fetch";
+﻿import type { Item } from "@/types/Item";
+import { http } from "@/api/Fetch";
 
 export interface Directory {
   id: number;

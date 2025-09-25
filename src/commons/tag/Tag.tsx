@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from "react";
-import TagItem from "./TagItem";
-import { type TagData } from "../../types/tag";
+import TagItem from "@/commons/tag/TagItem";
+import { type TagData } from "@/types/tag";
 
 interface TagGroupProps {
   tags: TagData[];

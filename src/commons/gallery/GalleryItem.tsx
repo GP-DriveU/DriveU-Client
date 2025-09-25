@@ -1,12 +1,10 @@
 ﻿import React from "react";
-import { type Item } from "../../types/Item";
-import { getIcon } from "../../utils/itemUtils";
-import IconFavorite from "../../assets/icon/icon_favorite.svg?react";
-import IconDownload from "../../assets/icon/icon_download.svg?react";
-import IconCheck from "../../assets/icon/icon_check.svg?react";
-import Button from "../inputs/Button";
-import { getDownloadPresignedUrl } from "../../api/File";
-import { getNote } from "../../api/Note";
+import { type Item } from "@/types/Item";
+import { getIcon } from "@/utils/itemUtils";
+import Button from "@/commons/inputs/Button";
+import { getDownloadPresignedUrl } from "@/api/File";
+import { getNote } from "@/api/Note";
+import { IconCheck, IconDownload, IconFavorite } from "@/assets";
 
 const GalleryItem: React.FC<{
   item: Item;
@@ -33,7 +31,7 @@ const GalleryItem: React.FC<{
             <div
               className="w-5 h-5 min-w-[20px] min-h-[20px] flex items-center bg-primary_light justify-center rounded-sm"
               style={{
-                border: "0.5px solid #4B5563", // Tailwind gray-600 equivalent
+                border: "0.5px solid #4B5563",
               }}
               onClick={(e) => {
                 e.stopPropagation();

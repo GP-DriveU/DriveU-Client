@@ -1,5 +1,5 @@
-﻿import type { User } from "../store/useAuthStore";
-import { http } from "./Fetch";
+﻿import type { User } from "@/store/useAuthStore";
+import { http } from "@/api/Fetch";
 
 interface OAuthResponse {
   user: {
@@ -26,7 +26,7 @@ interface OAuthResponse {
       name: string;
       order: number;
       is_default: boolean;
-      children: any[]; // Assuming no deeper nesting
+      children: any[];
     }[];
   }[];
 }

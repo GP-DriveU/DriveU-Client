@@ -1,15 +1,17 @@
 ﻿import { useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
-import Button from "../../commons/inputs/Button";
-import UploadOverlay from "../../commons/modals/UploadOverlay";
-import { useDirectoryStore } from "../../store/useDirectoryStore";
-import TagSelectModal from "../../commons/modals/TagSelectModal";
-import { getUploadPresignedUrl, registerFileMeta } from "../../api/File";
-import type { Item } from "../../types/Item";
-import ProgressModal from "../../commons/modals/ProgressModal";
-import { useTagOptions } from "../../hooks/useTagOptions";
-import LocalModal from "../../commons/modals/Modal";
-import AlertModal from "../../commons/modals/AlertModal";
+
+import Button from "@/commons/inputs/Button";
+import UploadOverlay from "@/commons/modals/UploadOverlay";
+import TagSelectModal from "@/commons/modals/TagSelectModal";
+import type { Item } from "@/types/Item";
+import ProgressModal from "@/commons/modals/ProgressModal";
+import LocalModal from "@/commons/modals/Modal";
+import AlertModal from "@/commons/modals/AlertModal";
+
+import { getUploadPresignedUrl, registerFileMeta } from "@/api/File";
+import { useDirectoryStore } from "@/store/useDirectoryStore";
+import { useTagOptions } from "@/hooks/useTagOptions";
 
 function HomeSection() {
   const navigate = useNavigate();
@@ -44,7 +46,7 @@ function HomeSection() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => {
         controller.abort();
-      }, 90000); // 90 seconds timeout
+      }, 90000);
       const filenameWithExtension = file.name;
       const { url, s3Path } = await getUploadPresignedUrl({
         filename: decodeURIComponent(filenameWithExtension),

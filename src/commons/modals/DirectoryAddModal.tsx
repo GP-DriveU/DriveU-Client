@@ -1,5 +1,5 @@
 ﻿import React from "react";
-import Button from "../inputs/Button";
+import Button from "@/commons/inputs/Button";
 
 interface DirectoryAddModalProps {
   isOpen: boolean;

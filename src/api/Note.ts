@@ -1,4 +1,4 @@
-﻿import { http } from "./Fetch";
+﻿import { http } from "@/api/Fetch";
 
 export interface GetNoteResponse {
   noteId: number;

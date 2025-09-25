@@ -1,18 +1,18 @@
 ﻿import { Routes, Route, useParams } from "react-router-dom";
-import HomePage from "../services/home/HomePage";
-import LandingPage from "../services/landing/LandingPage";
-import { useAuthStore } from "../store/useAuthStore";
-import LoginPage from "../services/auth/LoginPage";
-import OAuthCallback from "../services/auth/OauthPage";
-import AppLayout from "../services/AppLayout";
-import NoteDetailPage from "../services/contents/note/NoteDetailPage";
-import NoteEditPage from "../services/contents/note/NoteEditPage";
-import MyPage from "../services/mypage/MyPage";
-import QuestionListPage from "../services/question/QuestionListPage";
-import QuestionDetailPage from "../services/question/QuestionDetailPage";
-import FilePage from "../services/contents/FilePage";
-import FileDetailPage from "../services/contents/FileDetailPage";
-import NoteWritePage from "../services/contents/note/NoteWritePage";
+import HomePage from "@/services/home/HomePage";
+import LandingPage from "@/services/landing/LandingPage";
+import { useAuthStore } from "@/store/useAuthStore";
+import LoginPage from "@/services/auth/LoginPage";
+import OAuthCallback from "@/services/auth/OauthPage";
+import AppLayout from "@/services/AppLayout";
+import NoteDetailPage from "@/services/contents/note/NoteDetailPage";
+import NoteEditPage from "@/services/contents/note/NoteEditPage";
+import MyPage from "@/services/mypage/MyPage";
+import QuestionListPage from "@/services/question/QuestionListPage";
+import QuestionDetailPage from "@/services/question/QuestionDetailPage";
+import FilePage from "@/services/contents/FilePage";
+import FileDetailPage from "@/services/contents/FileDetailPage";
+import NoteWritePage from "@/services/contents/note/NoteWritePage";
 
 function Router() {
   const { user } = useAuthStore();

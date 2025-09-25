@@ -1,6 +1,6 @@
 ﻿import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { type TagData } from "../types/tag";
+import { type TagData } from "@/types/tag";
 
 interface TagState {
   tags: TagData[];

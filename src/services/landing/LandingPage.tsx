@@ -1,8 +1,6 @@
-﻿import LandingSection from "./LadingSection";
-import LandingImg_1 from "../../assets/image/image_landing_1.svg?react";
-import LandingImg_2 from "../../assets/image/image_landing_2.svg?react";
-import LandingImg_3 from "../../assets/image/image_landing_3.svg?react";
-import Button from "../../commons/inputs/Button";
+﻿import Button from "@/commons/inputs/Button";
+import { LandingImg_1, LandingImg_2, LandingImg_3 } from "@/assets";
+import LandingSection from "@/services/landing/LadingSection";
 
 function LandingPage() {
   return (

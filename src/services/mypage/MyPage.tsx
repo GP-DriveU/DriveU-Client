@@ -5,13 +5,13 @@ import {
   updateSemester,
   deleteSemester as apiDeleteSemester,
   type UserInfoResponse,
-} from "../../api/MyPage";
-import TitleSection from "../../commons/section/TitleSection";
-import MyPageSection from "./MyPageSection";
-import EditSemester from "./EditSemester";
-import AlertModal from "../../commons/modals/AlertModal";
-import Button from "../../commons/inputs/Button";
-import { useAuthStore } from "../../store/useAuthStore";
+} from "@/api/MyPage";
+import TitleSection from "@/commons/section/TitleSection";
+import AlertModal from "@/commons/modals/AlertModal";
+import Button from "@/commons/inputs/Button";
+import { useAuthStore } from "@/store/useAuthStore";
+import MyPageSection from "@/services/mypage/MyPageSection";
+import EditSemester from "@/services/mypage/EditSemester";
 
 const formatSemester = (s: { year: number; term: string }) =>
   `${String(s.year).slice(2)}년 ${s.term === "SPRING" ? "1학기" : "2학기"}`;
@@ -84,8 +84,7 @@ function MyPage() {
                   onRequestDelete={(semester) => setDeleteTarget(semester)}
                   setSemesters={(updatedArray) => {
                     if (!Array.isArray(updatedArray)) return;
-
-                    // Always set full edited string array directly as semesterData for now
+                    
                     const mapped = updatedArray
                       .map((s) => {
                         const trimmed = s.trim();
