@@ -1,5 +1,6 @@
 ﻿import type { User } from "@/store/useAuthStore";
 import { http } from "@/api/Fetch";
+import type { TermType } from "@/types/semester";
 
 interface OAuthResponse {
   user: {
@@ -9,7 +10,7 @@ interface OAuthResponse {
   semesters: {
     userSemesterId: number;
     year: number;
-    term: "SPRING" | "SUMMER" | "FALL" | "WINTER";
+    term: TermType;
     isCurrent: boolean;
   }[];
   token: {

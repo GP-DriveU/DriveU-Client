@@ -1,4 +1,5 @@
 ﻿import { http } from "@/api/Fetch";
+import type { TermType } from "@/types/semester";
 
 export interface UserInfoResponse {
   id: number;
@@ -7,20 +8,20 @@ export interface UserInfoResponse {
   semesters: {
     userSemesterId: number;
     year: number;
-    term: "SPRING" | "SUMMER" | "FALL" | "WINTER";
+    term: TermType;
     isCurrent: boolean;
   }[];
 }
 
 export interface SemesterRequest {
   year: number;
-  term: "SPRING" | "SUMMER" | "FALL" | "WINTER";
+  term: TermType;
 }
 
 export interface SemesterResponse {
   userSemesterId: number;
   year: number;
-  term: "SPRING" | "SUMMER" | "FALL" | "WINTER";
+  term: TermType;
   isCurrent: boolean;
 }
 
