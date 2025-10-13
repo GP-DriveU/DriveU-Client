@@ -1,5 +1,4 @@
-﻿import React from "react";
-import Button from "@/commons/inputs/Button";
+﻿import Button from "@/commons/inputs/Button";
 
 interface MyPageSectionProps {
   label: string;
@@ -13,7 +12,7 @@ interface MyPageSectionProps {
   showEditButton?: boolean;
 }
 
-const MyPageSection: React.FC<MyPageSectionProps> = ({
+function MyPageSection({
   label,
   value,
   isEditing = false,
@@ -23,7 +22,8 @@ const MyPageSection: React.FC<MyPageSectionProps> = ({
   editElement,
   editButtonText,
   showEditButton,
-}) => {
+}: MyPageSectionProps) {
+
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full px-4 py-3 border-y bg-white">
       <div className="flex flex-col w-full sm:flex-row items-start gap-2">

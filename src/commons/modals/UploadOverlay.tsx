@@ -1,11 +1,11 @@
 ﻿import React, { useCallback } from "react";
 
-type UploadOverlayProps = {
+interface UploadOverlayProps {
   onClose: () => void;
   onUpload: (files: FileList) => void;
 };
 
-const UploadOverlay: React.FC<UploadOverlayProps> = ({ onClose, onUpload }) => {
+function UploadOverlay ({ onClose, onUpload } : UploadOverlayProps) {
   const handleDrop = useCallback(
     (event: React.DragEvent) => {
       event.preventDefault();

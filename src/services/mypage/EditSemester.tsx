@@ -20,14 +20,15 @@ interface EditSemesterProps {
   ) => void;
 }
 
-const EditSemester: React.FC<EditSemesterProps> = ({
+function EditSemester({
   semesters,
   onRequestDelete,
   setSemesters,
   onEditComplete,
   onCreateSemester,
   onUpdateSemester,
-}) => {
+}: EditSemesterProps) {
+
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editedSemester, setEditedSemester] = useState("");
   const [newSemesterInput, setNewSemesterInput] = useState("");

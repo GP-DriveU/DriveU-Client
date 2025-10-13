@@ -1,6 +1,4 @@
-﻿import React from "react";
-
-interface TabBarItemProps {
+﻿interface TabBarItemProps {
   title: string;
   colorClass: string;
   selectedColorClass: string;
@@ -8,13 +6,13 @@ interface TabBarItemProps {
   onClick?: () => void;
 }
 
-const TabBarItem: React.FC<TabBarItemProps> = ({
+function TabBarItem ({
   title,
   colorClass,
   selectedColorClass,
   selected,
   onClick,
-}) => {
+}: TabBarItemProps) {
   return (
     <div
       className={`w-32 relative cursor-pointer ${

@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import { useState } from "react";
 import { createDirectory } from "@/api/Directory";
 import { useSemesterStore } from "@/store/useSemesterStore";
 import { useTagStore } from "@/store/useTagStore";
@@ -15,13 +15,14 @@ interface SidebarGroupProps {
   currentPath: string;
 }
 
-const SidebarGroup: React.FC<SidebarGroupProps> = ({
+function SidebarGroup ({
   parent,
   title,
   initialItems,
   basePath,
   currentPath,
-}) => {
+} : SidebarGroupProps) {
+
   const [items, setItems] = useState(initialItems);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newDirName, setNewDirName] = useState("");

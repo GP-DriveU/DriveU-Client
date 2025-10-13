@@ -1,5 +1,4 @@
 ﻿import { IconMenu, IconQuestion } from "@/assets";
-import React from "react";
 
 interface GalleryQuestionItemProps {
   id: string;
@@ -9,13 +8,14 @@ interface GalleryQuestionItemProps {
   onClick?: () => void;
 }
 
-const GalleryQuestionItem: React.FC<GalleryQuestionItemProps> = ({
+function GalleryQuestionItem({ 
   id,
   version,
   title,
   date,
-  onClick,
-}) => {
+  onClick }
+  : GalleryQuestionItemProps) {
+
   return (
     <div
       key={id}

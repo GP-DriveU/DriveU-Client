@@ -1,18 +1,17 @@
-﻿import React from "react";
-
-interface MultipleChoiceQuestionProps {
+﻿interface MultipleChoiceQuestionProps {
   index: number;
   question: string;
   options: string[];
   answer: string;
 }
 
-const MultipleChoiceQuestion: React.FC<MultipleChoiceQuestionProps> = ({
+function MultipleChoiceQuestion ({
   index,
   question,
   options,
   answer,
-}) => {
+}: MultipleChoiceQuestionProps) {
+
   return (
     <div className="w-full flex flex-col gap-6">
       <div className="text-primary text-3xl font-bold font-pretendard">

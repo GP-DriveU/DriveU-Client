@@ -1,5 +1,4 @@
-﻿import React from "react";
-import { getDownloadPresignedUrl } from "@/api/File";
+﻿import { getDownloadPresignedUrl } from "@/api/File";
 import { getNote } from "@/api/Note";
 import { type Item } from "@/types/Item";
 import { getIcon } from "@/utils/itemUtils";
@@ -14,7 +13,7 @@ interface ListItemProps {
   onClickItem: (id: number) => void;
 }
 
-const ListItem: React.FC<ListItemProps> = ({ item, onToggleSelect, onToggleFavorite, selectable, onClickItem }) => {
+function ListItem ({ item, onToggleSelect, onToggleFavorite, selectable, onClickItem } : ListItemProps) {
   return (
     <div
       className="flex items-center justify-between px-4 py-2 bg-white shadow-sm mb-2"

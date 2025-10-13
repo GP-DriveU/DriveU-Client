@@ -7,12 +7,13 @@ interface TagItemProps {
   onRemove?: () => void;
 }
 
-const TagItem: React.FC<TagItemProps> = ({
+function TagItem ({
   title,
   color,
   editable = false,
   onRemove,
-}) => {
+}: TagItemProps) {
+
   return (
     <div
       className={`inline-flex items-center h-[27px] px-3 rounded-[10px] outline outline-1 outline-offset-[-1px] bg-${color}/50 outline-${color}`}

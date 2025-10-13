@@ -13,13 +13,14 @@ interface TitleSectionProps {
   selectedId?: string;
 }
 
-const TitleSection: React.FC<TitleSectionProps> = ({
+function TitleSection({
   title,
   semester,
   items,
   onIconClick,
   selectedId,
-}) => {
+}: TitleSectionProps) {
+
   const handleClick = (id: string) => {
     if (onIconClick) {
       onIconClick(id);

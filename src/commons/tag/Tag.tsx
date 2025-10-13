@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+﻿import { useState, useEffect } from "react";
 import TagItem from "@/commons/tag/TagItem";
 import { type TagData } from "@/types/tag";
 
@@ -7,7 +7,8 @@ interface TagGroupProps {
   onSave: (updatedTags: TagData[]) => void;
 }
 
-const Tag: React.FC<TagGroupProps> = ({ tags, onSave }) => {
+function Tag ({ tags, onSave } : TagGroupProps) {
+
   const [editMode, setEditMode] = useState(false);
   const [localTags, setLocalTags] = useState<TagData[]>([]);
 

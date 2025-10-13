@@ -1,5 +1,4 @@
-﻿import React from "react";
-import { type Item } from "@/types/Item";
+﻿import { type Item } from "@/types/Item";
 import { getIcon } from "@/utils/itemUtils";
 import Button from "@/commons/inputs/Button";
 import { getDownloadPresignedUrl } from "@/api/File";
@@ -14,7 +13,14 @@ interface GalleryItemProps {
   onClickItem: (id: number) => void;
 }
 
-const GalleryItem: React.FC<GalleryItemProps> = ({ item, onToggleSelect, onToggleFavorite, selectable, onClickItem }) => {
+function GalleryItem({
+  item,
+  onToggleSelect,
+  onToggleFavorite,
+  selectable,
+  onClickItem,
+}: GalleryItemProps) {
+
   return (
     <div
       className="px-4 py-4 bg-white border-t border-b border-font flex flex-col items-center font-pretendard space-y-6"

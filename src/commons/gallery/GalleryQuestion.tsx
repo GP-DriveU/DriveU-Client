@@ -1,5 +1,4 @@
-﻿import React from "react";
-import { useNavigate } from "react-router-dom";
+﻿import { useNavigate } from "react-router-dom";
 import GalleryQuestionItem from "@/commons/gallery/GalleryQuestionItem";
 
 export interface GalleryQuestionItemProps {
@@ -13,7 +12,7 @@ interface GalleryQuestionGridProps {
   items: GalleryQuestionItemProps[];
 }
 
-const GalleryQuestion: React.FC<GalleryQuestionGridProps> = ({ items }) => {
+function GalleryQuestion ({ items } : GalleryQuestionGridProps) {
   const navigate = useNavigate();
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-8">

@@ -9,13 +9,14 @@ interface ListProps {
   onClickItem: (id: number) => void;
 }
 
-const List: React.FC<ListProps> = ({
+function List({
   items,
   onToggleSelect,
   onToggleFavorite,
   selectable,
   onClickItem,
-}) => {
+}: ListProps) {
+
   return (
     <div className="px-4 py-6 rounded-md">
       {items && items.length > 0 ? (

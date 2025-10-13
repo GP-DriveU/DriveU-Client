@@ -1,11 +1,10 @@
-﻿import React from "react";
-
-interface TextSectionProps {
+﻿interface TextSectionProps {
   title: string;
   rightElement?: React.ReactNode;
 }
 
-const TextSection: React.FC<TextSectionProps> = ({ title, rightElement }) => {
+function TextSection({ title, rightElement }: TextSectionProps) {
+
   return (
     <div className="flex gap-6 w-full px-10 pb-6 items-start h-full">
       <div className="text-font text-2xl items-start font-semibold font-pretendard">
