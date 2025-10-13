@@ -6,13 +6,15 @@ import { getDownloadPresignedUrl } from "@/api/File";
 import { getNote } from "@/api/Note";
 import { IconCheck, IconDownload, IconFavorite } from "@/assets";
 
-const GalleryItem: React.FC<{
+interface GalleryItemProps {
   item: Item;
   onToggleSelect: (id: number) => void;
   onToggleFavorite: (id: number) => void;
   selectable: boolean;
   onClickItem: (id: number) => void;
-}> = ({ item, onToggleSelect, onToggleFavorite, selectable, onClickItem }) => {
+}
+
+const GalleryItem: React.FC<GalleryItemProps> = ({ item, onToggleSelect, onToggleFavorite, selectable, onClickItem }) => {
   return (
     <div
       className="px-4 py-4 bg-white border-t border-b border-font flex flex-col items-center font-pretendard space-y-6"

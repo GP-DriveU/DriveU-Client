@@ -1,7 +1,6 @@
 ﻿import { IconMenu, IconQuestion } from "@/assets";
 import React from "react";
 
-
 interface GalleryQuestionItemProps {
   id: string;
   version: string;
