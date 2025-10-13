@@ -10,6 +10,7 @@ export { default as IconStore } from "@/assets/icon/icon_store.svg?react";
 export { default as IconAdd } from "@/assets/icon/icon_adddir.svg?react";
 export { default as IconUser} from "@/assets/icon/icon_user.svg?react";
 export { default as IconChevronDown } from "@/assets/icon/icon_chevron_down.svg?react";
+export { default as IconChevronUp } from "@/assets/icon/icon_chevron_up.svg?react";
 export { default as IconX } from "@/assets/icon/icon_x.svg?react";
 export { default as IconOauth} from "@/assets/icon/icon_google.svg?react";
 export { default as IconEdit } from "@/assets/icon/icon_edit.svg?react";
@@ -20,6 +21,9 @@ export { default as IconList } from "@/assets/icon/icon_list.svg?react";
 export { default as IconDeletion } from "@/assets/icon/icon_delete.svg?react";
 export { default as IconDocs } from "@/assets/icon/icon_docs.svg?react";
 export { default as IconNote } from "@/assets/icon/icon_note.svg?react";
+export { default as IconArrowDropDown } from "@/assets/icon/icon_arrow_drop_down.svg?react";
+export { default as IconArrowDropUp } from "@/assets/icon/icon_arrow_drop_up.svg?react";
+
 
 export { default as loadingAnimation } from "@/assets/animation/loading.json";
 
