@@ -1,16 +1,15 @@
-﻿import React from "react";
-
-interface ShortAnswerQuestionProps {
+﻿interface ShortAnswerQuestionProps {
   index: number;
   question: string;
   answer: string;
 }
 
-const ShortAnswerQuestion: React.FC<ShortAnswerQuestionProps> = ({
+function ShortAnswerQuestion ({
   index,
   question,
   answer,
-}) => {
+}: ShortAnswerQuestionProps) {
+
   return (
     <div className="w-full flex flex-col gap-4">
       <div className="text-primary text-3xl font-bold font-pretendard">

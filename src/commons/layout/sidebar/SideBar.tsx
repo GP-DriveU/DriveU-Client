@@ -1,11 +1,10 @@
-﻿import React from "react";
-import { useLocation } from "react-router-dom";
+﻿import { useLocation } from "react-router-dom";
 import { useDirectoryStore } from "@/store/useDirectoryStore";
 import { IconHome, IconStore, IconTrash } from "@/assets";
 import SidebarItem from "@/commons/layout/sidebar/SideBarItem";
 import SidebarGroup from "@/commons/layout/sidebar/SideBarGroup";
 
-const Sidebar: React.FC = () => {
+function Sidebar () {
   const location = useLocation();
   const getCurrentDirectories = useDirectoryStore(
     (state) => state.getCurrentDirectories

@@ -1,5 +1,4 @@
-﻿import React from "react";
-import Button from "@/commons/inputs/Button";
+﻿import Button from "@/commons/inputs/Button";
 
 interface AlertModalProps {
   title: string;
@@ -11,7 +10,7 @@ interface AlertModalProps {
   cancelText?: string;
 }
 
-const AlertModal: React.FC<AlertModalProps> = ({
+function AlertModal({
   title,
   description,
   onConfirm,
@@ -19,7 +18,8 @@ const AlertModal: React.FC<AlertModalProps> = ({
   isDanger = false,
   confirmText,
   cancelText,
-}) => {
+}: AlertModalProps) {
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
       <div className="w-full max-w-md px-6 py-6 bg-white rounded-xl flex flex-col items-center gap-6">

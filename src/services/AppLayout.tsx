@@ -1,4 +1,4 @@
-﻿import React, { useEffect } from "react";
+﻿import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuthStore } from "@/store/useAuthStore";
 import Sidebar from "@/commons/layout/sidebar/SideBar";
@@ -8,7 +8,8 @@ interface AppLayoutProps {
   children: React.ReactNode;
 }
 
-const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
+function AppLayout ({ children }: AppLayoutProps) {
+
   const { user } = useAuthStore();
   const navigate = useNavigate();
 

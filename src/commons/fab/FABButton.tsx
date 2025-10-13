@@ -1,8 +1,8 @@
 ﻿import { IconFAB } from "@/assets/index";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-const FABButton: React.FC<{
+interface FABButtonProps {
   isGenerating: boolean;
   isSelecting: boolean;
   onStartGenerating: () => void;
@@ -13,7 +13,9 @@ const FABButton: React.FC<{
   onUploadClick: () => void;
   onStartDelete: () => void;
   onWriteNoteClick?: () => void;
-}> = ({
+}
+
+function FABButton({
   isGenerating,
   isSelecting,
   onStartGenerating,
@@ -24,7 +26,8 @@ const FABButton: React.FC<{
   onUploadClick,
   onStartDelete,
   onWriteNoteClick,
-}) => {
+}: FABButtonProps) {
+  
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const { slug } = useParams();

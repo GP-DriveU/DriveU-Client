@@ -1,5 +1,4 @@
-﻿import React from "react";
-import Button from "@/commons/inputs/Button";
+﻿import Button from "@/commons/inputs/Button";
 
 interface DirectoryAddModalProps {
   isOpen: boolean;
@@ -10,13 +9,14 @@ interface DirectoryAddModalProps {
   items: { name: string }[];
 }
 
-const DirectoryAddModal: React.FC<DirectoryAddModalProps> = ({
+function DirectoryAddModal({
   isOpen,
   onClose,
   onSubmit,
   newDirName,
   setNewDirName,
-}) => {
+}: DirectoryAddModalProps) {
+
   if (!isOpen) return null;
 
   return (

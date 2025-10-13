@@ -1,10 +1,11 @@
-﻿import { create } from "zustand";
+﻿import type { TermType } from "@/types/semester";
+import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export type Semester = {
   userSemesterId: number;
   year: number;
-  term: "SPRING" | "SUMMER" | "FALL" | "WINTER";
+  term: TermType;
   isCurrent: boolean;
 };
 

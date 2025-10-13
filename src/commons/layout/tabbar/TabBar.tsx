@@ -1,12 +1,11 @@
-﻿import React from "react";
-import TabBarItem from "@/commons/layout/tabbar/TabBarItem";
+﻿import TabBarItem from "@/commons/layout/tabbar/TabBarItem";
 
 interface TabBarProps {
   selectedIndex: number;
   setSelectedIndex: (index: number) => void;
 }
 
-const TabBar: React.FC<TabBarProps> = ({ selectedIndex, setSelectedIndex }) => {
+function TabBar ({ selectedIndex, setSelectedIndex } : TabBarProps) {
   const tabs = [
     {
       title: "필기 내용",

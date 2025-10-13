@@ -1,33 +1,32 @@
 ﻿import React, { useState } from "react";
 import Button from "@/commons/inputs/Button";
 import { IconDeletion, IconEdit } from "@/assets";
+import type { TermType } from "@/types/semester";
 
 interface EditSemesterProps {
   semesters: string[];
   onRequestDelete: (semester: string) => void;
   setSemesters: React.Dispatch<React.SetStateAction<string[]>>;
   onEditComplete?: () => void;
-  onCreateSemester?: (data: {
+  onCreateSemester?: (data: { year: number; term: TermType }) => Promise<{
     year: number;
-    term: "SPRING" | "SUMMER" | "FALL" | "WINTER";
-  }) => Promise<{
-    year: number;
-    term: "SPRING" | "SUMMER" | "FALL" | "WINTER";
+    term: TermType;
   }>;
   onUpdateSemester?: (
     index: number,
-    data: { year: number; term: "SPRING" | "SUMMER" | "FALL" | "WINTER" }
+    data: { year: number; term: TermType }
   ) => void;
 }
 
-const EditSemester: React.FC<EditSemesterProps> = ({
+function EditSemester({
   semesters,
   onRequestDelete,
   setSemesters,
   onEditComplete,
   onCreateSemester,
   onUpdateSemester,
-}) => {
+}: EditSemesterProps) {
+
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editedSemester, setEditedSemester] = useState("");
   const [newSemesterInput, setNewSemesterInput] = useState("");

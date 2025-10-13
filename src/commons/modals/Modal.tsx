@@ -1,12 +1,15 @@
-﻿function LocalModal({
-  onClose,
-  title,
-  children,
-}: {
+﻿interface LocalModalProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
-}) {
+}
+
+function LocalModal({
+  onClose,
+  title,
+  children,
+}: LocalModalProps) {
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white rounded-lg shadow-lg w-96 p-6">

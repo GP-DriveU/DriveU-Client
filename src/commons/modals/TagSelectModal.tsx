@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+﻿import { useState } from "react";
 import Button from "@/commons/inputs/Button";
 import { type TagData } from "@/types/tag";
 
@@ -9,14 +9,14 @@ interface TagSelectModalProps {
   availableTags: TagData[];
   initialTags?: TagData[];
 }
-
-const TagSelectModal: React.FC<TagSelectModalProps> = ({
+function TagSelectModal ({
   isOpen,
   onClose,
   onSave,
   availableTags,
   initialTags,
-}) => {
+}: TagSelectModalProps) {
+
   const [selectedTags, setSelectedTags] = useState<TagData[]>(
     initialTags ?? []
   );
