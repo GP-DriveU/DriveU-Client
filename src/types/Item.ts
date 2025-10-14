@@ -16,3 +16,10 @@ export interface Item {
     tagName: string;
   } | null;
 }
+
+export interface TrashItem {
+  id: number;
+  name: string;
+  type: ItemType;
+  deletedAt: string;
+}

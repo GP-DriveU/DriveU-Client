@@ -1,42 +1,22 @@
-﻿import ListItem from "@/commons/list/ListItem";
-import { type Item } from "@/types/Item";
-
-interface ListProps {
-  items: Item[];
-  onToggleSelect: (id: number) => void;
-  onToggleFavorite: (id: number) => void;
-  selectable: boolean;
-  onClickItem: (id: number) => void;
+﻿interface ListProps<T> {
+  items: T[];
+  renderItem: (item: T) => React.ReactNode;
+  emptyComponent: React.ReactNode;
 }
 
-function List({
+function List<T extends { id: number | string }>({
   items,
-  onToggleSelect,
-  onToggleFavorite,
-  selectable,
-  onClickItem,
-}: ListProps) {
-
+  renderItem,
+  emptyComponent,
+}: ListProps<T>) {
+    
   return (
     <div className="px-4 py-6 rounded-md">
-      {items && items.length > 0 ? (
-        items.map((item) => (
-          <ListItem
-            key={item.id}
-            item={item}
-            onToggleSelect={onToggleSelect}
-            onToggleFavorite={onToggleFavorite}
-            selectable={selectable}
-            onClickItem={onClickItem}
-          />
-        ))
-      ) : (
-        <div className="text-center text-gray-500 py-4">
-          현재 저장된 파일이 없습니다.
-        </div>
-      )}
+      {items && items.length > 0
+        ? items.map((item) => <div key={item.id}>{renderItem(item)}</div>)
+        : emptyComponent}
     </div>
   );
-};
+}
 
 export default List;
