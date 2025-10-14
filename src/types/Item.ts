@@ -1,4 +1,4 @@
-﻿export type ItemType = "FILE" | "NOTE" | "LINK";
+﻿export type ItemType = "FILE" | "NOTE" | "LINK" | "DIRECTORY";
 
 export interface Item {
   id: number;
@@ -15,4 +15,11 @@ export interface Item {
     tagId: number;
     tagName: string;
   } | null;
+}
+
+export interface TrashItem {
+  id: number;
+  name: string;
+  type: ItemType;
+  deletedAt: string;
 }

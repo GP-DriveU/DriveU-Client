@@ -13,6 +13,7 @@ import QuestionDetailPage from "@/services/question/QuestionDetailPage";
 import FilePage from "@/services/contents/FilePage";
 import FileDetailPage from "@/services/contents/FileDetailPage";
 import NoteWritePage from "@/services/contents/note/NoteWritePage";
+import TrashPage from "@/services/trash/TrashPage";
 
 function Router() {
   const { user } = useAuthStore();
@@ -149,6 +150,15 @@ function Router() {
         element={
           <AppLayout>
             <QuestionDetailPage />
+          </AppLayout>
+        }
+      />
+
+      <Route
+        path="/trash"
+        element={
+          <AppLayout>
+            <TrashPage />
           </AppLayout>
         }
       />

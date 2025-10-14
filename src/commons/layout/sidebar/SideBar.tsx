@@ -21,6 +21,7 @@ function Sidebar () {
   }
 
   const isHome = location.pathname === "/";
+  const isTrash = location.pathname === "/trash";
 
   return (
     <aside className="w-[278px] min-w-[220px] min-h-screen px-10 py-6 bg-primary_light flex flex-col gap-4">
@@ -66,12 +67,11 @@ function Sidebar () {
       </div>
 
       <div className="flex-shrink-0 w-full flex flex-col gap-4">
-        <div className="flex flex-row items-center">
-          <IconTrash />
-          <SidebarItem
-            label="휴지통"
-            isActive={location.pathname === "/trash"}
-          />
+        <div className={`flex flex-row items-center ${
+            isTrash ? "bg-primary text-white" : ""
+          }`}>
+          <IconTrash className={`${isTrash ? "text-white" : ""}`} />
+          <SidebarItem label="휴지통" isActive={isTrash} to={"/trash"} />
         </div>
         <div className="flex flex-row items-center">
           <IconStore />

@@ -1,12 +1,12 @@
 ﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import List from "@/commons/list/List";
 import type { Item } from "@/types/Item";
 import { type MainPageResponse, getMainPage } from "@/api/Home";
 import { toggleFavoriteResource } from "@/api/File";
 import { useDirectoryStore } from "@/store/useDirectoryStore";
 import { useSemesterStore } from "@/store/useSemesterStore";
 import HomeSection from "@/services/home/HomeSection";
+import MainFileList from "@/commons/list/MainFileList";
 
 function HomePage() {
   const navigate = useNavigate();
@@ -85,7 +85,7 @@ function HomePage() {
             업로드한 파일이 없습니다.
           </div>
         ) : (
-          <List
+          <MainFileList
             items={recentItems}
             onToggleSelect={handleToggleSelect}
             onToggleFavorite={handleToggleFavorite}
@@ -103,7 +103,7 @@ function HomePage() {
             즐겨찾기한 파일이 없습니다.
           </div>
         ) : (
-          <List
+          <MainFileList
             items={favoriteItems}
             onToggleSelect={handleToggleSelect}
             onToggleFavorite={handleToggleFavorite}
