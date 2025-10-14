@@ -40,9 +40,9 @@ function Sort({ sortOption, onSortChange }: SortProps) {
         </button>
       </div>
 
-      {isConfigOpen && (
+      <div className={!isConfigOpen ? "invisible" : ""}>
         <SortConfig currentSort={sortOption} onSortChange={onSortChange} />
-      )}
+      </div>
     </div>
   );
 };
