@@ -1,4 +1,4 @@
-﻿export type ItemType = "FILE" | "NOTE" | "LINK";
+﻿export type ItemType = "FILE" | "NOTE" | "LINK" | "DIRECTORY";
 
 export interface Item {
   id: number;

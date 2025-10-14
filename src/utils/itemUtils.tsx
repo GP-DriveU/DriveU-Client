@@ -1,4 +1,4 @@
-﻿import { IconDocs, IconNote } from "@/assets";
+﻿import { IconAdd, IconDocs, IconNote } from "@/assets";
 import { type ItemType } from "@/types/Item";
 
 export const getIcon = (type: ItemType) => {
@@ -7,6 +7,8 @@ export const getIcon = (type: ItemType) => {
       return <IconDocs />;
     case "NOTE":
       return <IconNote />;
+    case "DIRECTORY":
+      return <IconAdd />;
     default:
       return <IconDocs />;
   }
