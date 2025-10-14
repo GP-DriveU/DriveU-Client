@@ -7,7 +7,7 @@ import EmptySection from "@/commons/section/EmptySection";
 
 interface TrashListProps {
   items: TrashItem[];
-  onRestore: (id: number) => void;
+  onRestore: (item: TrashItem) => void;
   onDelete: (item: TrashItem) => void;
 }
 
@@ -36,7 +36,7 @@ function TrashList({ items, onRestore, onDelete }: TrashListProps) {
               <Button
                 color="secondary"
                 size="small"
-                onClick={() => onRestore(item.id)}
+                onClick={() => onRestore(item)}
               >
                 복원
               </Button>

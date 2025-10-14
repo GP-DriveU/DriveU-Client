@@ -5,37 +5,19 @@ import TitleSection from "@/commons/section/TitleSection";
 import Sort from "@/commons/sorting/Sort";
 import type { SortOption } from "@/types/sort";
 import { FILE_TYPE_OPTIONS } from "@/types/trash";
-import type { TrashItem } from "@/types/Item";
+import type { TrashItem, ItemType } from "@/types/Item";
 import TrashList from "@/commons/list/TrashList";
 import Button from "@/commons/inputs/Button";
 import AlertModal from "@/commons/modals/AlertModal";
-
-const DUMMY_TRASH_DATA: TrashItem[] = [
-  {
-    id: 201,
-    name: "객체지향 프로그래밍 강의노트.md",
-    type: "NOTE",
-    deletedAt: "2024-06-01",
-  },
-  {
-    id: 202,
-    name: "2024년 1학기 성적표.pdf",
-    type: "FILE",
-    deletedAt: "2024-06-01",
-  },
-  {
-    id: 203,
-    name: "팀프로젝트 참고자료",
-    type: "DIRECTORY",
-    deletedAt: "2024-06-01",
-  },
-  {
-    id: 204,
-    name: "졸업과제 관련 링크",
-    type: "LINK",
-    deletedAt: "2024-06-01",
-  },
-];
+import {
+  deleteTrashDirectory,
+  deleteTrashFile,
+  emptyTrash,
+  getTrashItems,
+  restoreDirectory,
+  restoreFile,
+} from "@/api/Trash";
+import type { TrashSortType } from "@/types/trash";
 
 // todo: 나중에 modal refactor 필요
 interface ModalData {
@@ -45,43 +27,60 @@ interface ModalData {
   onConfirm: () => void;
 }
 
-const fetchTrashItems = async (
-  sortOption: SortOption,
-  filters: string[]
-): Promise<TrashItem[]> => {
-  console.log("[API 요청] 휴지통 데이터 요청:", { sortOption, filters });
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  if (Math.random() > 0.5) {
-    console.log("[API 응답] 데이터:", DUMMY_TRASH_DATA);
-    return Promise.resolve(DUMMY_TRASH_DATA);
-  } else {
-    console.log("[API 응답] 데이터 없음 (빈 배열)");
-    return Promise.resolve([]);
-  }
+const sortOptionToSortType = (sortOption: SortOption): TrashSortType => {
+  const fieldMap = {
+    deleteDate: "deletedAt",
+    name: "name",
+  };
+  const field =
+    fieldMap[sortOption.field as keyof typeof fieldMap] || "deletedAt";
+  return `${field},${sortOption.order}` as TrashSortType;
 };
 
 function TrashPage() {
   const [trashItems, setTrashItems] = useState<TrashItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const [modalData, setModalData] = useState<ModalData | null>(null);
 
   const iconItems = [{ id: "filter-icon", icon: <IconFilter /> }];
   const [sortOption, setSortOption] = useState<SortOption>({
     field: "deleteDate",
-    order: "asc",
+    order: "desc",
   });
   const [activeFilters, setActiveFilters] = useState<string[]>(["all"]);
 
+  const loadTrashItems = async () => {
+    setIsLoading(true);
+    try {
+      const apiSort = sortOptionToSortType(sortOption);
+      const response = await getTrashItems(activeFilters, apiSort);
+
+      const formattedData = response.resources.map((item) => ({
+        ...item,
+        type: item.type as ItemType,
+      }));
+      setTrashItems(formattedData);
+    } catch (error) {
+      console.error("휴지통 데이터를 불러오는 데 실패했습니다:", error);
+      setTrashItems([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    fetchTrashItems(sortOption, activeFilters)
-      .then((data) => {
-        setTrashItems(data);
-      })
-      .catch((error) => {
-        console.error("휴지통 데이터를 불러오는 데 실패했습니다:", error);
-        setTrashItems([]);
-      });
+    loadTrashItems();
   }, [sortOption, activeFilters]);
+
+  const handleFilterChange = (newFilters: string[]) => {
+    if (newFilters.length === 0) {
+      setActiveFilters(["all"]);
+      return;
+    }
+    
+    setActiveFilters(newFilters);
+  };
 
   const handleSortChange = (newSortOption: SortOption) => {
     setSortOption(newSortOption);
@@ -93,24 +92,32 @@ function TrashPage() {
     }
   };
 
-  const handleRestore = (id: number) => {
-    console.log(`[복원] 아이템 ID: ${id}`);
-    setTrashItems((prevItems) => prevItems.filter((item) => item.id !== id));
+  const handleRestoreItem = async (item: TrashItem) => {
+    try {
+      if (item.type === "DIRECTORY") {
+        await restoreDirectory(item.id);
+      } else {
+        await restoreFile(item.id);
+      }
+      await loadTrashItems();
+    } catch (error) {
+      console.error("항목 복원에 실패했습니다:", error);
+      // TODO: 사용자에게 에러 알림 (예: 토스트 메시지)
+    }
   };
 
-  const handleDeleteItem = (item: TrashItem) => {
+  const handleDeleteItemClick = (item: TrashItem) => {
     const itemType = item.type === "DIRECTORY" ? "디렉토리" : "파일";
     setModalData({
       title: `${itemType} 영구 삭제`,
       description: `<b>'${item.name}'</b> ${itemType}을(를)<br/>영구적으로 삭제하시겠습니까?<br/>이 작업은 되돌릴 수 없습니다.`,
       confirmText: "삭제",
-      onConfirm: () => confirmDeleteItem(item.id),
+      onConfirm: () => confirmDeleteItem(item),
     });
   };
 
-  const handleEmptyTrash = () => {
+  const handleEmptyTrashClick = () => {
     if (trashItems.length === 0) return;
-
     setModalData({
       title: "휴지통 비우기",
       description:
@@ -124,16 +131,31 @@ function TrashPage() {
     setModalData(null);
   };
 
-  const confirmDeleteItem = (id: number) => {
-    console.log(`[영구 삭제] 아이템 ID: ${id}`);
-    setTrashItems((prevItems) => prevItems.filter((item) => item.id !== id));
-    closeModal();
+  const confirmDeleteItem = async (item: TrashItem) => {
+    try {
+      if (item.type === "DIRECTORY") {
+        await deleteTrashDirectory(item.id);
+      } else {
+        await deleteTrashFile(item.id);
+      }
+      closeModal();
+      await loadTrashItems();
+    } catch (error) {
+      console.error("항목 영구 삭제에 실패했습니다:", error);
+      closeModal();
+    }
   };
 
-  const confirmEmptyTrash = () => {
-    console.log("[영구 삭제] 휴지통의 모든 아이템");
-    setTrashItems([]);
-    closeModal();
+  const confirmEmptyTrash = async () => {
+    try {
+      await emptyTrash();
+      closeModal();
+
+      await loadTrashItems();
+    } catch (error) {
+      console.error("휴지통 비우기에 실패했습니다:", error);
+      closeModal();
+    }
   };
 
   return (
@@ -143,7 +165,7 @@ function TrashPage() {
         items={iconItems}
         onIconClick={handleFilterToggle}
         selectedId={isFilterVisible ? "filter-icon" : undefined}
-        isIconDisabled={trashItems.length === 0}
+        isIconDisabled={trashItems.length === 0 && !isLoading}
       />
       {isFilterVisible && (
         <div className="w-full bg-white flex flex-row gap-16 px-12 mb-4">
@@ -152,26 +174,32 @@ function TrashPage() {
             title="파일 형식"
             options={FILE_TYPE_OPTIONS}
             selectedFilters={activeFilters}
-            onFilterChange={setActiveFilters}
+            onFilterChange={handleFilterChange}
             allKey="all"
           />
         </div>
       )}
 
       <div className="w-full flex-1 px-6 pb-6">
-        <TrashList
-          items={trashItems}
-          onRestore={handleRestore}
-          onDelete={handleDeleteItem}
-        />
+        {isLoading ? (
+          <div className="flex justify-center items-center h-full">
+            <p>데이터를 불러오는 중입니다...</p>
+          </div>
+        ) : (
+          <TrashList
+            items={trashItems}
+            onRestore={handleRestoreItem}
+            onDelete={handleDeleteItemClick}
+          />
+        )}
       </div>
 
       <div className="w-48 mb-24">
         <Button
           color="danger"
           size="medium"
-          onClick={handleEmptyTrash}
-          disabled={trashItems.length === 0}
+          onClick={handleEmptyTrashClick}
+          disabled={trashItems.length === 0 || isLoading}
         >
           휴지통 비우기
         </Button>
