@@ -8,7 +8,7 @@ import EmptySection from "@/commons/section/EmptySection";
 interface TrashListProps {
   items: TrashItem[];
   onRestore: (id: number) => void;
-  onDelete: (id: number) => void;
+  onDelete: (item: TrashItem) => void;
 }
 
 function TrashList({ items, onRestore, onDelete }: TrashListProps) {
@@ -36,18 +36,14 @@ function TrashList({ items, onRestore, onDelete }: TrashListProps) {
               <Button
                 color="secondary"
                 size="small"
-                onClick={() => {
-                  onRestore(item.id);
-                }}
+                onClick={() => onRestore(item.id)}
               >
                 복원
               </Button>
               <Button
-                color="primary"
+                color="danger"
                 size="small"
-                onClick={() => {
-                  onDelete(item.id);
-                }}
+                onClick={() => onDelete(item)}
               >
                 삭제
               </Button>

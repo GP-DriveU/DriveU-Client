@@ -8,6 +8,7 @@ import { FILE_TYPE_OPTIONS } from "@/types/trash";
 import type { TrashItem } from "@/types/Item";
 import TrashList from "@/commons/list/TrashList";
 import Button from "@/commons/inputs/Button";
+import AlertModal from "@/commons/modals/AlertModal";
 
 const DUMMY_TRASH_DATA: TrashItem[] = [
   {
@@ -36,6 +37,14 @@ const DUMMY_TRASH_DATA: TrashItem[] = [
   },
 ];
 
+// todo: 나중에 modal refactor 필요
+interface ModalData {
+  title: string;
+  description: string;
+  confirmText?: string;
+  onConfirm: () => void;
+}
+
 const fetchTrashItems = async (
   sortOption: SortOption,
   filters: string[]
@@ -54,6 +63,7 @@ const fetchTrashItems = async (
 function TrashPage() {
   const [trashItems, setTrashItems] = useState<TrashItem[]>([]);
   const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [modalData, setModalData] = useState<ModalData | null>(null);
 
   const iconItems = [{ id: "filter-icon", icon: <IconFilter /> }];
   const [sortOption, setSortOption] = useState<SortOption>({
@@ -88,9 +98,42 @@ function TrashPage() {
     setTrashItems((prevItems) => prevItems.filter((item) => item.id !== id));
   };
 
-  const handleDelete = (id: number) => {
+  const handleDeleteItem = (item: TrashItem) => {
+    const itemType = item.type === "DIRECTORY" ? "디렉토리" : "파일";
+    setModalData({
+      title: `${itemType} 영구 삭제`,
+      description: `<b>'${item.name}'</b> ${itemType}을(를)<br/>영구적으로 삭제하시겠습니까?<br/>이 작업은 되돌릴 수 없습니다.`,
+      confirmText: "삭제",
+      onConfirm: () => confirmDeleteItem(item.id),
+    });
+  };
+
+  const handleEmptyTrash = () => {
+    if (trashItems.length === 0) return;
+
+    setModalData({
+      title: "휴지통 비우기",
+      description:
+        "휴지통의 모든 항목을 영구적으로 삭제하시겠습니까?<br/>이 작업은 되돌릴 수 없습니다.",
+      confirmText: "모두 삭제",
+      onConfirm: confirmEmptyTrash,
+    });
+  };
+
+  const closeModal = () => {
+    setModalData(null);
+  };
+
+  const confirmDeleteItem = (id: number) => {
     console.log(`[영구 삭제] 아이템 ID: ${id}`);
     setTrashItems((prevItems) => prevItems.filter((item) => item.id !== id));
+    closeModal();
+  };
+
+  const confirmEmptyTrash = () => {
+    console.log("[영구 삭제] 휴지통의 모든 아이템");
+    setTrashItems([]);
+    closeModal();
   };
 
   return (
@@ -119,14 +162,31 @@ function TrashPage() {
         <TrashList
           items={trashItems}
           onRestore={handleRestore}
-          onDelete={handleDelete}
+          onDelete={handleDeleteItem}
         />
       </div>
-      <div className="w-32 flex-1">
-        <Button color="danger" size="medium" onClick={() => {}}>
+
+      <div className="w-48 mb-24">
+        <Button
+          color="danger"
+          size="medium"
+          onClick={handleEmptyTrash}
+          disabled={trashItems.length === 0}
+        >
           휴지통 비우기
         </Button>
       </div>
+
+      {modalData && (
+        <AlertModal
+          title={modalData.title}
+          description={modalData.description}
+          onConfirm={modalData.onConfirm}
+          onCancel={closeModal}
+          isDanger={true}
+          confirmText={modalData.confirmText}
+        />
+      )}
     </div>
   );
 }
