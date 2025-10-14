@@ -6,6 +6,7 @@ import { type Item } from "@/types/Item";
 import { IconCheck, IconDownload, IconFavorite } from "@/assets";
 import { getDownloadPresignedUrl } from "@/api/File";
 import { getNote } from "@/api/Note";
+import EmptySection from "@/commons/section/EmptySection";
 
 interface MainFileListProps {
   items: Item[];
@@ -54,8 +55,11 @@ function MainFileList({
     <List
       items={items}
       emptyComponent={
-        <div className="text-center text-gray-500 py-4">
-          현재 저장된 파일이 없습니다.
+        <div className="w-full h-full flex flex-col items-center justify-center">
+          <EmptySection
+            title="저장된 파일 및 노트 없음"
+            subtitle="새로운 파일이나 노트를 업로드하세요."
+          />
         </div>
       }
       renderItem={(item) => (
