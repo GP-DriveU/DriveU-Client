@@ -36,7 +36,7 @@ function Filter({
   };
 
   return (
-    <div className="inline-flex flex-col justify-start items-start gap-4 w-full">
+    <div className="inline-flex flex-col justify-start items-start gap-4">
       <h2 className="self-stretch text-black text-xl font-normal">
         {title}
       </h2>
