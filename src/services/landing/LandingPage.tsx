@@ -1,12 +1,18 @@
 ﻿import Button from "@/commons/inputs/Button";
-import { LandingImg_1, LandingImg_2, LandingImg_3 } from "@/assets";
 import LandingSection from "@/services/landing/LadingSection";
+import landingImage1 from "@/assets/image/image_landing_1.webp";
+import landingImage2 from "@/assets/image/image_landing_2.webp";
+import landingImage3 from "@/assets/image/image_landing_3.webp";
 
 function LandingPage() {
   return (
     <div className="space-y-20 font-sans">
       <LandingSection
-        image={<LandingImg_1 />}
+        image={landingImage1}
+        alt="DriveU 클라우드 서비스 메인 화면"
+        width={512}
+        height={512}
+        loading="eager"
         title="DriveU"
         description={
           <>
@@ -28,7 +34,11 @@ function LandingPage() {
       />
 
       <LandingSection
-        image={<LandingImg_2 />}
+        image={landingImage2}
+        alt="노트북과 모바일 기기에서 클라우드 자료를 확인하는 모습"
+        width={512}
+        height={512}
+        loading="lazy"
         title={
           <>
             어디서든 안전하게, <br />
@@ -46,7 +56,11 @@ function LandingPage() {
       />
 
       <LandingSection
-        image={<LandingImg_3 />}
+        image={landingImage3}
+        alt="AI가 문서를 요약하고 문제를 생성하는 기능 시연"
+        width={512}
+        height={512}
+        loading="lazy"
         title={
           <>
             AI가 요약하고, <br />

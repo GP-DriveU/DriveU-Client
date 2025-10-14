@@ -24,9 +24,4 @@ export { default as IconNote } from "@/assets/icon/icon_note.svg?react";
 export { default as IconArrowDropDown } from "@/assets/icon/icon_arrow_drop_down.svg?react";
 export { default as IconArrowDropUp } from "@/assets/icon/icon_arrow_drop_up.svg?react";
 
-
 export { default as loadingAnimation } from "@/assets/animation/loading.json";
-
-export { default as LandingImg_1 } from "@/assets/image/image_landing_1.svg?react";
-export { default as LandingImg_2 } from "@/assets/image/image_landing_2.svg?react";
-export { default as LandingImg_3 } from "@/assets/image/image_landing_3.svg?react";

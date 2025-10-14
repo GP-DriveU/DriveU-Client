@@ -3,7 +3,11 @@
 interface LandingSectionProps {
   title: ReactNode;
   description: ReactNode;
-  image: ReactNode;
+  image: string;
+  alt: string;
+  width: number;
+  height: number;
+  loading?: "eager" | "lazy";
   imageLeft?: boolean;
   button?: ReactNode;
   align?: "left" | "center" | "right";
@@ -13,6 +17,10 @@ function LandingSection({
   title,
   description,
   image,
+  alt,
+  width,
+  height,
+  loading = "lazy",
   imageLeft = false,
   button,
   align = "center",
@@ -36,13 +44,25 @@ function LandingSection({
     <section className="max-w-screen-xl bg-[#FFFFFF] mx-auto flex flex-col lg:flex-row items-center justify-between gap-10 py-10 px-6">
       {imageLeft ? (
         <>
-          {image}
+          <img
+            src={image}
+            alt={alt}
+            width={width}
+            height={height}
+            loading={loading}
+          />
           {content}
         </>
       ) : (
         <>
           {content}
-          {image}
+          <img
+            src={image}
+            alt={alt}
+            width={width}
+            height={height}
+            loading={loading}
+          />
         </>
       )}
     </section>
