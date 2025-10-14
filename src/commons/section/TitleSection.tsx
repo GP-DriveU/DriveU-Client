@@ -11,6 +11,7 @@ interface TitleSectionProps {
   items?: IconItem[];
   onIconClick?: (id: string) => void;
   selectedId?: string;
+  isIconDisabled?: boolean;
 }
 
 function TitleSection({
@@ -19,10 +20,10 @@ function TitleSection({
   items,
   onIconClick,
   selectedId,
+  isIconDisabled,
 }: TitleSectionProps) {
-
   const handleClick = (id: string) => {
-    if (onIconClick) {
+    if (onIconClick && !isIconDisabled) {
       onIconClick(id);
     }
   };
@@ -43,19 +44,27 @@ function TitleSection({
             <div
               key={id}
               onClick={() => handleClick(id)}
-              className={`w-8 h-8 flex items-center justify-center cursor-pointer rounded ${
+              className={`relative w-8 h-8 flex items-center justify-center rounded ${
                 selectedId === id ? "bg-primary text-white" : "text-black"
+              } ${
+                isIconDisabled
+                  ? "cursor-not-allowed opacity-40"
+                  : "cursor-pointer"
               }`}
             >
               <div className={selectedId === id ? "fill-white text-white" : ""}>
                 {icon}
               </div>
+
+              {selectedId === id && !isIconDisabled && (
+                <span className="absolute top-[-2px] right-[-2px] w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-white" />
+              )}
             </div>
           ))}
         </div>
       )}
     </div>
   );
-};
+}
 
 export default TitleSection;
