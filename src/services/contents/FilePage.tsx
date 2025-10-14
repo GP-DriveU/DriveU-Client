@@ -9,7 +9,6 @@ import UploadOverlay from "@/commons/modals/UploadOverlay";
 import FABButton from "@/commons/fab/FABButton";
 import TitleSection from "@/commons/section/TitleSection";
 import Gallery from "@/commons/gallery/Gallery";
-import List from "@/commons/list/List";
 
 import {
   getResourcesByDirectory,
@@ -24,6 +23,7 @@ import { useDirectoryStore } from "@/store/useDirectoryStore";
 import { useSemesterStore } from "@/store/useSemesterStore";
 import { IconFilter, IconGallery, IconList } from "@/assets";
 import { type Item } from "@/types/Item";
+import MainFileList from "@/commons/list/MainFileList";
 
 function FilePage() {
   const params = useParams();
@@ -253,7 +253,7 @@ function FilePage() {
             onClickItem={handleItemClick}
           />
         ) : (
-          <List
+          <MainFileList
             items={items}
             onToggleSelect={handleToggleSelect}
             onToggleFavorite={handleToggleFavorite}
