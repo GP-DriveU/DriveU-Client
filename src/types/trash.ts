@@ -5,3 +5,9 @@
   link: "링크",
   directory: "디렉토리",
 };
+
+export type TrashSortType =
+  | "deletedAt,asc"
+  | "deletedAt,desc"
+  | "name,asc"
+  | "name,desc";
