@@ -99,10 +99,12 @@ function TrashPage() {
       } else {
         await restoreFile(item.id);
       }
+
+      alert(`'${item.name}' 파일 복원이 완료되었습니다.`);
       await loadTrashItems();
     } catch (error) {
-      console.error("항목 복원에 실패했습니다:", error);
-      // TODO: 사용자에게 에러 알림 (예: 토스트 메시지)
+      console.error("파일 복원에 실패했습니다:", error);
+      alert(`'${item.name}' 복원 중 오류가 발생했습니다.`);
     }
   };
 
