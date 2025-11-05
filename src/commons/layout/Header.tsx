@@ -37,11 +37,11 @@ function Header() {
           </div>
         ) : (
           <div className="flex gap-4 text-font items-center">
-            <span className="text-big-bold font-bold">
+            <span className="hidden sm:inline text-big-bold font-bold">
               {user.name}
               <span className="font-regular text-big-regular">님</span>
             </span>
-            <div className="flex items-center gap-2 px-3 py-1 border rounded">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-1 border rounded">
               <span className="text-sm sm:text-base font-semibold">
                 {selectedSemesterKey
                   ? (() => {
