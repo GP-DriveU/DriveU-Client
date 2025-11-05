@@ -1,15 +1,15 @@
 ﻿function Footer() {
   return (
-    <footer className="w-full px-24 py-8 bg-primary flex flex-row justify-between items-center text-white text-xs font-sans">
-      <div className="flex flex-col items-start gap-1">
+    <footer className="w-full md:px-24 px-12 py-8 bg-primary flex md:flex-row flex-col md:gap-0 gap-12 justify-between items-center text-white text-xs font-sans">
+      <div className="w-full flex flex-col items-start gap-1">
         <div className="text-xl font-semibold">DriveU</div>
         <div className="text-[10px] leading-snug">
           <p>Copyright © 2025 Konkuk University Graduation Project</p>
           <p>All rights reserved</p>
         </div>
       </div>
-      <div className="flex flex-col gap-2 text-center text-[11px] leading-[1.5]">
-        <div className="text-base font-bold text-center">
+      <div className="w-full flex flex-col gap-2 md:text-right text-[11px] leading-[1.5]">
+        <div className="text-base font-bold">
           <span className="text-[#4caf4f]">Konkuk </span>
           <span className="text-white">바로가기</span>
         </div>
