@@ -9,12 +9,16 @@ interface AppLayoutProps {
   children: React.ReactNode;
 }
 
+const MOBILE_BREAKPOINT = 768;
+
 function AppLayout ({ children }: AppLayoutProps) {
 
   const { user } = useAuthStore();
   const navigate = useNavigate();
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < MOBILE_BREAKPOINT : false
+  );
+ 
   useEffect(() => {
     if (!user) {
       navigate("/login");
@@ -23,11 +27,10 @@ function AppLayout ({ children }: AppLayoutProps) {
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
     };
 
     window.addEventListener("resize", handleResize);
-    handleResize(); // initial check
 
     return () => window.removeEventListener("resize", handleResize);
   }, []);
