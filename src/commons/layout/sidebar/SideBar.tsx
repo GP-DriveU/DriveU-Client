@@ -46,7 +46,7 @@ function Sidebar () {
             if (!route) return null;
 
             const items = (dir.children ?? []).map((child) => ({
-              name: child.name,
+              ...child,
               slug: `${encodeURIComponent(child.name)}-${child.id}`,
             }));
 
