@@ -28,6 +28,11 @@ interface DirectoryStore {
     parentDirectoryId: number,
     newChildren: DirectoryItem[]
   ) => void;
+  moveDirectory: (
+    directoryId: number,
+    oldParentId: number,
+    newParentId: number
+  ) => void;
 }
 
 export const useDirectoryStore = create<DirectoryStore>()(
@@ -90,6 +95,48 @@ export const useDirectoryStore = create<DirectoryStore>()(
             semesterDirectories: {
               ...state.semesterDirectories,
               [key]: updatedDirs,
+            },
+          };
+        });
+      },
+      moveDirectory: (directoryId, oldParentId, newParentId) => {
+        const key = get().selectedSemesterKey;
+        if (!key) return;
+
+        set((state) => {
+          const currentDirs = state.semesterDirectories[key] ?? [];
+          let itemToMove: DirectoryItem | undefined;
+
+          const updatedDirs = currentDirs.map((dir) => {
+            if (dir.id === oldParentId) {
+              itemToMove = dir.children.find((c) => c.id === directoryId);
+              return {
+                ...dir,
+                children: dir.children.filter((c) => c.id !== directoryId),
+              };
+            }
+            return dir;
+          });
+
+          if (!itemToMove) return state;
+
+          const finalDirs = updatedDirs.map((dir) => {
+            if (dir.id === newParentId) {
+              return {
+                ...dir,
+                children: [...dir.children, itemToMove!],
+              };
+            }
+            return dir;
+          });
+
+          // 3. 순서(order) 재정렬 (옵션: 여기서는 간단히 맨 뒤로 추가)
+          //    정확한 순서 반영은 updateDirectoryOrder와 조합 필요
+
+          return {
+            semesterDirectories: {
+              ...state.semesterDirectories,
+              [key]: finalDirs,
             },
           };
         });

@@ -1,20 +1,9 @@
 ﻿import { useState } from "react";
 import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
   SortableContext,
-  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { createDirectory, deleteDirectory, updateDirectoriesOrder } from "@/api/Directory";
+import { createDirectory, deleteDirectory } from "@/api/Directory";
 import { useSemesterStore } from "@/store/useSemesterStore";
 import { useTagStore } from "@/store/useTagStore";
 import {
@@ -38,11 +27,10 @@ interface SidebarGroupProps {
 function SidebarGroup({
   parent,
   title,
-  initialItems,
+  initialItems: items,
   basePath,
   currentPath,
 }: SidebarGroupProps) {
-  const [items, setItems] = useState<ItemType[]>(initialItems);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newDirName, setNewDirName] = useState("");
   const currentSemesterId =
@@ -50,61 +38,12 @@ function SidebarGroup({
 
   const { setSemesterDirectories } = useDirectoryStore.getState();
   const currentSemester = useSemesterStore.getState();
-  const updateDirectoryOrder = useDirectoryStore(
-    (state) => state.updateDirectoryOrder
-  );
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
-
-  async function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-
-    if (over && active.id !== over.id) {
-      const oldIndex = items.findIndex((item) => item.slug === active.id);
-      const newIndex = items.findIndex((item) => item.slug === over.id);
-      const newItems = arrayMove(items, oldIndex, newIndex);
-
-      setItems(newItems);
-
-      const newChildrenForStore = newItems.map(({ slug, ...rest }, index) => ({
-        ...rest,
-        order: index,
-      }));
-      
-      updateDirectoryOrder(parent, newChildrenForStore);
-
-      try {
-        if (!currentSemesterId) throw new Error("학기 정보가 없습니다.");
-
-        const updates = newChildrenForStore.map((item) => ({
-          directoryId: item.id,
-          order: item.order,
-        }));
-
-        await updateDirectoriesOrder({
-          parentDirectoryId: parent,
-          updates,
-        });
-      } catch (error) {
-        console.error("순서 변경 API 호출 실패:", error);
-        // [TODO] 에러 처리 (예: 토스트 알림, 상태 롤백)
-        // 지금은 낙관적 업데이트를 롤백하지 않지만, 필요시 롤백 로직 추가
-      }
-    }
-  }
 
   const handleDelete = async (directoryId: number) => {
     try {
       if (!currentSemesterId) throw new Error("학기 정보가 없습니다.");
 
       await deleteDirectory(directoryId);
-
-      setItems((prev) => prev.filter((item) => item.id !== directoryId));
 
       const year = currentSemester.getCurrentSemester()?.year;
       const term = currentSemester.getCurrentSemester()?.term;
@@ -129,7 +68,6 @@ function SidebarGroup({
       setTags(tags.filter((tag) => tag.id !== directoryId));
     } catch (error) {
       console.error("디렉토리 삭제 API 호출 실패:", error);
-      // [TODO] 에러 처리 (예: 토스트 알림)
     }
   };
 
@@ -141,31 +79,25 @@ function SidebarGroup({
           <IconAdd onClick={() => setIsModalOpen(true)} />
         </div>
         <hr className="border-font border-t-0.5" />
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
+        <SortableContext
+          items={items.map((i) => i.slug)}
+          strategy={verticalListSortingStrategy}
         >
-          <SortableContext
-            items={items.map((i) => i.slug)}
-            strategy={verticalListSortingStrategy}
-          >
-            {items.map((item) => {
-              const path = `${basePath}/${item.slug}`;
-              return (
-                <SortableItem
-                  key={item.slug}
-                  id={item.slug}
-                  directoryId={item.id}
-                  label={item.name}
-                  to={path}
-                  isActive={currentPath.startsWith(path)}
-                  onDelete={handleDelete}
-                />
-              );
-            })}
-          </SortableContext>
-        </DndContext>
+          {items.map((item) => {
+            const path = `${basePath}/${item.slug}`;
+            return (
+              <SortableItem
+                key={item.slug}
+                id={item.slug}
+                directoryId={item.id}
+                label={item.name}
+                to={path}
+                isActive={currentPath.startsWith(path)}
+                onDelete={handleDelete}
+              />
+            );
+          })}
+        </SortableContext>
       </div>
       <DirectoryAddModal
         isOpen={isModalOpen}
@@ -187,8 +119,6 @@ function SidebarGroup({
               name,
             });
 
-            const newSlug = `${encodeURIComponent(name)}-${newDir.id}`;
-
             const newDirectoryItem: DirectoryItem = {
               id: newDir.id,
               name: newDir.name,
@@ -196,8 +126,6 @@ function SidebarGroup({
               is_default: false,
               children: [],
             };
-
-            setItems([...items, { ...newDirectoryItem, slug: newSlug }]);
 
             const year = currentSemester.getCurrentSemester()?.year;
             const term = currentSemester.getCurrentSemester()?.term;
