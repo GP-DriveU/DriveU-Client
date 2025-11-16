@@ -17,15 +17,20 @@ import {
 import { createDirectory } from "@/api/Directory";
 import { useSemesterStore } from "@/store/useSemesterStore";
 import { useTagStore } from "@/store/useTagStore";
-import { useDirectoryStore } from "@/store/useDirectoryStore";
+import {
+  useDirectoryStore,
+  type DirectoryItem,
+} from "@/store/useDirectoryStore";
 import DirectoryAddModal from "@/commons/modals/DirectoryAddModal";
 import SortableItem from "./SortableItem";
 import { IconAdd } from "@/assets";
 
+type ItemType = DirectoryItem & { slug: string };
+
 interface SidebarGroupProps {
   parent: number;
   title: string;
-  initialItems: { name: string; slug: string }[];
+  initialItems: ItemType[];
   basePath: string;
   currentPath: string;
 }
@@ -37,13 +42,17 @@ function SidebarGroup({
   basePath,
   currentPath,
 }: SidebarGroupProps) {
-  const [items, setItems] = useState(initialItems);
+  const [items, setItems] = useState<ItemType[]>(initialItems);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newDirName, setNewDirName] = useState("");
   const currentSemesterId =
     useSemesterStore().getCurrentSemester()?.userSemesterId;
+
   const { setSemesterDirectories } = useDirectoryStore.getState();
   const currentSemester = useSemesterStore.getState();
+  const updateDirectoryOrder = useDirectoryStore(
+    (state) => state.updateDirectoryOrder
+  );
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -56,11 +65,18 @@ function SidebarGroup({
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
-      setItems((items) => {
-        const oldIndex = items.findIndex((item) => item.slug === active.id);
-        const newIndex = items.findIndex((item) => item.slug === over.id);
-        return arrayMove(items, oldIndex, newIndex);
-      });
+      const oldIndex = items.findIndex((item) => item.slug === active.id);
+      const newIndex = items.findIndex((item) => item.slug === over.id);
+      const newItems = arrayMove(items, oldIndex, newIndex);
+
+      setItems(newItems);
+
+      const newChildrenForStore = newItems.map(({ slug, ...rest }, index) => ({
+        ...rest,
+        order: index,
+      }));
+
+      updateDirectoryOrder(parent, newChildrenForStore);
     }
   }
 
@@ -81,13 +97,13 @@ function SidebarGroup({
             items={items.map((i) => i.slug)}
             strategy={verticalListSortingStrategy}
           >
-            {items.map(({ name, slug }) => {
-              const path = `${basePath}/${slug}`;
+            {items.map((item) => {
+              const path = `${basePath}/${item.slug}`;
               return (
                 <SortableItem
-                  key={slug}
-                  id={slug}
-                  label={name}
+                  key={item.slug}
+                  id={item.slug}
+                  label={item.name}
                   to={path}
                   isActive={currentPath.startsWith(path)}
                 />
@@ -117,7 +133,17 @@ function SidebarGroup({
             });
 
             const newSlug = `${encodeURIComponent(name)}-${newDir.id}`;
-            setItems([...items, { name, slug: newSlug }]);
+
+            const newDirectoryItem: DirectoryItem = {
+              id: newDir.id,
+              name: newDir.name,
+              order: newDir.order,
+              is_default: false,
+              children: [],
+            };
+
+            setItems([...items, { ...newDirectoryItem, slug: newSlug }]);
+
             const year = currentSemester.getCurrentSemester()?.year;
             const term = currentSemester.getCurrentSemester()?.term;
 
@@ -129,13 +155,7 @@ function SidebarGroup({
                       ...dir,
                       children: [
                         ...(dir.children ?? []),
-                        {
-                          id: newDir.id,
-                          name: newDir.name,
-                          order: newDir.order,
-                          is_default: false,
-                          children: [],
-                        },
+                        newDirectoryItem,
                       ],
                     };
                   }
@@ -164,7 +184,7 @@ function SidebarGroup({
         }}
         newDirName={newDirName}
         setNewDirName={setNewDirName}
-        items={items}
+        items={items.map((item) => ({ name: item.name, slug: item.slug }))}
       />
     </>
   );
