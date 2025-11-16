@@ -3,7 +3,7 @@ import { CSS } from '@dnd-kit/utilities';
 import SidebarItem from './SideBarItem';
 import AlertModal from '@/commons/modals/AlertModal';
 import { IconDrag, IconTrash } from '@/assets';
-import { useState } from 'react';
+import { useState, type MouseEvent } from "react";
 
 interface SortableItemProps {
   id: string;
@@ -28,7 +28,7 @@ function SortableItem(props: SortableItemProps) {
     transition,
   };
 
-  const handleDeleteClick = (e: React.MouseEvent) => {
+  const handleDeleteClick = (e: MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setIsModalOpen(true);
