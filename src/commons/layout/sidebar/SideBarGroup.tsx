@@ -19,7 +19,7 @@ import { useSemesterStore } from "@/store/useSemesterStore";
 import { useTagStore } from "@/store/useTagStore";
 import { useDirectoryStore } from "@/store/useDirectoryStore";
 import DirectoryAddModal from "@/commons/modals/DirectoryAddModal";
-import { SortableItem } from "./SortableItem";
+import SortableItem from "./SortableItem";
 import { IconAdd } from "@/assets";
 
 interface SidebarGroupProps {
