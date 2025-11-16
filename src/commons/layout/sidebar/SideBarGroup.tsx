@@ -13,6 +13,7 @@ import {
 import DirectoryAddModal from "@/commons/modals/DirectoryAddModal";
 import SortableItem from "./SortableItem";
 import { IconAdd } from "@/assets";
+import { useDroppable } from "@dnd-kit/core";
 
 type ItemType = DirectoryItem & { slug: string };
 
@@ -33,11 +34,14 @@ function SidebarGroup({
 }: SidebarGroupProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newDirName, setNewDirName] = useState("");
-  const currentSemesterId =
-    useSemesterStore().getCurrentSemester()?.userSemesterId;
+  const currentSemesterId = useSemesterStore().getCurrentSemester()?.userSemesterId;
 
   const { setSemesterDirectories, updateDirectoryName: updateStoreDirName } = useDirectoryStore.getState();
   const currentSemester = useSemesterStore.getState();
+
+  const { isOver, setNodeRef } = useDroppable({
+    id: `group-${parent}`,
+  });
 
   const handleDelete = async (directoryId: number) => {
     try {
@@ -97,26 +101,37 @@ function SidebarGroup({
           <IconAdd onClick={() => setIsModalOpen(true)} />
         </div>
         <hr className="border-font border-t-0.5" />
-        <SortableContext
-          items={items.map((i) => i.slug)}
-          strategy={verticalListSortingStrategy}
+        <div
+          ref={setNodeRef}
+          className={`transition-colors rounded-md ${
+            isOver ? "bg-primary-dark" : ""
+          } ${
+            items.length === 0
+              ? "min-h-[32px]"
+              : ""
+          }`}
         >
-          {items.map((item) => {
-            const path = `${basePath}/${item.slug}`;
-            return (
-              <SortableItem
-                key={item.slug}
-                id={item.slug}
-                directoryId={item.id}
-                label={item.name}
-                to={path}
-                isActive={currentPath.startsWith(path)}
-                onDelete={handleDelete}
-                onRename={handleRename}
-              />
-            );
-          })}
-        </SortableContext>
+          <SortableContext
+            items={items.map((i) => i.slug)}
+            strategy={verticalListSortingStrategy}
+          >
+            {items.map((item) => {
+              const path = `${basePath}/${item.slug}`;
+              return (
+                <SortableItem
+                  key={item.slug}
+                  id={item.slug}
+                  directoryId={item.id}
+                  label={item.name}
+                  to={path}
+                  isActive={currentPath.startsWith(path)}
+                  onDelete={handleDelete}
+                  onRename={handleRename}
+                />
+              );
+            })}
+          </SortableContext>
+        </div>
       </div>
       <DirectoryAddModal
         isOpen={isModalOpen}

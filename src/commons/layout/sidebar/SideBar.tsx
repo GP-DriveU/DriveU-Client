@@ -51,60 +51,84 @@ function Sidebar() {
 
     if (!over || active.id === over.id) return;
 
-    const activeItemData = findItemAndParent(String(active.id));
-    const overItemData = findItemAndParent(String(over.id));
+    const activeId = String(active.id);
+    const overId = String(over.id);
 
+    const activeItemData = findItemAndParent(activeId);
     if (!activeItemData) return;
 
-    if (overItemData && activeItemData.parentId === overItemData.parentId) {
-      const parentId = activeItemData.parentId;
-      const parentDir = currentDirectories.find((d) => d.id === parentId);
-      if (!parentDir) return;
+    const { item: activeItem, parentId: oldParentId } = activeItemData;
+    const overItemData = findItemAndParent(overId);
 
-      const oldIndex = parentDir.children.findIndex(
-        (c) => c.id === activeItemData.item.id
-      );
-      const newIndex = parentDir.children.findIndex(
-        (c) => c.id === overItemData.item.id
-      );
+    if (overItemData) {
+      const { parentId: newParentId } = overItemData;
 
-      const newChildren = arrayMove(parentDir.children, oldIndex, newIndex);
+      if (oldParentId === newParentId) {
+        const parentId = activeItemData.parentId;
+        const parentDir = currentDirectories.find((d) => d.id === parentId);
+        if (!parentDir) return;
 
-      const newChildrenForStore = newChildren.map((child, index) => ({
-        ...child,
-        order: index,
-      }));
-      updateDirectoryOrder(parentId, newChildrenForStore);
+        const oldIndex = parentDir.children.findIndex(
+          (c) => c.id === activeItemData.item.id
+        );
+        const newIndex = parentDir.children.findIndex(
+          (c) => c.id === overItemData.item.id
+        );
 
-      try {
-        if (!currentSemesterId) throw new Error("학기 정보가 없습니다.");
-        const updates = newChildrenForStore.map((item) => ({
-          directoryId: item.id,
-          order: item.order,
+        const newChildren = arrayMove(parentDir.children, oldIndex, newIndex);
+
+        const newChildrenForStore = newChildren.map((child, index) => ({
+          ...child,
+          order: index,
         }));
-        await updateDirectoriesOrder({
-          parentDirectoryId: parentId,
-          updates,
-        });
-      } catch (error) {
-        console.error("순서 변경 API 호출 실패:", error);
-      }
-    }
-    else if (
-      overItemData &&
-      activeItemData.parentId !== overItemData.parentId
-    ) {
-      const activeItemId = activeItemData.item.id;
-      const oldParentId = activeItemData.parentId;
-      const newParentId = overItemData.parentId;
+        updateDirectoryOrder(parentId, newChildrenForStore);
 
-      moveDirectory(activeItemId, oldParentId, newParentId);
+        try {
+          if (!currentSemesterId) throw new Error("학기 정보가 없습니다.");
+          const updates = newChildrenForStore.map((item) => ({
+            directoryId: item.id,
+            order: item.order,
+          }));
+          await updateDirectoriesOrder({
+            parentDirectoryId: parentId,
+            updates,
+          });
+        } catch (error) {
+          console.error("순서 변경 API 호출 실패:", error);
+        }
+      }
+      else {
+        const activeItemId = activeItemData.item.id;
+        const oldParentId = activeItemData.parentId;
+        const newParentId = overItemData.parentId;
+
+        moveDirectory(activeItemId, oldParentId, newParentId);
+
+        try {
+          await updateDirectoryParent(activeItemId, { newParentId });
+        } catch (error) {
+          console.error("부모 변경 API 호출 실패:", error);
+          moveDirectory(activeItemId, newParentId, oldParentId);
+        }
+      }
+      return;
+    }
+    if (overId.startsWith("group-")) {
+      const newParentId = Number(overId.split("-")[1]);
+
+      if (oldParentId === newParentId) return;
+
+      console.log(
+        `(그룹 이동) ${activeItem.id}번 아이템을 ${oldParentId} -> ${newParentId} 그룹으로 이동`
+      );
+
+      moveDirectory(activeItem.id, oldParentId, newParentId);
 
       try {
-        await updateDirectoryParent(activeItemId, { newParentId });
+        await updateDirectoryParent(activeItem.id, { newParentId });
       } catch (error) {
         console.error("부모 변경 API 호출 실패:", error);
-        moveDirectory(activeItemId, newParentId, oldParentId);
+        moveDirectory(activeItem.id, newParentId, oldParentId);
       }
     }
   }
