@@ -23,5 +23,6 @@ export { default as IconDocs } from "@/assets/icon/icon_docs.svg?react";
 export { default as IconNote } from "@/assets/icon/icon_note.svg?react";
 export { default as IconArrowDropDown } from "@/assets/icon/icon_arrow_drop_down.svg?react";
 export { default as IconArrowDropUp } from "@/assets/icon/icon_arrow_drop_up.svg?react";
+export { default as IconDrag } from "@/assets/icon/icon_drag.svg?react";
 
 export { default as loadingAnimation } from "@/assets/animation/loading.json";
