@@ -24,6 +24,10 @@ interface DirectoryStore {
     semesterData: { year: number; term: string; directories: DirectoryItem[] }[]
   ) => void;
   getCurrentDirectories: () => DirectoryItem[];
+  updateDirectoryOrder: (
+    parentDirectoryId: number,
+    newChildren: DirectoryItem[]
+  ) => void;
 }
 
 export const useDirectoryStore = create<DirectoryStore>()(
@@ -68,6 +72,27 @@ export const useDirectoryStore = create<DirectoryStore>()(
         const key = get().selectedSemesterKey;
         const dirs = get().semesterDirectories[key] ?? [];
         return dirs;
+      },
+      updateDirectoryOrder: (parentDirectoryId, newChildren) => {
+        const key = get().selectedSemesterKey;
+        if (!key) return;
+
+        set((state) => {
+          const currentDirs = state.semesterDirectories[key] ?? [];
+          const updatedDirs = currentDirs.map((dir) => {
+            if (dir.id === parentDirectoryId) {
+              return { ...dir, children: newChildren };
+            }
+            return dir;
+          });
+
+          return {
+            semesterDirectories: {
+              ...state.semesterDirectories,
+              [key]: updatedDirs,
+            },
+          };
+        });
       },
     }),
     {

@@ -1,35 +1,84 @@
 ﻿import { useState } from "react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { createDirectory } from "@/api/Directory";
 import { useSemesterStore } from "@/store/useSemesterStore";
 import { useTagStore } from "@/store/useTagStore";
-import { useDirectoryStore } from "@/store/useDirectoryStore";
+import {
+  useDirectoryStore,
+  type DirectoryItem,
+} from "@/store/useDirectoryStore";
 import DirectoryAddModal from "@/commons/modals/DirectoryAddModal";
-import SidebarItem from "@/commons/layout/sidebar/SideBarItem";
+import SortableItem from "./SortableItem";
 import { IconAdd } from "@/assets";
+
+type ItemType = DirectoryItem & { slug: string };
 
 interface SidebarGroupProps {
   parent: number;
   title: string;
-  initialItems: { name: string; slug: string }[];
+  initialItems: ItemType[];
   basePath: string;
   currentPath: string;
 }
 
-function SidebarGroup ({
+function SidebarGroup({
   parent,
   title,
   initialItems,
   basePath,
   currentPath,
-} : SidebarGroupProps) {
-
-  const [items, setItems] = useState(initialItems);
+}: SidebarGroupProps) {
+  const [items, setItems] = useState<ItemType[]>(initialItems);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newDirName, setNewDirName] = useState("");
   const currentSemesterId =
     useSemesterStore().getCurrentSemester()?.userSemesterId;
+
   const { setSemesterDirectories } = useDirectoryStore.getState();
   const currentSemester = useSemesterStore.getState();
+  const updateDirectoryOrder = useDirectoryStore(
+    (state) => state.updateDirectoryOrder
+  );
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    if (over && active.id !== over.id) {
+      const oldIndex = items.findIndex((item) => item.slug === active.id);
+      const newIndex = items.findIndex((item) => item.slug === over.id);
+      const newItems = arrayMove(items, oldIndex, newIndex);
+
+      setItems(newItems);
+
+      const newChildrenForStore = newItems.map(({ slug, ...rest }, index) => ({
+        ...rest,
+        order: index,
+      }));
+
+      updateDirectoryOrder(parent, newChildrenForStore);
+    }
+  }
 
   return (
     <>
@@ -39,17 +88,29 @@ function SidebarGroup ({
           <IconAdd onClick={() => setIsModalOpen(true)} />
         </div>
         <hr className="border-font border-t-0.5" />
-        {items.map(({ name, slug }) => {
-          const path = `${basePath}/${slug}`;
-          return (
-            <SidebarItem
-              key={slug}
-              label={name}
-              to={path}
-              isActive={currentPath.startsWith(path)}
-            />
-          );
-        })}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext
+            items={items.map((i) => i.slug)}
+            strategy={verticalListSortingStrategy}
+          >
+            {items.map((item) => {
+              const path = `${basePath}/${item.slug}`;
+              return (
+                <SortableItem
+                  key={item.slug}
+                  id={item.slug}
+                  label={item.name}
+                  to={path}
+                  isActive={currentPath.startsWith(path)}
+                />
+              );
+            })}
+          </SortableContext>
+        </DndContext>
       </div>
       <DirectoryAddModal
         isOpen={isModalOpen}
@@ -72,7 +133,17 @@ function SidebarGroup ({
             });
 
             const newSlug = `${encodeURIComponent(name)}-${newDir.id}`;
-            setItems([...items, { name, slug: newSlug }]);
+
+            const newDirectoryItem: DirectoryItem = {
+              id: newDir.id,
+              name: newDir.name,
+              order: newDir.order,
+              is_default: false,
+              children: [],
+            };
+
+            setItems([...items, { ...newDirectoryItem, slug: newSlug }]);
+
             const year = currentSemester.getCurrentSemester()?.year;
             const term = currentSemester.getCurrentSemester()?.term;
 
@@ -84,13 +155,7 @@ function SidebarGroup ({
                       ...dir,
                       children: [
                         ...(dir.children ?? []),
-                        {
-                          id: newDir.id,
-                          name: newDir.name,
-                          order: newDir.order,
-                          is_default: false,
-                          children: [],
-                        },
+                        newDirectoryItem,
                       ],
                     };
                   }
@@ -119,10 +184,10 @@ function SidebarGroup ({
         }}
         newDirName={newDirName}
         setNewDirName={setNewDirName}
-        items={items}
+        items={items.map((item) => ({ name: item.name, slug: item.slug }))}
       />
     </>
   );
-};
+}
 
 export default SidebarGroup;
