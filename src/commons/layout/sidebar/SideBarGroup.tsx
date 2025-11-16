@@ -14,7 +14,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { createDirectory } from "@/api/Directory";
+import { createDirectory, deleteDirectory, updateDirectoriesOrder } from "@/api/Directory";
 import { useSemesterStore } from "@/store/useSemesterStore";
 import { useTagStore } from "@/store/useTagStore";
 import {
@@ -61,7 +61,7 @@ function SidebarGroup({
     })
   );
 
-  function handleDragEnd(event: DragEndEvent) {
+  async function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
@@ -75,10 +75,63 @@ function SidebarGroup({
         ...rest,
         order: index,
       }));
-
+      
       updateDirectoryOrder(parent, newChildrenForStore);
+
+      try {
+        if (!currentSemesterId) throw new Error("학기 정보가 없습니다.");
+
+        const updates = newChildrenForStore.map((item) => ({
+          directoryId: item.id,
+          order: item.order,
+        }));
+
+        await updateDirectoriesOrder({
+          parentDirectoryId: parent,
+          updates,
+        });
+      } catch (error) {
+        console.error("순서 변경 API 호출 실패:", error);
+        // [TODO] 에러 처리 (예: 토스트 알림, 상태 롤백)
+        // 지금은 낙관적 업데이트를 롤백하지 않지만, 필요시 롤백 로직 추가
+      }
     }
   }
+
+  const handleDelete = async (directoryId: number) => {
+    try {
+      if (!currentSemesterId) throw new Error("학기 정보가 없습니다.");
+
+      await deleteDirectory(directoryId);
+
+      setItems((prev) => prev.filter((item) => item.id !== directoryId));
+
+      const year = currentSemester.getCurrentSemester()?.year;
+      const term = currentSemester.getCurrentSemester()?.term;
+
+      if (year && term) {
+        setSemesterDirectories(year, term, (prev) =>
+          prev.map((dir) => {
+            if (dir.id === parent) {
+              return {
+                ...dir,
+                children: (dir.children ?? []).filter(
+                  (child) => child.id !== directoryId
+                ),
+              };
+            }
+            return dir;
+          })
+        );
+      }
+
+      const { tags, setTags } = useTagStore.getState();
+      setTags(tags.filter((tag) => tag.id !== directoryId));
+    } catch (error) {
+      console.error("디렉토리 삭제 API 호출 실패:", error);
+      // [TODO] 에러 처리 (예: 토스트 알림)
+    }
+  };
 
   return (
     <>
@@ -103,9 +156,11 @@ function SidebarGroup({
                 <SortableItem
                   key={item.slug}
                   id={item.slug}
+                  directoryId={item.id}
                   label={item.name}
                   to={path}
                   isActive={currentPath.startsWith(path)}
+                  onDelete={handleDelete}
                 />
               );
             })}
@@ -153,10 +208,7 @@ function SidebarGroup({
                   if (dir.id === parentDirectoryId) {
                     return {
                       ...dir,
-                      children: [
-                        ...(dir.children ?? []),
-                        newDirectoryItem,
-                      ],
+                      children: [...(dir.children ?? []), newDirectoryItem],
                     };
                   }
                   return dir;

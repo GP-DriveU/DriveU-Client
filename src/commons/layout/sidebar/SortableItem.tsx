@@ -1,27 +1,24 @@
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import SidebarItem from './SideBarItem';
-import AlertModal from '@/commons/modals/AlertModal';
-import { IconDrag, IconTrash } from '@/assets';
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import SidebarItem from "./SideBarItem";
+import AlertModal from "@/commons/modals/AlertModal";
+import { IconDrag, IconTrash } from "@/assets";
 import { useState, type MouseEvent } from "react";
 
 interface SortableItemProps {
   id: string;
+  directoryId: number;
   label: string;
   to: string;
   isActive: boolean;
+  onDelete: (directoryId: number) => void;
 }
 
 function SortableItem(props: SortableItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: props.id });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: props.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -34,10 +31,8 @@ function SortableItem(props: SortableItemProps) {
     setIsModalOpen(true);
   };
 
-  // 모달 확인 (삭제) 핸들러 - 더미 함수
   const handleConfirmDelete = () => {
-    console.log(`(DUMMY) Deleting item: ${props.id} - ${props.label}`);
-    // 실제 구현 시: deleteSemester(props.id);
+    props.onDelete(props.directoryId);
     setIsModalOpen(false);
   };
 
