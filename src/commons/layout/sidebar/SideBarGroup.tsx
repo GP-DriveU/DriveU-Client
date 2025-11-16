@@ -3,7 +3,7 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { createDirectory, deleteDirectory } from "@/api/Directory";
+import { createDirectory, deleteDirectory, updateDirectoryName } from "@/api/Directory";
 import { useSemesterStore } from "@/store/useSemesterStore";
 import { useTagStore } from "@/store/useTagStore";
 import {
@@ -36,7 +36,7 @@ function SidebarGroup({
   const currentSemesterId =
     useSemesterStore().getCurrentSemester()?.userSemesterId;
 
-  const { setSemesterDirectories } = useDirectoryStore.getState();
+  const { setSemesterDirectories, updateDirectoryName: updateStoreDirName } = useDirectoryStore.getState();
   const currentSemester = useSemesterStore.getState();
 
   const handleDelete = async (directoryId: number) => {
@@ -71,6 +71,24 @@ function SidebarGroup({
     }
   };
 
+  const handleRename = async (directoryId: number, newName: string) => {
+    updateStoreDirName(parent, directoryId, newName);
+
+    try {
+      await updateDirectoryName(directoryId, { name: newName });
+
+      const { tags, setTags } = useTagStore.getState();
+      setTags(
+        tags.map((tag) =>
+          tag.id === directoryId ? { ...tag, title: newName } : tag
+        )
+      );
+    } catch (error) {
+      console.error("이름 변경 API 호출 실패:", error);
+      // [TODO] 스토어 롤백 로직 (이름 변경 실패 시)
+    }
+  };
+
   return (
     <>
       <div className="w-full flex flex-col gap-2">
@@ -94,6 +112,7 @@ function SidebarGroup({
                 to={path}
                 isActive={currentPath.startsWith(path)}
                 onDelete={handleDelete}
+                onRename={handleRename}
               />
             );
           })}

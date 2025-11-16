@@ -33,6 +33,11 @@ interface DirectoryStore {
     oldParentId: number,
     newParentId: number
   ) => void;
+  updateDirectoryName: (
+    parentDirectoryId: number,
+    directoryId: number,
+    newName: string
+  ) => void;
 }
 
 export const useDirectoryStore = create<DirectoryStore>()(
@@ -130,13 +135,39 @@ export const useDirectoryStore = create<DirectoryStore>()(
             return dir;
           });
 
-          // 3. 순서(order) 재정렬 (옵션: 여기서는 간단히 맨 뒤로 추가)
-          //    정확한 순서 반영은 updateDirectoryOrder와 조합 필요
-
           return {
             semesterDirectories: {
               ...state.semesterDirectories,
               [key]: finalDirs,
+            },
+          };
+        });
+      },
+      updateDirectoryName: (parentDirectoryId, directoryId, newName) => {
+        const key = get().selectedSemesterKey;
+        if (!key) return;
+
+        set((state) => {
+          const currentDirs = state.semesterDirectories[key] ?? [];
+          const updatedDirs = currentDirs.map((dir) => {
+            if (dir.id === parentDirectoryId) {
+              return {
+                ...dir,
+                children: dir.children.map((child) => {
+                  if (child.id === directoryId) {
+                    return { ...child, name: newName };
+                  }
+                  return child;
+                }),
+              };
+            }
+            return dir;
+          });
+
+          return {
+            semesterDirectories: {
+              ...state.semesterDirectories,
+              [key]: updatedDirs,
             },
           };
         });
