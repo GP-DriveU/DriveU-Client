@@ -32,7 +32,7 @@ export const generateQuestions = async (
   data: QuestionGenerationRequest[]
 ): Promise<QuestionGenerationResponse> => {
   const response = await http.post<QuestionGenerationResponse>(
-    `directories/${directoryId}/questions`,
+    `v2/directories/${directoryId}/questions`,
     data
   );
   return response.response;

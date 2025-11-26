@@ -15,6 +15,6 @@ export const getNoteSummary = async (
 export const createNoteSummary = async (
   noteId: number
 ): Promise<SummaryResponse> => {
-  const response = await http.post<SummaryResponse>(`note/${noteId}/summary`);
+  const response = await http.post<SummaryResponse>(`v2/note/${noteId}/summary`);
   return response.response;
 };
