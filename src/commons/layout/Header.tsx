@@ -53,6 +53,7 @@ function Header() {
               <IconChevronDown />
             </div>
             <IconUser
+              style={{ cursor: "pointer" }}
               onClick={() => {
                 navigate("/mypage");
               }}

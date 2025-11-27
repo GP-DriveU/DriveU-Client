@@ -3,12 +3,14 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { createDirectory, deleteDirectory, updateDirectoryName } from "@/api/Directory";
+import {
+  createDirectory,
+  deleteDirectory,
+  updateDirectoryName,
+} from "@/api/Directory";
 import { useSemesterStore } from "@/store/useSemesterStore";
 import { useTagStore } from "@/store/useTagStore";
-import {
-  useDirectoryStore,
-} from "@/store/useDirectoryStore";
+import { useDirectoryStore } from "@/store/useDirectoryStore";
 import DirectoryAddModal from "@/commons/modals/DirectoryAddModal";
 import SortableItem from "./SortableItem";
 import { IconAdd } from "@/assets";
@@ -34,9 +36,11 @@ function SidebarGroup({
 }: SidebarGroupProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newDirName, setNewDirName] = useState("");
-  const currentSemesterId = useSemesterStore().getCurrentSemester()?.userSemesterId;
+  const currentSemesterId =
+    useSemesterStore().getCurrentSemester()?.userSemesterId;
 
-  const { setSemesterDirectories, updateDirectoryName: updateStoreDirName } = useDirectoryStore.getState();
+  const { setSemesterDirectories, updateDirectoryName: updateStoreDirName } =
+    useDirectoryStore.getState();
   const currentSemester = useSemesterStore.getState();
 
   const { isOver, setNodeRef } = useDroppable({
@@ -89,7 +93,7 @@ function SidebarGroup({
         )
       );
     } catch (error) {
-      if(previousName) {
+      if (previousName) {
         updateStoreDirName(parent, directoryId, previousName);
       }
       console.error("이름 변경 API 호출 실패:", error);
@@ -101,18 +105,17 @@ function SidebarGroup({
       <div className="w-full flex flex-col gap-2">
         <div className="flex items-center justify-between py-1">
           <span className="text-xl font-semibold">{title}</span>
-          <IconAdd onClick={() => setIsModalOpen(true)} />
+          <IconAdd
+            style={{ cursor: "pointer", width: "20px", height: "20px" }}
+            onClick={() => setIsModalOpen(true)}
+          />
         </div>
         <hr className="border-font border-t-0.5" />
         <div
           ref={setNodeRef}
           className={`transition-colors rounded-md ${
             isOver ? "bg-primary-dark" : ""
-          } ${
-            items.length === 0
-              ? "min-h-[32px]"
-              : ""
-          }`}
+          } ${items.length === 0 ? "min-h-[32px]" : ""}`}
         >
           <SortableContext
             items={items.map((i) => i.slug)}

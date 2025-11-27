@@ -124,6 +124,7 @@ textarea {
   margin: 0;
   outline: none;
   appearance: none;
+  cursor: pointer;
 }
 
 /* 이미지의 하단 공백 제거 */
