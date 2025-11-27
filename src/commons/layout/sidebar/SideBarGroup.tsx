@@ -8,12 +8,12 @@ import { useSemesterStore } from "@/store/useSemesterStore";
 import { useTagStore } from "@/store/useTagStore";
 import {
   useDirectoryStore,
-  type DirectoryItem,
 } from "@/store/useDirectoryStore";
 import DirectoryAddModal from "@/commons/modals/DirectoryAddModal";
 import SortableItem from "./SortableItem";
 import { IconAdd } from "@/assets";
 import { useDroppable } from "@dnd-kit/core";
+import type { DirectoryItem } from "@/types/directory";
 
 type ItemType = DirectoryItem & { slug: string };
 
@@ -76,6 +76,7 @@ function SidebarGroup({
   };
 
   const handleRename = async (directoryId: number, newName: string) => {
+    const previousName = items.find((item) => item.id === directoryId)?.name;
     updateStoreDirName(parent, directoryId, newName);
 
     try {
@@ -88,8 +89,10 @@ function SidebarGroup({
         )
       );
     } catch (error) {
+      if(previousName) {
+        updateStoreDirName(parent, directoryId, previousName);
+      }
       console.error("이름 변경 API 호출 실패:", error);
-      // [TODO] 스토어 롤백 로직 (이름 변경 실패 시)
     }
   };
 
