@@ -1,4 +1,4 @@
-﻿import { Routes, Route, useParams } from "react-router-dom";
+﻿import { Routes, Route, useParams, Navigate } from "react-router-dom";
 import HomePage from "@/services/home/HomePage";
 import LandingPage from "@/services/landing/LandingPage";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -14,6 +14,7 @@ import FilePage from "@/services/contents/FilePage";
 import FileDetailPage from "@/services/contents/FileDetailPage";
 import NoteWritePage from "@/services/contents/note/NoteWritePage";
 import TrashPage from "@/services/trash/TrashPage";
+import NotFoundPage from "@/services/error/404/ErrorPage";
 
 function Router() {
   const { user } = useAuthStore();
@@ -162,6 +163,9 @@ function Router() {
           </AppLayout>
         }
       />
+
+      <Route path="/404" element={<NotFoundPage />} />
+      <Route path="*" element={<Navigate to="/404" replace />} />
     </Routes>
   );
 }
