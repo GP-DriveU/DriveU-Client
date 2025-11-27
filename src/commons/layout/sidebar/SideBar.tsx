@@ -98,8 +98,7 @@ function Sidebar() {
           console.error("순서 변경 API 호출 실패:", error);
           updateDirectoryOrder(parentId, previousChildren);
         }
-      }
-      else {
+      } else {
         const activeItemId = activeItemData.item.id;
         const oldParentId = activeItemData.parentId;
         const newParentId = overItemData.parentId;
@@ -131,6 +130,33 @@ function Sidebar() {
     }
   }
 
+  const groupedDirectories = currentDirectories.map((dir) => {
+    const routeMap: Record<string, { slug: string; emoji: string }> = {
+      학업: { slug: "study", emoji: "🏫" },
+      과목: { slug: "subject", emoji: "📚" },
+      대외활동: { slug: "activity", emoji: "📢" },
+    };
+
+    const route = routeMap[dir.name];
+    if (!route) return null;
+
+    const items = (dir.children ?? []).map((child) => ({
+      ...child,
+      slug: `${encodeURIComponent(child.name)}-${child.id}`,
+    }));
+
+    return (
+      <SidebarGroup
+        key={dir.id}
+        parent={dir.id}
+        title={`${route.emoji} ${dir.name}`}
+        initialItems={items}
+        basePath={`/${route.slug}`}
+        currentPath={location.pathname}
+      />
+    );
+  });
+
   if (currentDirectories.length === 0) {
     return (
       <aside className="w-[278px] min-w-[220px] min-h-screen px-10 py-6 bg-primary_light flex flex-col gap-4">
@@ -150,70 +176,46 @@ function Sidebar() {
     >
       <aside className="w-[278px] min-w-[220px] min-h-screen px-10 py-6 bg-primary_light flex flex-col gap-4">
         <div className="flex-shrink-0 mb-6 flex flex-col gap-3">
-        <div
-          className={`flex flex-row items-center mb-6 ${
-            isHome ? "bg-primary text-white" : ""
-          }`}
-        >
-          <IconHome className={`${isHome ? "text-white" : ""}`} />
-          <SidebarItem label="전체보기" isActive={isHome} to={"/"} />
-        </div>
-          {(() => {
-            const grouped = currentDirectories.map((dir) => {
-            const routeMap: Record<string, { slug: string; emoji: string }> = {
-              학업: { slug: "study", emoji: "🏫" },
-              과목: { slug: "subject", emoji: "📚" },
-              대외활동: { slug: "activity", emoji: "📢" },
-            };
-
-            const route = routeMap[dir.name];
-            if (!route) return null;
-
-              const items = (dir.children ?? []).map((child) => ({
-                ...child,
-                slug: `${encodeURIComponent(child.name)}-${child.id}`,
-              }));
-
-              return (
-                <SidebarGroup
-                  key={dir.id}
-                  parent={dir.id}
-                  title={`${route.emoji} ${dir.name}`}
-                  initialItems={items}
-                  basePath={`/${route.slug}`}
-                  currentPath={location.pathname}
-                />
-              );
-            });
-
-            return grouped;
-          })()}
-        </div>
-
-      <div className="flex-shrink-0 w-full flex flex-col gap-4">
-        <div className={`flex flex-row items-center ${
-            isTrash ? "bg-primary text-white" : ""
-          }`}>
-          <IconTrash className={`${isTrash ? "text-white" : ""}`} />
-          <SidebarItem label="휴지통" isActive={isTrash} to={"/trash"} />
-        </div>
-        <div className="flex flex-row items-center">
-          <IconStore />
-          <SidebarItem
-            label="저장 용량"
-            isActive={location.pathname === "/store"}
-          />
-        </div>
-        <div className="text-xs font-pretendard text-font">
-          <div className="h-2.5 w-full bg-[#d9d9d9] overflow-hidden">
-            <div className="h-2.5 bg-[#61758f]" style={{ width: "55%" }}></div>
+          <div
+            className={`flex flex-row items-center mb-6 ${
+              isHome ? "bg-primary text-white" : ""
+            }`}
+          >
+            <IconHome className={`${isHome ? "text-white" : ""}`} />
+            <SidebarItem label="전체보기" isActive={isHome} to={"/"} />
           </div>
-          <div className="mt-1">
-            <strong className="font-extrabold">2GB</strong> 중{" "}
-            <strong className="font-extrabold">1.1GB</strong> 사용
+          {groupedDirectories}
+        </div>
+
+        <div className="flex-shrink-0 w-full flex flex-col gap-4">
+          <div
+            className={`flex flex-row items-center ${
+              isTrash ? "bg-primary text-white" : ""
+            }`}
+          >
+            <IconTrash className={`${isTrash ? "text-white" : ""}`} />
+            <SidebarItem label="휴지통" isActive={isTrash} to={"/trash"} />
+          </div>
+          <div className="flex flex-row items-center">
+            <IconStore />
+            <SidebarItem
+              label="저장 용량"
+              isActive={location.pathname === "/store"}
+            />
+          </div>
+          <div className="text-xs font-pretendard text-font">
+            <div className="h-2.5 w-full bg-[#d9d9d9] overflow-hidden">
+              <div
+                className="h-2.5 bg-[#61758f]"
+                style={{ width: "55%" }}
+              ></div>
+            </div>
+            <div className="mt-1">
+              <strong className="font-extrabold">2GB</strong> 중{" "}
+              <strong className="font-extrabold">1.1GB</strong> 사용
+            </div>
           </div>
         </div>
-      </div>
       </aside>
     </DndContext>
   );
