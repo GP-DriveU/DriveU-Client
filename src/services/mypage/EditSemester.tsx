@@ -137,11 +137,11 @@ function EditSemester({
           )}
           <div className="flex gap-4 items-center">
             <IconEdit
-              style={{ cursor: "pointer", width: "32px", height: "32px" }}
+              className="cursor-pointer w-8 h-8"
               onClick={() => handleEdit(index)}
             />
             <IconDeletion
-              style={{ cursor: "pointer", width: "32px", height: "32px" }}
+              className="cursor-pointer w-8 h-8"
               onClick={() => onRequestDelete(semester)}
             />
           </div>

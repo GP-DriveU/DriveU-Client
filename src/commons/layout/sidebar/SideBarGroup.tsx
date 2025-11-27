@@ -106,7 +106,7 @@ function SidebarGroup({
         <div className="flex items-center justify-between py-1">
           <span className="text-xl font-semibold">{title}</span>
           <IconAdd
-            style={{ cursor: "pointer", width: "20px", height: "20px" }}
+            className="cursor-pointer w-5 h-5"
             onClick={() => setIsModalOpen(true)}
           />
         </div>
