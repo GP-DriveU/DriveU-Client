@@ -1,4 +1,6 @@
 ﻿import { http } from "@/api/Fetch";
+import type { DirectoryItem } from "@/types/directory";
+
 
 interface CreateDirectoryRequest {
   parentDirectoryId: number | undefined;
@@ -50,6 +52,15 @@ interface ReorderedDirectory {
 interface UpdateDirectoriesOrderResponse {
   parentDirectoryId: number;
   reorderedDirectories: ReorderedDirectory[];
+}
+
+export const fetchDirectory = async (
+  userSemesterId: number,
+): Promise<DirectoryItem[]> => {
+  const response = await http.get<DirectoryItem[]>(
+    `user-semesters/${userSemesterId}/directories`
+  );
+  return response.response;
 }
 
 export const createDirectory = async (
