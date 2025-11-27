@@ -52,7 +52,7 @@ function TrashPage() {
   });
   const [activeFilters, setActiveFilters] = useState<string[]>(["all"]);
   const { selectedSemesterKey, fetchAndUpdateDirectories } = useDirectoryStore();
-  const currentSemesterId = useSemesterStore().getCurrentSemester()?.userSemesterId ?? 0;
+  const { semesters } = useSemesterStore();
 
   const loadTrashItems = async () => {
     setIsLoading(true);
@@ -82,7 +82,7 @@ function TrashPage() {
       setActiveFilters(["all"]);
       return;
     }
-    
+
     setActiveFilters(newFilters);
   };
 
@@ -111,8 +111,13 @@ function TrashPage() {
         const [yearStr, term] = selectedSemesterKey.split("-");
         const year = parseInt(yearStr, 10);
 
-        if (currentSemesterId > 0) {
-          await fetchAndUpdateDirectories(currentSemesterId, year, term);
+        const targetSemester = semesters.find(
+          (s) => s.year === year && s.term === term
+        );
+        const targetSemesterId = targetSemester?.userSemesterId ?? 0;
+
+        if (targetSemesterId > 0) {
+          await fetchAndUpdateDirectories(targetSemesterId, year, term);
         } else {
           console.warn("userSemesterId가 없어 디렉토리 갱신을 건너뜁니다.");
         }
