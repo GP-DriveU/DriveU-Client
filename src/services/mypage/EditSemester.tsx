@@ -26,7 +26,6 @@ function EditSemester({
   onCreateSemester,
   onUpdateSemester,
 }: EditSemesterProps) {
-
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editedSemester, setEditedSemester] = useState("");
   const [newSemesterInput, setNewSemesterInput] = useState("");
@@ -137,8 +136,14 @@ function EditSemester({
             </div>
           )}
           <div className="flex gap-4 items-center">
-            <IconEdit onClick={() => handleEdit(index)} />
-            <IconDeletion onClick={() => onRequestDelete(semester)} />
+            <IconEdit
+              className="cursor-pointer w-8 h-8"
+              onClick={() => handleEdit(index)}
+            />
+            <IconDeletion
+              className="cursor-pointer w-8 h-8"
+              onClick={() => onRequestDelete(semester)}
+            />
           </div>
         </div>
       ))}
@@ -170,6 +175,6 @@ function EditSemester({
       </div>
     </div>
   );
-};
+}
 
 export default EditSemester;

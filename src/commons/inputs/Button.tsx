@@ -33,9 +33,9 @@ function Button({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${sizeStyle[size]} rounded-[15px] font-semibold ${
-        colorStyle[color]
-      }
+      className={`${
+        sizeStyle[size]
+      } rounded-[15px] font-semibold cursor-pointer ${colorStyle[color]}
         ${disabled && "bg-gray-300 text-font-color cursor-not-allowed"}
         ${className}`}
     >

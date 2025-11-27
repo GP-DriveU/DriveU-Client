@@ -23,7 +23,6 @@ function MainFileList({
   selectable,
   onClickItem,
 }: MainFileListProps) {
-
   const handleDownload = async (item: Item) => {
     try {
       if (item.type === "NOTE") {
@@ -85,7 +84,7 @@ function MainFileList({
           }
           children={
             <div className="flex items-center gap-2">
-              <div className="truncate" title={item.title}>
+              <div className="truncate cursor-pointer" title={item.title}>
                 {item.title}
               </div>
               <div
