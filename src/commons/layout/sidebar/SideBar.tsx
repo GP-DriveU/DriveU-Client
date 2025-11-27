@@ -120,10 +120,6 @@ function Sidebar() {
 
       if (oldParentId === newParentId) return;
 
-      console.log(
-        `(그룹 이동) ${activeItem.id}번 아이템을 ${oldParentId} -> ${newParentId} 그룹으로 이동`
-      );
-
       moveDirectory(activeItem.id, oldParentId, newParentId);
 
       try {
