@@ -18,6 +18,8 @@ import {
   restoreFile,
 } from "@/api/Trash";
 import type { TrashSortType } from "@/types/trash";
+import { useDirectoryStore } from "@/store/useDirectoryStore";
+import { useSemesterStore } from "@/store/useSemesterStore";
 
 // todo: 나중에 modal refactor 필요
 interface ModalData {
@@ -49,6 +51,8 @@ function TrashPage() {
     order: "desc",
   });
   const [activeFilters, setActiveFilters] = useState<string[]>(["all"]);
+  const { selectedSemesterKey, fetchAndUpdateDirectories } = useDirectoryStore();
+  const currentSemesterId = useSemesterStore().getCurrentSemester()?.userSemesterId ?? 0;
 
   const loadTrashItems = async () => {
     setIsLoading(true);
@@ -102,6 +106,17 @@ function TrashPage() {
 
       alert(`'${item.name}' 파일 복원이 완료되었습니다.`);
       await loadTrashItems();
+
+      if (selectedSemesterKey) {
+        const [yearStr, term] = selectedSemesterKey.split("-");
+        const year = parseInt(yearStr, 10);
+
+        if (currentSemesterId > 0) {
+          await fetchAndUpdateDirectories(currentSemesterId, year, term);
+        } else {
+          console.warn("userSemesterId가 없어 디렉토리 갱신을 건너뜁니다.");
+        }
+      }
     } catch (error) {
       console.error("파일 복원에 실패했습니다:", error);
       alert(`'${item.name}' 복원 중 오류가 발생했습니다.`);

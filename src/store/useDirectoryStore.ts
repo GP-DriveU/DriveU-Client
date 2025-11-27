@@ -1,13 +1,7 @@
-﻿import { create } from "zustand";
+﻿import { fetchDirectory } from "@/api/Directory";
+import type { DirectoryItem } from "@/types/directory";
+import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-export interface DirectoryItem {
-  id: number;
-  name: string;
-  is_default: boolean;
-  order: number;
-  children: DirectoryItem[];
-}
 
 const getSemesterKey = (year: number, term: string) => `${year}-${term}`;
 
@@ -38,6 +32,11 @@ interface DirectoryStore {
     directoryId: number,
     newName: string
   ) => void;
+  fetchAndUpdateDirectories: (
+    userSemesterId: number,
+    year: number,
+    term: string
+  ) => Promise<void>;
 }
 
 export const useDirectoryStore = create<DirectoryStore>()(
@@ -171,6 +170,15 @@ export const useDirectoryStore = create<DirectoryStore>()(
             },
           };
         });
+      },
+      fetchAndUpdateDirectories: async (userSemesterId, year, term) => {
+        try {
+          const directories = await fetchDirectory(userSemesterId);
+          get().setSemesterDirectories(year, term, directories);
+        } catch (error) {
+          console.error("디렉토리 목록 업데이트 실패:", error);
+          throw error;
+        }
       },
     }),
     {
