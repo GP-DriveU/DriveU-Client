@@ -75,6 +75,7 @@ function Sidebar() {
           (c) => c.id === overItemData.item.id
         );
 
+        const previousChildren = [...parentDir.children];
         const newChildren = arrayMove(parentDir.children, oldIndex, newIndex);
 
         const newChildrenForStore = newChildren.map((child, index) => ({
@@ -95,6 +96,7 @@ function Sidebar() {
           });
         } catch (error) {
           console.error("순서 변경 API 호출 실패:", error);
+          updateDirectoryOrder(parentId, previousChildren);
         }
       }
       else {
