@@ -1,13 +1,7 @@
-﻿import { create } from "zustand";
+﻿import { fetchDirectory } from "@/api/Directory";
+import type { DirectoryItem } from "@/types/directory";
+import { create } from "zustand";
 import { persist } from "zustand/middleware";
-
-export interface DirectoryItem {
-  id: number;
-  name: string;
-  is_default: boolean;
-  order: number;
-  children: DirectoryItem[];
-}
 
 const getSemesterKey = (year: number, term: string) => `${year}-${term}`;
 
@@ -28,6 +22,21 @@ interface DirectoryStore {
     parentDirectoryId: number,
     newChildren: DirectoryItem[]
   ) => void;
+  moveDirectory: (
+    directoryId: number,
+    oldParentId: number,
+    newParentId: number
+  ) => void;
+  updateDirectoryName: (
+    parentDirectoryId: number,
+    directoryId: number,
+    newName: string
+  ) => void;
+  fetchAndUpdateDirectories: (
+    userSemesterId: number,
+    year: number,
+    term: string
+  ) => Promise<void>;
 }
 
 export const useDirectoryStore = create<DirectoryStore>()(
@@ -93,6 +102,83 @@ export const useDirectoryStore = create<DirectoryStore>()(
             },
           };
         });
+      },
+      moveDirectory: (directoryId, oldParentId, newParentId) => {
+        const key = get().selectedSemesterKey;
+        if (!key) return;
+
+        set((state) => {
+          const currentDirs = state.semesterDirectories[key] ?? [];
+          let itemToMove: DirectoryItem | undefined;
+
+          const updatedDirs = currentDirs.map((dir) => {
+            if (dir.id === oldParentId) {
+              itemToMove = dir.children.find((c) => c.id === directoryId);
+              return {
+                ...dir,
+                children: dir.children.filter((c) => c.id !== directoryId),
+              };
+            }
+            return dir;
+          });
+
+          if (!itemToMove) return state;
+
+          const finalDirs = updatedDirs.map((dir) => {
+            if (dir.id === newParentId) {
+              return {
+                ...dir,
+                children: [...dir.children, itemToMove!],
+              };
+            }
+            return dir;
+          });
+
+          return {
+            semesterDirectories: {
+              ...state.semesterDirectories,
+              [key]: finalDirs,
+            },
+          };
+        });
+      },
+      updateDirectoryName: (parentDirectoryId, directoryId, newName) => {
+        const key = get().selectedSemesterKey;
+        if (!key) return;
+
+        set((state) => {
+          const currentDirs = state.semesterDirectories[key] ?? [];
+          const updatedDirs = currentDirs.map((dir) => {
+            if (dir.id === parentDirectoryId) {
+              return {
+                ...dir,
+                children: dir.children.map((child) => {
+                  if (child.id === directoryId) {
+                    return { ...child, name: newName };
+                  }
+                  return child;
+                }),
+              };
+            }
+            return dir;
+          });
+
+          return {
+            semesterDirectories: {
+              ...state.semesterDirectories,
+              [key]: updatedDirs,
+            },
+          };
+        });
+      },
+      fetchAndUpdateDirectories: async (userSemesterId, year, term) => {
+        try {
+          const directories = await fetchDirectory(userSemesterId);
+          get().setSemesterDirectories(year, term, directories);
+        } catch (error) {
+          console.error("디렉토리 목록 업데이트 실패:", error);
+          throw error;
+        }
       },
     }),
     {

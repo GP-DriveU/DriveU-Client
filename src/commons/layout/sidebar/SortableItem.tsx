@@ -1,27 +1,32 @@
-import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import SidebarItem from './SideBarItem';
-import AlertModal from '@/commons/modals/AlertModal';
-import { IconDrag, IconTrash } from '@/assets';
-import { useState, type MouseEvent } from "react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import SidebarItem from "./SideBarItem";
+import AlertModal from "@/commons/modals/AlertModal";
+import { IconDrag, IconTrash } from "@/assets";
+import {
+  useState,
+  type MouseEvent,
+  type KeyboardEvent,
+} from "react";
 
 interface SortableItemProps {
   id: string;
+  directoryId: number;
   label: string;
   to: string;
   isActive: boolean;
+  onDelete: (directoryId: number) => void;
+  onRename: (directoryId: number, newName: string) => void;
 }
 
 function SortableItem(props: SortableItemProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: props.id });
+  const [isEditing, setIsEditing] = useState(false);
+  const [inputValue, setInputValue] = useState(props.label);
+
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: props.id });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -34,15 +39,43 @@ function SortableItem(props: SortableItemProps) {
     setIsModalOpen(true);
   };
 
-  // 모달 확인 (삭제) 핸들러 - 더미 함수
   const handleConfirmDelete = () => {
-    console.log(`(DUMMY) Deleting item: ${props.id} - ${props.label}`);
-    // 실제 구현 시: deleteSemester(props.id);
+    props.onDelete(props.directoryId);
     setIsModalOpen(false);
   };
 
   const handleCancelDelete = () => {
     setIsModalOpen(false);
+  };
+
+  const handleDoubleClick = (e: MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsEditing(true);
+  };
+
+  const handleSubmitRename = () => {
+    setIsEditing(false);
+    const newName = inputValue.trim();
+
+    if (newName && newName !== props.label) {
+      props.onRename(props.directoryId, newName);
+    } else {
+      setInputValue(props.label);
+    }
+  };
+
+  const handleInputKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSubmitRename();
+    } else if (e.key === "Escape") {
+      setInputValue(props.label);
+      setIsEditing(false);
+    }
+  };
+
+  const handleInputBlur = () => {
+    handleSubmitRename();
   };
 
   return (
@@ -61,21 +94,35 @@ function SortableItem(props: SortableItemProps) {
           <IconDrag className="w-4 h-4 text-gray-400" />
         </button>
 
-        <div className="flex-grow">
-          <SidebarItem
-            label={props.label}
-            to={props.to}
-            isActive={props.isActive}
-          />
+        <div className="flex-grow" onDoubleClick={handleDoubleClick}>
+          {isEditing ? (
+            <input
+              type="text"
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleInputKeyDown}
+              onBlur={handleInputBlur}
+              autoFocus
+              className="w-full h-8 px-4 text-xl font-normal font-pretendard bg-white border border-primary text-font"
+            />
+          ) : (
+            <SidebarItem
+              label={props.label}
+              to={props.to}
+              isActive={props.isActive}
+            />
+          )}
         </div>
 
-        <button
-          onClick={handleDeleteClick}
-          className="opacity-0 group-hover:opacity-100 transition-opacity p-1"
-          aria-label={`${props.label} 삭제`}
-        >
-          <IconTrash className="w-4 h-4 text-gray-500 hover:text-red-500" />
-        </button>
+        {!isEditing && (
+          <button
+            onClick={handleDeleteClick}
+            className="opacity-0 group-hover:opacity-100 transition-opacity p-1"
+            aria-label={`${props.label} 삭제`}
+          >
+            <IconTrash className="w-4 h-4 text-gray-500 hover:text-red-500" />
+          </button>
+        )}
       </div>
 
       {isModalOpen && (

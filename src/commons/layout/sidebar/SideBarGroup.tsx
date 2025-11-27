@@ -1,29 +1,19 @@
 ﻿import { useState } from "react";
 import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  arrayMove,
   SortableContext,
-  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { createDirectory } from "@/api/Directory";
+import { createDirectory, deleteDirectory, updateDirectoryName } from "@/api/Directory";
 import { useSemesterStore } from "@/store/useSemesterStore";
 import { useTagStore } from "@/store/useTagStore";
 import {
   useDirectoryStore,
-  type DirectoryItem,
 } from "@/store/useDirectoryStore";
 import DirectoryAddModal from "@/commons/modals/DirectoryAddModal";
 import SortableItem from "./SortableItem";
 import { IconAdd } from "@/assets";
+import { useDroppable } from "@dnd-kit/core";
+import type { DirectoryItem } from "@/types/directory";
 
 type ItemType = DirectoryItem & { slug: string };
 
@@ -38,47 +28,73 @@ interface SidebarGroupProps {
 function SidebarGroup({
   parent,
   title,
-  initialItems,
+  initialItems: items,
   basePath,
   currentPath,
 }: SidebarGroupProps) {
-  const [items, setItems] = useState<ItemType[]>(initialItems);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newDirName, setNewDirName] = useState("");
-  const currentSemesterId =
-    useSemesterStore().getCurrentSemester()?.userSemesterId;
+  const currentSemesterId = useSemesterStore().getCurrentSemester()?.userSemesterId;
 
-  const { setSemesterDirectories } = useDirectoryStore.getState();
+  const { setSemesterDirectories, updateDirectoryName: updateStoreDirName } = useDirectoryStore.getState();
   const currentSemester = useSemesterStore.getState();
-  const updateDirectoryOrder = useDirectoryStore(
-    (state) => state.updateDirectoryOrder
-  );
 
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  );
+  const { isOver, setNodeRef } = useDroppable({
+    id: `group-${parent}`,
+  });
 
-  function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
+  const handleDelete = async (directoryId: number) => {
+    try {
+      if (!currentSemesterId) throw new Error("학기 정보가 없습니다.");
 
-    if (over && active.id !== over.id) {
-      const oldIndex = items.findIndex((item) => item.slug === active.id);
-      const newIndex = items.findIndex((item) => item.slug === over.id);
-      const newItems = arrayMove(items, oldIndex, newIndex);
+      await deleteDirectory(directoryId);
 
-      setItems(newItems);
+      const year = currentSemester.getCurrentSemester()?.year;
+      const term = currentSemester.getCurrentSemester()?.term;
 
-      const newChildrenForStore = newItems.map(({ slug, ...rest }, index) => ({
-        ...rest,
-        order: index,
-      }));
+      if (year && term) {
+        setSemesterDirectories(year, term, (prev) =>
+          prev.map((dir) => {
+            if (dir.id === parent) {
+              return {
+                ...dir,
+                children: (dir.children ?? []).filter(
+                  (child) => child.id !== directoryId
+                ),
+              };
+            }
+            return dir;
+          })
+        );
+      }
 
-      updateDirectoryOrder(parent, newChildrenForStore);
+      const { tags, setTags } = useTagStore.getState();
+      setTags(tags.filter((tag) => tag.id !== directoryId));
+    } catch (error) {
+      console.error("디렉토리 삭제 API 호출 실패:", error);
     }
-  }
+  };
+
+  const handleRename = async (directoryId: number, newName: string) => {
+    const previousName = items.find((item) => item.id === directoryId)?.name;
+    updateStoreDirName(parent, directoryId, newName);
+
+    try {
+      await updateDirectoryName(directoryId, { name: newName });
+
+      const { tags, setTags } = useTagStore.getState();
+      setTags(
+        tags.map((tag) =>
+          tag.id === directoryId ? { ...tag, title: newName } : tag
+        )
+      );
+    } catch (error) {
+      if(previousName) {
+        updateStoreDirName(parent, directoryId, previousName);
+      }
+      console.error("이름 변경 API 호출 실패:", error);
+    }
+  };
 
   return (
     <>
@@ -88,10 +104,15 @@ function SidebarGroup({
           <IconAdd onClick={() => setIsModalOpen(true)} />
         </div>
         <hr className="border-font border-t-0.5" />
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
+        <div
+          ref={setNodeRef}
+          className={`transition-colors rounded-md ${
+            isOver ? "bg-primary-dark" : ""
+          } ${
+            items.length === 0
+              ? "min-h-[32px]"
+              : ""
+          }`}
         >
           <SortableContext
             items={items.map((i) => i.slug)}
@@ -103,14 +124,17 @@ function SidebarGroup({
                 <SortableItem
                   key={item.slug}
                   id={item.slug}
+                  directoryId={item.id}
                   label={item.name}
                   to={path}
                   isActive={currentPath.startsWith(path)}
+                  onDelete={handleDelete}
+                  onRename={handleRename}
                 />
               );
             })}
           </SortableContext>
-        </DndContext>
+        </div>
       </div>
       <DirectoryAddModal
         isOpen={isModalOpen}
@@ -132,8 +156,6 @@ function SidebarGroup({
               name,
             });
 
-            const newSlug = `${encodeURIComponent(name)}-${newDir.id}`;
-
             const newDirectoryItem: DirectoryItem = {
               id: newDir.id,
               name: newDir.name,
@@ -141,8 +163,6 @@ function SidebarGroup({
               is_default: false,
               children: [],
             };
-
-            setItems([...items, { ...newDirectoryItem, slug: newSlug }]);
 
             const year = currentSemester.getCurrentSemester()?.year;
             const term = currentSemester.getCurrentSemester()?.term;
@@ -153,10 +173,7 @@ function SidebarGroup({
                   if (dir.id === parentDirectoryId) {
                     return {
                       ...dir,
-                      children: [
-                        ...(dir.children ?? []),
-                        newDirectoryItem,
-                      ],
+                      children: [...(dir.children ?? []), newDirectoryItem],
                     };
                   }
                   return dir;
