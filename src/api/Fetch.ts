@@ -33,6 +33,12 @@ const baseFetch = async (
       window.location.href = "/login";
       return Promise.reject(new Error("Unauthorized, redirected to login"));
     }
+
+    if (res.status === 404) {
+      window.location.href = "/404";
+      return Promise.reject(new Error("Resource not found, redirected to 404"));
+    }
+
     throw new Error(`HTTP error! status: ${res.status}`);
   }
 
