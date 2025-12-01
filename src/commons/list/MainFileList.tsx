@@ -63,7 +63,7 @@ function MainFileList({
       }
       renderItem={(item) => (
         <ListItem
-          onClick={() => item.type === "NOTE" && onClickItem(item.id)}
+          onClick={() => onClickItem(item.id)}
           leading={
             selectable ? (
               <div
