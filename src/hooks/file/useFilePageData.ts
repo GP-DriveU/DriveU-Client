@@ -53,7 +53,7 @@ export const useFilePageData = () => {
         return {
           ...item,
           type: isLink ? "LINK" : item.type,
-          iconType: isLink ? "LINK" : isFile ? "FILE" : "NOTE",
+          iconType: isLink ? item.iconType : isFile ? "FILE" : "NOTE",
         };
       });
       setItems(mappedResponse);

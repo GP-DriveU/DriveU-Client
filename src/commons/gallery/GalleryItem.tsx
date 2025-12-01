@@ -50,7 +50,7 @@ function GalleryItem({
               )}
             </div>
           ) : (
-            getIcon(item.type)
+            getIcon(item.type, item.iconType)
           )}
         </div>
         <div

@@ -79,7 +79,7 @@ function MainFileList({
                 )}
               </div>
             ) : (
-              getIcon(item.type)
+              getIcon(item.type, item.iconType)
             )
           }
           children={
