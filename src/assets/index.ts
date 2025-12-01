@@ -25,5 +25,7 @@ export { default as IconArrowDropDown } from "@/assets/icon/icon_arrow_drop_down
 export { default as IconArrowDropUp } from "@/assets/icon/icon_arrow_drop_up.svg?react";
 export { default as IconDrag } from "@/assets/icon/icon_drag.svg?react";
 export { default as IconLink } from "@/assets/icon/icon_link.svg?react";
+export { default as IconYoutube } from "@/assets/icon/icon_youtube.svg?react";
+export { default as IconGithub } from "@/assets/icon/icon_github.svg?react";
 
 export { default as loadingAnimation } from "@/assets/animation/loading.json";
