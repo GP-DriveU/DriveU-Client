@@ -6,7 +6,7 @@
   IconGithub,
   IconYoutube,
 } from "@/assets";
-import { type ItemType } from "@/types/Item";
+import { type Item, type ItemType } from "@/types/Item";
 
 export const getIcon = (type: ItemType, iconType?: string) => {
   const getTargetIcon = () => {
@@ -35,5 +35,14 @@ export const getIcon = (type: ItemType, iconType?: string) => {
     <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
       {getTargetIcon()}
     </div>
+  );
+};
+
+export const canPreviewItem = (item: Item): boolean => {
+  return (
+    item.type === "FILE" &&
+    ["png", "jpg", "jpeg", "gif", "webp", "pdf"].includes(
+      item.extension?.toLowerCase()
+    )
   );
 };

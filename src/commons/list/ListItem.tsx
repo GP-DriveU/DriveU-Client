@@ -19,7 +19,7 @@ function ListItem({ leading, children, actions, onClick }: ListItemProps) {
     >
       <div className="flex items-center gap-2">
         {leading}
-        <div className="w-48 font-medium flex flex-col truncate">
+        <div className="w-80 font-medium flex flex-col truncate">
           {children}
         </div>
       </div>

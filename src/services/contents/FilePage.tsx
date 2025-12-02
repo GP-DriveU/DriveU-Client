@@ -8,6 +8,7 @@ import { IconFilter, IconGallery, IconList } from "@/assets";
 import { toggleFavoriteResource } from "@/api/File";
 import { useFilePageController } from "@/hooks/file/useFilePageController";
 import FilePageModals from "./FilePageModals";
+import FilePreviewModal from "@/commons/modals/FilePreviewModal";
 
 function FilePage() {
   const navigate = useNavigate();
@@ -113,6 +114,7 @@ function FilePage() {
       </div>
 
       <FilePageModals data={data} modals={modals} actions={actions} />
+      <FilePreviewModal />
     </div>
   );
 }
