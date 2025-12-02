@@ -1,4 +1,5 @@
-﻿import { useNavigate } from "react-router-dom";
+﻿import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { IconChevronDown, IconUser } from "@/assets";
 import Button from "@/commons/inputs/Button";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -8,7 +9,15 @@ function Header() {
   const { user } = useAuthStore();
   const isLoggedIn = !!user;
   const navigate = useNavigate();
-  const { selectedSemesterKey } = useSemesterStore();
+  const { selectedSemesterKey, semesters, setSelectedSemester } =
+    useSemesterStore();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const handleSemesterClick = (year: number, term: any) => {
+    setSelectedSemester(year, term);
+    setIsDropdownOpen(false);
+    navigate("/");
+  };
 
   return (
     <header
@@ -17,7 +26,7 @@ function Header() {
     >
       <div className="flex items-center justify-between">
         <h1
-          className="text-primary text-2xl sm:text-3xl font-extrabold"
+          className="text-primary text-2xl sm:text-3xl font-extrabold cursor-pointer"
           onClick={() => navigate("/")}
         >
           DriveU
@@ -36,21 +45,45 @@ function Header() {
             </Button>
           </div>
         ) : (
-          <div className="flex gap-4 text-font items-center">
+          <div className="flex gap-4 text-font items-center relative">
             <span className="hidden md:inline text-big-bold font-bold">
               {user.name}
               <span className="font-regular text-big-regular">님</span>
             </span>
-            <div className="hidden md:flex items-center gap-2 px-3 py-1 border rounded">
-              <span className="text-sm sm:text-base font-semibold">
-                {selectedSemesterKey
-                  ? (() => {
-                      const [year, term] = selectedSemesterKey.split("-");
-                      return `${year}년 ${term === "SPRING" ? "1" : "2"}학기`;
-                    })()
-                  : ""}
-              </span>
-              <IconChevronDown />
+
+            <div className="relative">
+              <div
+                className="hidden md:flex items-center gap-2 px-3 py-1 border rounded cursor-pointer hover:bg-gray-50"
+                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              >
+                <span className="text-sm sm:text-base font-semibold select-none">
+                  {selectedSemesterKey
+                    ? (() => {
+                        const [year, term] = selectedSemesterKey.split("-");
+                        return `${year}년 ${term === "SPRING" ? "1" : "2"}학기`;
+                      })()
+                    : "학기 선택"}
+                </span>
+                <IconChevronDown
+                  className={`transition-transform duration-200 ${
+                    isDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
+              </div>
+
+              {isDropdownOpen && (
+                <div className="absolute top-full right-0 mt-2 w-40 bg-white border rounded shadow-lg z-50 flex flex-col py-1">
+                  {semesters.map((sem) => (
+                    <div
+                      key={sem.userSemesterId}
+                      className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm font-medium text-center"
+                      onClick={() => handleSemesterClick(sem.year, sem.term)}
+                    >
+                      {sem.year}년 {sem.term === "SPRING" ? "1" : "2"}학기
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
             <IconUser
               className="cursor-pointer"
