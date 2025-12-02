@@ -9,23 +9,31 @@
 import { type ItemType } from "@/types/Item";
 
 export const getIcon = (type: ItemType, iconType?: string) => {
-  switch (type) {
-    case "LINK":
-      switch (iconType) {
-        case "GITHUB":
-          return <IconGithub />;
-        case "YOUTUBE":
-          return <IconYoutube />;
-        default:
-          return <IconLink />;
-      }
-    case "FILE":
-      return <IconDocs />;
-    case "NOTE":
-      return <IconNote />;
-    case "DIRECTORY":
-      return <IconAdd />;
-    default:
-      return <IconDocs />;
-  }
+  const getTargetIcon = () => {
+    switch (type) {
+      case "LINK":
+        switch (iconType) {
+          case "GITHUB":
+            return <IconGithub />;
+          case "YOUTUBE":
+            return <IconYoutube />;
+          default:
+            return <IconLink />;
+        }
+      case "FILE":
+        return <IconDocs />;
+      case "NOTE":
+        return <IconNote />;
+      case "DIRECTORY":
+        return <IconAdd />;
+      default:
+        return <IconDocs />;
+    }
+  };
+
+  return (
+    <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+      {getTargetIcon()}
+    </div>
+  );
 };
