@@ -20,7 +20,6 @@ function GalleryItem({
   selectable,
   onClickItem,
 }: GalleryItemProps) {
-
   return (
     <div
       className="px-4 py-4 bg-white border-t border-b border-font flex flex-col items-center font-pretendard space-y-6"
@@ -28,7 +27,7 @@ function GalleryItem({
         borderTop: "0.5px solid #4B5563",
         borderBottom: "0.5px solid #4B5563",
       }}
-      onClick={() => item.type === "NOTE" && onClickItem(item.id)}
+      onClick={() => onClickItem(item.id)}
     >
       <div className="w-full relative flex items-center">
         <div className="ml-8 flex-1 text-black text-xl font-normal truncate whitespace-nowrap overflow-hidden">
@@ -51,7 +50,7 @@ function GalleryItem({
               )}
             </div>
           ) : (
-            getIcon(item.type)
+            getIcon(item.type, item.iconType)
           )}
         </div>
         <div
@@ -118,6 +117,6 @@ function GalleryItem({
       </div>
     </div>
   );
-};
+}
 
 export default GalleryItem;

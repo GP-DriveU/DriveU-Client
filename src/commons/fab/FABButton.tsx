@@ -12,6 +12,7 @@ interface FABButtonProps {
   onStartSelecting: () => void;
   onUploadClick: () => void;
   onStartDelete: () => void;
+  onLinkClick: () => void;
   onWriteNoteClick?: () => void;
 }
 
@@ -25,9 +26,9 @@ function FABButton({
   onStartSelecting,
   onUploadClick,
   onStartDelete,
+  onLinkClick,
   onWriteNoteClick,
 }: FABButtonProps) {
-  
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
   const { slug } = useParams();
@@ -39,6 +40,7 @@ function FABButton({
       ? [{ label: "선택 항목 삭제" }, { label: "삭제 취소" }]
       : [
           !showWriteNote ? { label: "업로드" } : null,
+          !showWriteNote ? { label: "링크 업로드" } : null,
           showWriteNote ? { label: "노트 작성" } : null,
           { label: "삭제" },
           { label: "문제 생성" },
@@ -61,7 +63,7 @@ function FABButton({
             style={{ transitionDelay: `${index * 50}ms` }}
           >
             <div
-              className="px-3 py-1 w-20 bg-secondary font-bold text-center text-white text-sm rounded-md shadow cursor-pointer"
+              className="px-3 py-1 w-24 bg-secondary font-bold text-center text-white text-sm rounded-md shadow cursor-pointer"
               onClick={() => {
                 if (action.label === "문제 생성") {
                   if (!isGenerating) {
@@ -96,6 +98,9 @@ function FABButton({
                 } else if (action.label === "노트 작성") {
                   onWriteNoteClick?.();
                   setIsOpen(false);
+                } else if (action.label === "링크 업로드") {
+                  onLinkClick?.();
+                  setIsOpen(false);
                 }
               }}
             >
@@ -127,6 +132,6 @@ function FABButton({
       </div>
     </div>
   );
-};
+}
 
 export default FABButton;
