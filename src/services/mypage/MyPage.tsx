@@ -12,9 +12,10 @@ import Button from "@/commons/inputs/Button";
 import { useAuthStore } from "@/store/useAuthStore";
 import MyPageSection from "@/services/mypage/MyPageSection";
 import EditSemester from "@/services/mypage/EditSemester";
+import { useSemesterStore } from "@/store/useSemesterStore";
 
 const formatSemester = (s: { year: number; term: string }) =>
-  `${String(s.year).slice(2)}년 ${s.term === "SPRING" ? "1학기" : "2학기"}`;
+  `${s.year}년 ${s.term === "SPRING" ? "1학기" : "2학기"}`;
 
 function MyPage() {
   const [user, setUser] = useState<UserInfoResponse | null>(null);
@@ -23,28 +24,45 @@ function MyPage() {
   >([]);
   const [isEditingSemester, setIsEditingSemester] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
+
   const logout = useAuthStore((state) => state.logout);
+  const { setSemesters: setStoreSemesters } = useSemesterStore();
+
+  const syncStore = (newSemesters: UserInfoResponse["semesters"]) => {
+    setStoreSemesters(
+      newSemesters.map((s) => ({
+        userSemesterId: s.userSemesterId,
+        year: s.year,
+        term: s.term,
+        isCurrent: s.isCurrent,
+      }))
+    );
+  };
 
   useEffect(() => {
     const fetchUserInfo = async () => {
       const data = await getUserInfo();
       setUser(data);
       setSemesterData(data.semesters);
+      syncStore(data.semesters);
     };
     fetchUserInfo();
   }, []);
 
   const deleteSemester = async (semesterLabel: string) => {
-    const filtered = semesterData.filter(
-      (s) => formatSemester(s).trim() !== semesterLabel.trim()
-    );
-    setSemesterData(filtered);
-
     const target = semesterData.find(
       (s) => formatSemester(s).trim() === semesterLabel.trim()
     );
+
     if (target) {
       await apiDeleteSemester(target.userSemesterId);
+
+      const filtered = semesterData.filter(
+        (s) => s.userSemesterId !== target.userSemesterId
+      );
+      setSemesterData(filtered);
+
+      syncStore(filtered);
     }
   };
 
@@ -82,45 +100,28 @@ function MyPage() {
                 <EditSemester
                   semesters={semesterData.map(formatSemester)}
                   onRequestDelete={(semester) => setDeleteTarget(semester)}
-                  setSemesters={(updatedArray) => {
-                    if (!Array.isArray(updatedArray)) return;
-                    
-                    const mapped = updatedArray
-                      .map((s) => {
-                        const trimmed = s.trim();
-                        if (!/^\d{4}년 [12]학기$/.test(trimmed)) {
-                          return null;
-                        }
-                        const [yearStr, termStr] = trimmed.split("년 ");
-                        const year = parseInt(yearStr, 10);
-                        const term = termStr === "1학기" ? "SPRING" : "FALL";
-                        return {
-                          year,
-                          term,
-                          isCurrent: false,
-                          userSemesterId: 0,
-                        };
-                      })
-                      .filter(Boolean) as UserInfoResponse["semesters"];
-
-                    setSemesterData(mapped);
-                  }}
+                  setSemesters={() => {}}
                   onEditComplete={() => setIsEditingSemester(false)}
                   onCreateSemester={async (newSemester) => {
                     const created = await createSemester(newSemester);
-                    setSemesterData((prev) => [...prev, created]);
+                    const newData = [...semesterData, created];
+                    setSemesterData(newData);
+                    syncStore(newData);
                     return created;
                   }}
                   onUpdateSemester={async (index, updatedSemester) => {
                     const target = semesterData[index];
                     if (!target) return;
+
                     const updated = await updateSemester(
                       target.userSemesterId,
                       updatedSemester
                     );
+
                     const copy = [...semesterData];
                     copy[index] = updated;
                     setSemesterData(copy);
+                    syncStore(copy);
                   }}
                 />
               </div>
