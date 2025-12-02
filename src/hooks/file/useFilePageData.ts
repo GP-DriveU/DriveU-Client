@@ -1,4 +1,4 @@
-﻿import { useState, useCallback, useEffect } from "react";
+﻿import { useState, useCallback, useEffect, useMemo } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { useDirectoryStore } from "@/store/useDirectoryStore";
 import { useSemesterStore } from "@/store/useSemesterStore";
@@ -10,9 +10,16 @@ export const useFilePageData = () => {
   const params = useParams();
   const location = useLocation();
   const { selectedSemesterKey } = useSemesterStore();
-  const getCurrentDirectories = useDirectoryStore(
-    (state) => state.getCurrentDirectories
-  );
+
+  const { getDirectoriesBySemester } = useDirectoryStore();
+
+  const { year, term } = useMemo(() => {
+    if (!selectedSemesterKey) return { year: 0, term: "" };
+    const [y, t] = selectedSemesterKey.split("-");
+    return { year: Number(y), term: t };
+  }, [selectedSemesterKey]);
+
+  const currentDirs = getDirectoriesBySemester(year, term);
 
   const slug = params.slug ?? "";
   const slugParts = slug.split("-");
@@ -20,7 +27,6 @@ export const useFilePageData = () => {
   const slugPrefix =
     pathSegments.length >= 2 ? pathSegments[pathSegments.length - 2] : "";
   const category = params.slug?.replace(/-\d+$/, "") ?? "파일";
-  const currentDirs = getCurrentDirectories();
 
   const resolveDirectoryId = (prefix: string, id: number): number => {
     const map: Record<string, string> = { study: "학업", subject: "과목" };
@@ -48,6 +54,8 @@ export const useFilePageData = () => {
   const [items, setItems] = useState<Item[]>([]);
 
   const fetchResources = useCallback(async () => {
+    if (!directoryId) return;
+
     try {
       const response = await getResourcesByDirectory(directoryId);
       const mappedResponse = response.map((item: any) => {
