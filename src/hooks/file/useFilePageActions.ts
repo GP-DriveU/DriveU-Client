@@ -78,18 +78,31 @@ export const useFilePageActions = ({
       });
       const extension =
         filenameWithExtension.split(".").pop()?.toUpperCase() ?? "";
-      const { fileId } = await registerFileMeta(directoryId, {
-        title: file.name,
-        s3Path,
-        extension,
-        size: file.size,
-        tagId: selectedTags?.[0]?.id,
-      });
+
       try {
         await fetch(url, {
           method: "PUT",
           body: file,
           signal: controller.signal,
+        });
+        const { fileId } = await registerFileMeta(directoryId, {
+          title: file.name,
+          s3Path,
+          extension,
+          size: file.size,
+          tagId: selectedTags?.[0]?.id,
+        });
+        uploaded.push({
+          id: fileId,
+          type: "FILE",
+          title: file.name,
+          url,
+          previewLine: "새로 업로드된 파일입니다.",
+          description: "새로 업로드된 파일입니다.",
+          extension,
+          iconType: "FILE",
+          isSelected: false,
+          favorite: false,
         });
       } catch (e) {
         if (controller.signal.aborted) {
@@ -100,18 +113,6 @@ export const useFilePageActions = ({
       } finally {
         clearTimeout(timeoutId);
       }
-      uploaded.push({
-        id: fileId,
-        type: "FILE",
-        title: file.name,
-        url,
-        previewLine: "새로 업로드된 파일입니다.",
-        description: "새로 업로드된 파일입니다.",
-        extension,
-        iconType: "FILE",
-        isSelected: false,
-        favorite: false,
-      });
     }
     return uploaded;
   };
