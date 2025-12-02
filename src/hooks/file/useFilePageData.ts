@@ -10,12 +10,15 @@ export const useFilePageData = () => {
   const params = useParams();
   const location = useLocation();
   const { selectedSemesterKey } = useSemesterStore();
-  const { getCurrentDirectories } = useDirectoryStore.getState();
+  const getCurrentDirectories = useDirectoryStore(
+    (state) => state.getCurrentDirectories
+  );
 
   const slug = params.slug ?? "";
   const slugParts = slug.split("-");
   const pathSegments = location.pathname.split("/").filter(Boolean);
-  const slugPrefix = pathSegments[pathSegments.length - 2];
+  const slugPrefix =
+    pathSegments.length >= 2 ? pathSegments[pathSegments.length - 2] : "";
   const category = params.slug?.replace(/-\d+$/, "") ?? "파일";
   const currentDirs = getCurrentDirectories();
 
