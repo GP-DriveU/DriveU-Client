@@ -1,6 +1,5 @@
 ﻿import List from "@/commons/list/List";
 import ListItem from "@/commons/list/ListItem";
-import Button from "@/commons/inputs/Button";
 import { getIcon } from "@/utils/itemUtils";
 import { type Item } from "@/types/Item";
 import { IconCheck, IconDownload, IconFavorite } from "@/assets";
@@ -106,39 +105,15 @@ function MainFileList({
             </div>
           }
           actions={
-            <>
-              {item.type === "NOTE" && (
-                <>
-                  <Button
-                    color="secondary"
-                    size="small"
-                    onClick={() => {
-                      /* 수정 로직 */
-                    }}
-                  >
-                    수정
-                  </Button>
-                  <Button
-                    color="primary"
-                    size="small"
-                    onClick={() => {
-                      /* 요약 로직 */
-                    }}
-                  >
-                    요약
-                  </Button>
-                </>
-              )}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleDownload(item);
-                }}
-                className="w-[30px] h-[30px] flex items-center justify-center"
-              >
-                <IconDownload />
-              </button>
-            </>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDownload(item);
+              }}
+              className="w-[30px] h-[30px] flex items-center justify-center"
+            >
+              <IconDownload />
+            </button>
           }
         />
       )}
