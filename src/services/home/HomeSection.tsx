@@ -36,8 +36,10 @@ function HomeSection() {
 
   const { modals } = useFilePageUI();
 
+  const currentDirectoryId = selectedDirectoryId ?? 0;
+
   const actions = useFilePageActions({
-    directoryId: selectedDirectoryId || 0,
+    directoryId: currentDirectoryId,
     items: dummyItems,
     setItems: setDummyItems,
     modals: modals,
@@ -59,6 +61,7 @@ function HomeSection() {
     tagOptions,
     baseDir: { name: baseDir?.name },
     setItems: setDummyItems,
+    directoryId: currentDirectoryId,
   };
 
   return (
