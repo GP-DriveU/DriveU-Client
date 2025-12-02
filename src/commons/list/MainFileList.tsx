@@ -1,6 +1,6 @@
 ﻿import List from "@/commons/list/List";
 import ListItem from "@/commons/list/ListItem";
-import { getIcon } from "@/utils/itemUtils";
+import { canPreviewItem, getIcon } from "@/utils/itemUtils";
 import { type Item } from "@/types/Item";
 import { IconCheck, IconDownload, IconFavorite } from "@/assets";
 import { getDownloadPresignedUrl } from "@/api/File";
@@ -69,11 +69,7 @@ function MainFileList({
         </div>
       }
       renderItem={(item) => {
-        const canPreview =
-          item.type === "FILE" &&
-          ["png", "jpg", "jpeg", "gif", "webp", "pdf"].includes(
-            item.extension?.toLowerCase()
-          );
+        const canPreview = canPreviewItem(item);
 
         return (
           <ListItem

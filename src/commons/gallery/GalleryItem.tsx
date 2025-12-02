@@ -1,5 +1,5 @@
 ﻿import { type Item } from "@/types/Item";
-import { getIcon } from "@/utils/itemUtils";
+import { canPreviewItem, getIcon } from "@/utils/itemUtils";
 import { getDownloadPresignedUrl } from "@/api/File";
 import { getNote } from "@/api/Note";
 import { IconCheck, IconDownload, IconFavorite } from "@/assets";
@@ -22,11 +22,7 @@ function GalleryItem({
 }: GalleryItemProps) {
   const { openPreview } = useFilePreviewStore();
 
-  const canPreview =
-    item.type === "FILE" &&
-    ["png", "jpg", "jpeg", "gif", "webp", "pdf"].includes(
-      item.extension?.toLowerCase()
-    );
+  const canPreview = canPreviewItem(item);
 
   const handlePreviewClick = (e: React.MouseEvent) => {
     e.stopPropagation();
