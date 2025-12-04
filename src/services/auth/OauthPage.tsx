@@ -30,17 +30,25 @@ function OAuthCallback() {
           .getState()
           .login(user, token.accessToken, token.refreshToken);
 
-        const { year, term } = semesters[0];
-        useSemesterStore.getState().setSelectedSemester(year, term);
-        useDirectoryStore.getState().setSelectedSemester(year, term);
-        useSemesterStore.getState().setSemesters(semesters);
-        useDirectoryStore.getState().setDirectoriesFromServer([
-          {
-            year,
-            term,
-            directories,
-          },
-        ]);
+        const targetSemester =
+          semesters.find((s) => s.isCurrent) || semesters[0];
+
+        if (targetSemester) {
+          const { year, term } = targetSemester;
+
+          useSemesterStore.getState().setSemesters(semesters);
+          useSemesterStore.getState().setSelectedSemester(year, term);
+          useDirectoryStore.getState().setDirectoriesFromServer([
+            {
+              year,
+              term,
+              directories,
+            },
+          ]);
+        } else {
+          useSemesterStore.getState().setSemesters([]);
+        }
+
         const availableColorKeys = [
           "yellow",
           "green",
@@ -49,6 +57,7 @@ function OAuthCallback() {
           "gray",
           "lightblue",
         ];
+
         const tagItems = directories
           .filter((dir) => dir.name === "학업" || dir.name === "과목")
           .flatMap((dir) =>
@@ -61,10 +70,12 @@ function OAuthCallback() {
               parentDirectoryId: dir.id,
             }))
           );
+
         useTagStore.getState().setTags(tagItems);
         navigate("/", { replace: true });
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error("Login Failed:", err);
         navigate("/login");
       });
   }, [navigate, redirectUri, searchParams]);
