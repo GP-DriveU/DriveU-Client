@@ -1,9 +1,5 @@
-﻿import { useLocation } from "react-router-dom";
-import { useDirectoryStore } from "@/store/useDirectoryStore";
-import { IconHome, IconStore, IconTrash } from "@/assets";
-import SidebarItem from "@/commons/layout/sidebar/SideBarItem";
-import SidebarGroup from "@/commons/layout/sidebar/SideBarGroup";
-
+﻿import { useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import {
   DndContext,
   closestCenter,
@@ -14,28 +10,57 @@ import {
   type DragEndEvent,
 } from "@dnd-kit/core";
 import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
-
-import { updateDirectoryParent, updateDirectoriesOrder } from "@/api/Directory";
+import { useDirectoryStore } from "@/store/useDirectoryStore";
 import { useSemesterStore } from "@/store/useSemesterStore";
-import { useMemo } from "react";
+import { useStorageStore } from "@/store/useStorageStore";
+import { updateDirectoryParent, updateDirectoriesOrder } from "@/api/Directory";
+import SidebarItem from "@/commons/layout/sidebar/SideBarItem";
+import SidebarGroup from "@/commons/layout/sidebar/SideBarGroup";
+import { IconHome, IconStore, IconTrash } from "@/assets";
+
+const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return "0B";
+
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB", "TB"];
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))}${sizes[i]}`;
+};
 
 function Sidebar() {
   const location = useLocation();
   const { selectedSemesterKey } = useSemesterStore();
+  const { totalStorage, remainingStorage } = useStorageStore();
+
   const { getDirectoriesBySemester, updateDirectoryOrder, moveDirectory } =
     useDirectoryStore();
 
   const currentSemesterId =
     useSemesterStore().getCurrentSemester()?.userSemesterId;
 
+  const { usedStorage, usagePercentage } = useMemo(() => {
+    const safeTotal = Math.max(totalStorage, 1);
+    const safeRemaining = Math.min(remainingStorage, safeTotal);
+
+    const used = safeTotal - safeRemaining;
+    const percentage = (used / safeTotal) * 100;
+
+    return {
+      usedStorage: used,
+      usagePercentage: Math.max(0, Math.min(100, percentage)),
+    };
+  }, [totalStorage, remainingStorage]);
+
   const { year, term, currentDirectories } = useMemo(() => {
     if (!selectedSemesterKey) {
       return { year: 0, term: "", currentDirectories: [] };
     }
     const [yearStr, termStr] = selectedSemesterKey.split("-");
-    const year = Number(yearStr);
-    const dirs = getDirectoriesBySemester(year, termStr);
-    return { year, term: termStr, currentDirectories: dirs };
+    const yearNum = Number(yearStr);
+    const dirs = getDirectoriesBySemester(yearNum, termStr);
+    return { year: yearNum, term: termStr, currentDirectories: dirs };
   }, [selectedSemesterKey, getDirectoriesBySemester]);
 
   const sensors = useSensors(
@@ -113,7 +138,6 @@ function Sidebar() {
         }
       } else {
         const activeItemId = activeItemData.item.id;
-        const oldParentId = activeItemData.parentId;
         const newParentId = overItemData.parentId;
 
         moveDirectory(year, term, activeItemId, oldParentId, newParentId);
@@ -170,14 +194,6 @@ function Sidebar() {
     );
   });
 
-  if (currentDirectories.length === 0) {
-    return (
-      <aside className="w-[278px] min-w-[220px] min-h-screen px-10 py-6 bg-primary_light flex flex-col gap-4">
-        <div className="text-center text-font">학기 정보가 없습니다.</div>
-      </aside>
-    );
-  }
-
   const isHome = location.pathname === "/";
   const isTrash = location.pathname === "/trash";
 
@@ -219,13 +235,21 @@ function Sidebar() {
           <div className="text-xs font-pretendard text-font">
             <div className="h-2.5 w-full bg-[#d9d9d9] overflow-hidden">
               <div
-                className="h-2.5 bg-[#61758f]"
-                style={{ width: "55%" }}
+                className="h-2.5 bg-[#61758f] transition-all duration-300 ease-out"
+                style={{ width: `${usagePercentage}%` }}
               ></div>
             </div>
-            <div className="mt-1">
-              <strong className="font-extrabold">2GB</strong> 중{" "}
-              <strong className="font-extrabold">1.1GB</strong> 사용
+            <div className="mt-1 flex justify-between">
+              <div>
+                <strong className="font-extrabold">
+                  {formatFileSize(totalStorage)}
+                </strong>
+                {" 중 "}
+                <strong className="font-extrabold">
+                  {formatFileSize(usedStorage)}
+                </strong>
+                {" 사용"}
+              </div>
             </div>
           </div>
         </div>

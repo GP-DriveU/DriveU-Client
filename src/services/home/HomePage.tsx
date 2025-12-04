@@ -7,6 +7,7 @@ import { useDirectoryStore } from "@/store/useDirectoryStore";
 import { useSemesterStore } from "@/store/useSemesterStore";
 import HomeSection from "@/services/home/HomeSection";
 import MainFileList from "@/commons/list/MainFileList";
+import { useStorageStore } from "@/store/useStorageStore";
 
 function HomePage() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ function HomePage() {
   const [favoriteItems, setFavoriteItems] = useState<Item[]>([]);
   const { semesters, selectedSemesterKey } = useSemesterStore();
   const { setSemesterDirectories } = useDirectoryStore();
+  const { setRemainingStorage } = useStorageStore();
 
   const currentTargetSemester = useMemo(() => {
     if (!selectedSemesterKey) return undefined;
@@ -37,6 +39,7 @@ function HomePage() {
 
         setRecentItems(data.recentFiles);
         setFavoriteItems(data.favoriteFiles);
+        setRemainingStorage(data.remainingStorage);
       } catch (e) {
         console.error("메인페이지 데이터를 불러오지 못했습니다:", e);
       }
