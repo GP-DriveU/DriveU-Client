@@ -100,6 +100,9 @@ function QuestionDetailPage() {
     }
   };
 
+  const correctCount = results.filter((r) => r.isCorrect).length;
+  const totalCount = questions.length;
+
   return (
     <div className="w-full flex bg-white flex-col mb-16 pb-20">
       <div className="w-full pl-10 pt-6">
@@ -114,13 +117,21 @@ function QuestionDetailPage() {
         title="버전"
         rightElement={
           <div className="flex items-center gap-4">
-            <span>{version}</span>
-            {isSolved && (
-              <span className="text-primary font-bold">[채점 완료]</span>
-            )}
+            <span className="text-font text-md">{version}</span>
           </div>
         }
       />
+
+      {isSolved && totalCount > 0 && (
+        <div className="flex items-center gap-1 px-10 pb-4">
+          <span className="text-red-600 font-extrabold text-xl">
+            {correctCount}
+          </span>
+          <span className="text-gray-400 text-lg mx-0.5">/</span>
+          <span className="text-gray-600 font-bold text-lg">{totalCount}</span>
+          <span className="ml-1 text-md text-red-500 font-bold">정답</span>
+        </div>
+      )}
 
       <div className="flex flex-col gap-16 px-10 py-4">
         {questions.map((q, index) => {
@@ -153,7 +164,7 @@ function QuestionDetailPage() {
         })}
       </div>
 
-      <div className="w-full flex justify-center py-10">
+      <div className="w-full flex justify-center pt-24">
         <div className="w-48">
           {isSolved ? (
             <Button size="medium" color="primary" onClick={handleRetry}>
