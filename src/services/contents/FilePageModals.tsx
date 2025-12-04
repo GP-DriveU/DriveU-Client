@@ -22,13 +22,20 @@ const FilePageModals = ({ data, modals, actions }: FilePageModalsProps) => {
         <LinkInputModal
           isOpen={isOpen.link}
           onClose={() => modalActions.close("link")}
-          onConfirm={(title, url) => {
+          onConfirm={async (title, url) => {
             modalActions.close("link");
             if (
               data.tagOptions.length === 0 ||
               data.baseDir?.name === "대외활동"
             ) {
-              actions.registerLink(title, url, null);
+              try {
+                modalActions.open("loading");
+                await actions.registerLink(title, url, null);
+              } catch (e) {
+                console.error(e);
+              } finally {
+                modalActions.close("loading");
+              }
             } else {
               modalActions.setPendingLink({ title, url });
               modalActions.open("tag");
@@ -50,14 +57,23 @@ const FilePageModals = ({ data, modals, actions }: FilePageModalsProps) => {
             modalActions.close("tag");
             const tagId = selectedTags?.[0]?.id || 0;
 
-            if (state.pendingLinkData) {
-              await actions.registerLink(
-                state.pendingLinkData.title,
-                state.pendingLinkData.url,
-                tagId
-              );
-            } else if (state.pendingFiles) {
-              await actions.uploadFiles(state.pendingFiles, selectedTags);
+            try {
+              modalActions.open("loading");
+              if (state.pendingLinkData) {
+                await actions.registerLink(
+                  state.pendingLinkData.title,
+                  state.pendingLinkData.url,
+                  tagId
+                );
+              } else if (state.pendingFiles) {
+                await actions.uploadFiles(state.pendingFiles, selectedTags);
+              }
+            } catch (error) {
+              console.error(error);
+            } finally {
+              modalActions.close("loading");
+              modalActions.setPendingFiles(null);
+              modalActions.setPendingLink(null);
             }
           }}
         />
@@ -69,11 +85,19 @@ const FilePageModals = ({ data, modals, actions }: FilePageModalsProps) => {
           onUpload={async (files) => {
             if (!files) return;
             modalActions.close("upload");
+
             if (
               data.tagOptions.length === 0 ||
               data.baseDir?.name === "대외활동"
             ) {
-              await actions.uploadFiles(files);
+              try {
+                modalActions.open("loading");
+                await actions.uploadFiles(files);
+              } catch (e) {
+                console.error(e);
+              } finally {
+                modalActions.close("loading");
+              }
             } else {
               modalActions.setPendingFiles(files);
               modalActions.open("tag");
