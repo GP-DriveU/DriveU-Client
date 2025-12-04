@@ -27,6 +27,13 @@ export interface SemesterQuestionSummary {
   createdAt: string;
 }
 
+export interface QuestionTitleUpdateResponse {
+  questionId: number;
+  title: string;
+  version: number;
+  updatedAt: string;
+}
+
 export const generateQuestions = async (
   directoryId: number,
   data: QuestionGenerationRequest[]
@@ -52,6 +59,17 @@ export const fetchQuestionDetail = async (
 ): Promise<QuestionGenerationResponse> => {
   const response = await http.get<QuestionGenerationResponse>(
     `questions/${questionId}`
+  );
+  return response.response;
+};
+
+export const updateQuestionTitle = async (
+  questionId: number,
+  title: string
+): Promise<QuestionTitleUpdateResponse> => {
+  const response = await http.patch<QuestionTitleUpdateResponse>(
+    `questions/${questionId}/title`,
+    { title }
   );
   return response.response;
 };
