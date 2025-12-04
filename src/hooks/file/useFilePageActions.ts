@@ -8,6 +8,7 @@ import {
 } from "@/api/File";
 import { generateQuestions as generateQuestionsApi } from "@/api/Question";
 import { type Item } from "@/types/Item";
+import { useStorageStore } from "@/store/useStorageStore";
 
 interface ActionDeps {
   directoryId: number;
@@ -24,6 +25,7 @@ export const useFilePageActions = ({
 }: ActionDeps) => {
   const navigate = useNavigate();
   const { actions: modalActions } = modals;
+  const { setRemainingStorage } = useStorageStore();
 
   const toggleItemSelection = (id: number) => {
     setItems((prev) =>
@@ -52,7 +54,6 @@ export const useFilePageActions = ({
     } else if (item.type === "NOTE") {
       navigate(`/study/강의필기-${directoryId}/${id}`);
     } else {
-      // todo: 미리보기 넣기
       return;
     }
   };
@@ -85,13 +86,16 @@ export const useFilePageActions = ({
           body: file,
           signal: controller.signal,
         });
-        const { fileId } = await registerFileMeta(directoryId, {
-          title: file.name,
-          s3Path,
-          extension,
-          size: file.size,
-          tagId: selectedTags?.[0]?.id,
-        });
+        const { fileId, remainingStorage } = await registerFileMeta(
+          directoryId,
+          {
+            title: file.name,
+            s3Path,
+            extension,
+            size: file.size,
+            tagId: selectedTags?.[0]?.id,
+          }
+        );
         uploaded.push({
           id: fileId,
           type: "FILE",
@@ -104,6 +108,7 @@ export const useFilePageActions = ({
           isSelected: false,
           favorite: false,
         });
+        setRemainingStorage(remainingStorage);
       } catch (e) {
         if (controller.signal.aborted) {
           alert(`${file.name} 업로드가 2분을 초과하여 취소되었습니다.`);
