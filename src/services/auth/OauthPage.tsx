@@ -30,6 +30,19 @@ function OAuthCallback() {
           .getState()
           .login(user, token.accessToken, token.refreshToken);
 
+        if (!semesters || semesters.length === 0) {
+          console.warn(
+            "[OAuth] Login success, but no semesters returned from server."
+          );
+
+          useSemesterStore.getState().setSemesters([]);
+
+          alert("등록된 학기 정보가 없습니다. 관리자에게 문의해주세요.");
+
+          navigate("/login");
+          return;
+        }
+
         const targetSemester =
           semesters.find((s) => s.isCurrent) || semesters[0];
 
@@ -45,8 +58,6 @@ function OAuthCallback() {
               directories,
             },
           ]);
-        } else {
-          useSemesterStore.getState().setSemesters([]);
         }
 
         const availableColorKeys = [
