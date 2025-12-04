@@ -1,19 +1,16 @@
-﻿import { useState, useMemo } from "react"; // useMemo 추가
+﻿import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import MDEditor from "@uiw/react-md-editor";
 import { getCodeString } from "rehype-rewrite";
 import katex from "katex";
-
 import TextSection from "@/commons/section/TextSection";
 import Button from "@/commons/inputs/Button";
 import TagItem from "@/commons/tag/TagItem";
-
 import type { TagData } from "@/types/tag";
 import { useTagStore } from "@/store/useTagStore";
 import { IconArrowLeft } from "@/assets";
-import { useDirectoryStore } from "@/store/useDirectoryStore";
-import { useSemesterStore } from "@/store/useSemesterStore";
 import { createNote } from "@/api/Note";
+import { useSemesterDirectoriesStore } from "@/store/useSemesterDirectoriesStore";
 
 function NoteWritePage() {
   const navigate = useNavigate();
@@ -23,21 +20,7 @@ function NoteWritePage() {
   const [title, setTitle] = useState("");
   const allTags = useTagStore((state) => state.tags);
   const [selectedTag, setSelectedTag] = useState<TagData | null>(null);
-
-  const { selectedSemesterKey } = useSemesterStore();
-
-  const { year, term } = useMemo(() => {
-    if (!selectedSemesterKey) return { year: 0, term: "" };
-    const [y, t] = selectedSemesterKey.split("-");
-    return { year: Number(y), term: t };
-  }, [selectedSemesterKey]);
-
-  const directories = useDirectoryStore((state) =>
-    state.getDirectoriesBySemester(year, term)
-  );
-
-  const studyDirectory = directories.find((dir) => dir.name === "학업");
-  const studyDirectoryId = studyDirectory?.id;
+  const { studyDirectoryId } = useSemesterDirectoriesStore();
 
   return (
     <div className="w-full flex bg-white flex-col">
