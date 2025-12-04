@@ -2,16 +2,44 @@
   index: number;
   question: string;
   options: string[];
-  answer: string;
+  userAnswer?: string;
+  correctAnswer?: string;
+  isSolved: boolean;
+  onSelect: (answer: string) => void;
 }
 
-function MultipleChoiceQuestion ({
+const getOptionStyle = (
+  option: string,
+  isSolved: boolean,
+  userAnswer?: string,
+  correctAnswer?: string
+) => {
+  if (isSolved) {
+    if (option === correctAnswer) {
+      return "bg-green-100 text-green-700 border-green-500";
+    }
+    if (option === userAnswer) {
+      return "bg-red-100 text-red-700 border-red-500";
+    }
+    return "bg-tag-gray text-black border-transparent";
+  }
+
+  if (option === userAnswer) {
+    return "bg-tag-lightblue text-primary border-primary";
+  }
+
+  return "bg-tag-gray text-black border-transparent";
+};
+
+function MultipleChoiceQuestion({
   index,
   question,
   options,
-  answer,
+  userAnswer,
+  correctAnswer,
+  isSolved,
+  onSelect,
 }: MultipleChoiceQuestionProps) {
-
   return (
     <div className="w-full flex flex-col gap-6">
       <div className="text-primary text-3xl font-bold font-pretendard">
@@ -24,11 +52,13 @@ function MultipleChoiceQuestion ({
         {options.map((opt, i) => (
           <div
             key={i}
-            className={`w-full rounded-[10px] px-6 py-4 ${
-              opt === answer
-                ? "bg-tag-lightblue text-primary"
-                : "bg-tag-gray text-black"
-            } text-xl font-normal font-pretendard`}
+            onClick={() => !isSolved && onSelect(opt)}
+            className={`w-full rounded-[10px] px-6 py-4 text-xl font-normal font-pretendard border-2 cursor-pointer transition-colors ${getOptionStyle(
+              opt,
+              isSolved,
+              userAnswer,
+              correctAnswer
+            )}`}
           >
             {opt}
           </div>
@@ -36,6 +66,6 @@ function MultipleChoiceQuestion ({
       </div>
     </div>
   );
-};
+}
 
 export default MultipleChoiceQuestion;
