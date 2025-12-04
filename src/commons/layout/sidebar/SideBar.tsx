@@ -17,15 +17,26 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 import { updateDirectoryParent, updateDirectoriesOrder } from "@/api/Directory";
 import { useSemesterStore } from "@/store/useSemesterStore";
+import { useMemo } from "react";
 
 function Sidebar() {
   const location = useLocation();
-  const { getCurrentDirectories, updateDirectoryOrder, moveDirectory } =
+  const { selectedSemesterKey } = useSemesterStore();
+  const { getDirectoriesBySemester, updateDirectoryOrder, moveDirectory } =
     useDirectoryStore();
+
   const currentSemesterId =
     useSemesterStore().getCurrentSemester()?.userSemesterId;
 
-  const currentDirectories = getCurrentDirectories();
+  const { year, term, currentDirectories } = useMemo(() => {
+    if (!selectedSemesterKey) {
+      return { year: 0, term: "", currentDirectories: [] };
+    }
+    const [yearStr, termStr] = selectedSemesterKey.split("-");
+    const year = Number(yearStr);
+    const dirs = getDirectoriesBySemester(year, termStr);
+    return { year, term: termStr, currentDirectories: dirs };
+  }, [selectedSemesterKey, getDirectoriesBySemester]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -50,6 +61,7 @@ function Sidebar() {
     const { active, over } = event;
 
     if (!over || active.id === over.id) return;
+    if (!year || !term) return;
 
     const activeId = String(active.id);
     const overId = String(over.id);
@@ -82,7 +94,8 @@ function Sidebar() {
           ...child,
           order: index,
         }));
-        updateDirectoryOrder(parentId, newChildrenForStore);
+
+        updateDirectoryOrder(year, term, parentId, newChildrenForStore);
 
         try {
           if (!currentSemesterId) throw new Error("학기 정보가 없습니다.");
@@ -96,20 +109,20 @@ function Sidebar() {
           });
         } catch (error) {
           console.error("순서 변경 API 호출 실패:", error);
-          updateDirectoryOrder(parentId, previousChildren);
+          updateDirectoryOrder(year, term, parentId, previousChildren);
         }
       } else {
         const activeItemId = activeItemData.item.id;
         const oldParentId = activeItemData.parentId;
         const newParentId = overItemData.parentId;
 
-        moveDirectory(activeItemId, oldParentId, newParentId);
+        moveDirectory(year, term, activeItemId, oldParentId, newParentId);
 
         try {
           await updateDirectoryParent(activeItemId, { newParentId });
         } catch (error) {
           console.error("부모 변경 API 호출 실패:", error);
-          moveDirectory(activeItemId, newParentId, oldParentId);
+          moveDirectory(year, term, activeItemId, newParentId, oldParentId);
         }
       }
       return;
@@ -119,13 +132,13 @@ function Sidebar() {
 
       if (oldParentId === newParentId) return;
 
-      moveDirectory(activeItem.id, oldParentId, newParentId);
+      moveDirectory(year, term, activeItem.id, oldParentId, newParentId);
 
       try {
         await updateDirectoryParent(activeItem.id, { newParentId });
       } catch (error) {
         console.error("부모 변경 API 호출 실패:", error);
-        moveDirectory(activeItem.id, newParentId, oldParentId);
+        moveDirectory(year, term, activeItem.id, newParentId, oldParentId);
       }
     }
   }

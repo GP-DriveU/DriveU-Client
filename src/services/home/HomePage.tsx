@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+﻿import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Item } from "@/types/Item";
 import { type MainPageResponse, getMainPage } from "@/api/Home";
@@ -12,19 +12,26 @@ function HomePage() {
   const navigate = useNavigate();
   const [recentItems, setRecentItems] = useState<Item[]>([]);
   const [favoriteItems, setFavoriteItems] = useState<Item[]>([]);
-  const { getCurrentSemester } = useSemesterStore();
+  const { semesters, selectedSemesterKey } = useSemesterStore();
+  const { setSemesterDirectories } = useDirectoryStore();
+
+  const currentTargetSemester = useMemo(() => {
+    if (!selectedSemesterKey) return undefined;
+    const [year, term] = selectedSemesterKey.split("-");
+    return semesters.find((s) => s.year === Number(year) && s.term === term);
+  }, [semesters, selectedSemesterKey]);
 
   useEffect(() => {
     const fetchMainPage = async () => {
       try {
-        const userSemesterId = getCurrentSemester()?.userSemesterId;
-        if (userSemesterId === undefined) return;
+        if (!currentTargetSemester) return;
+
+        const userSemesterId = currentTargetSemester.userSemesterId;
         const data: MainPageResponse = await getMainPage(userSemesterId);
 
-        const { setSemesterDirectories } = useDirectoryStore.getState();
         setSemesterDirectories(
-          getCurrentSemester()?.year!,
-          getCurrentSemester()?.term!,
+          currentTargetSemester.year,
+          currentTargetSemester.term,
           data.directories
         );
 
@@ -36,7 +43,7 @@ function HomePage() {
     };
 
     fetchMainPage();
-  }, []);
+  }, [currentTargetSemester, setSemesterDirectories]);
 
   const handleToggleSelect = (id: number) => {
     setRecentItems((prev) =>

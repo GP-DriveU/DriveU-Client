@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Button from "@/commons/inputs/Button";
 import LocalModal from "@/commons/modals/Modal";
 import { useDirectoryStore } from "@/store/useDirectoryStore";
+import { useSemesterStore } from "@/store/useSemesterStore";
 import { useTagOptions } from "@/hooks/useTagOptions";
 import { useFilePageUI } from "@/hooks/file/useFilePageUI";
 import { useFilePageActions } from "@/hooks/file/useFilePageActions";
@@ -21,7 +22,15 @@ function HomeSection() {
   );
   const [dummyItems, setDummyItems] = useState<Item[]>([]);
 
-  const dir = useDirectoryStore().getCurrentDirectories();
+  const { selectedSemesterKey } = useSemesterStore();
+  const { getDirectoriesBySemester } = useDirectoryStore();
+
+  const dir = useMemo(() => {
+    if (!selectedSemesterKey) return [];
+    const [yearStr, term] = selectedSemesterKey.split("-");
+    return getDirectoriesBySemester(Number(yearStr), term);
+  }, [selectedSemesterKey, getDirectoriesBySemester]);
+
   const allTags = useTagOptions();
 
   const baseDir = useMemo(

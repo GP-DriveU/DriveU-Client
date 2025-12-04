@@ -6,9 +6,7 @@ import { persist } from "zustand/middleware";
 const getSemesterKey = (year: number, term: string) => `${year}-${term}`;
 
 interface DirectoryStore {
-  selectedSemesterKey: string;
   semesterDirectories: Record<string, DirectoryItem[]>;
-  setSelectedSemester: (year: number, term: string) => void;
   setSemesterDirectories: (
     year: number,
     term: string,
@@ -17,17 +15,23 @@ interface DirectoryStore {
   setDirectoriesFromServer: (
     semesterData: { year: number; term: string; directories: DirectoryItem[] }[]
   ) => void;
-  getCurrentDirectories: () => DirectoryItem[];
+  getDirectoriesBySemester: (year: number, term: string) => DirectoryItem[];
   updateDirectoryOrder: (
+    year: number,
+    term: string,
     parentDirectoryId: number,
     newChildren: DirectoryItem[]
   ) => void;
   moveDirectory: (
+    year: number,
+    term: string,
     directoryId: number,
     oldParentId: number,
     newParentId: number
   ) => void;
   updateDirectoryName: (
+    year: number,
+    term: string,
     parentDirectoryId: number,
     directoryId: number,
     newName: string
@@ -42,12 +46,7 @@ interface DirectoryStore {
 export const useDirectoryStore = create<DirectoryStore>()(
   persist(
     (set, get) => ({
-      selectedSemesterKey: "",
       semesterDirectories: {},
-      setSelectedSemester: (year, term) => {
-        const key = getSemesterKey(year, term);
-        set({ selectedSemesterKey: key });
-      },
       setSemesterDirectories: (year, term, dirs) =>
         set((state) => {
           const key = getSemesterKey(year, term);
@@ -77,17 +76,18 @@ export const useDirectoryStore = create<DirectoryStore>()(
           },
         }));
       },
-      getCurrentDirectories: () => {
-        const key = get().selectedSemesterKey;
+      getDirectoriesBySemester: (year, term) => {
+        const key = getSemesterKey(year, term);
         const dirs = get().semesterDirectories[key] ?? [];
         return dirs;
       },
-      updateDirectoryOrder: (parentDirectoryId, newChildren) => {
-        const key = get().selectedSemesterKey;
-        if (!key) return;
+      updateDirectoryOrder: (year, term, parentDirectoryId, newChildren) => {
+        const key = getSemesterKey(year, term);
 
         set((state) => {
           const currentDirs = state.semesterDirectories[key] ?? [];
+          if (currentDirs.length === 0) return state;
+
           const updatedDirs = currentDirs.map((dir) => {
             if (dir.id === parentDirectoryId) {
               return { ...dir, children: newChildren };
@@ -103,15 +103,16 @@ export const useDirectoryStore = create<DirectoryStore>()(
           };
         });
       },
-      moveDirectory: (directoryId, oldParentId, newParentId) => {
-        const key = get().selectedSemesterKey;
-        if (!key) return;
+      moveDirectory: (year, term, directoryId, oldParentId, newParentId) => {
+        const key = getSemesterKey(year, term);
 
         set((state) => {
           const currentDirs = state.semesterDirectories[key] ?? [];
+          if (currentDirs.length === 0) return state;
+
           let itemToMove: DirectoryItem | undefined;
 
-          const updatedDirs = currentDirs.map((dir) => {
+          const afterRemoveDirs = currentDirs.map((dir) => {
             if (dir.id === oldParentId) {
               itemToMove = dir.children.find((c) => c.id === directoryId);
               return {
@@ -124,7 +125,7 @@ export const useDirectoryStore = create<DirectoryStore>()(
 
           if (!itemToMove) return state;
 
-          const finalDirs = updatedDirs.map((dir) => {
+          const finalDirs = afterRemoveDirs.map((dir) => {
             if (dir.id === newParentId) {
               return {
                 ...dir,
@@ -142,12 +143,19 @@ export const useDirectoryStore = create<DirectoryStore>()(
           };
         });
       },
-      updateDirectoryName: (parentDirectoryId, directoryId, newName) => {
-        const key = get().selectedSemesterKey;
-        if (!key) return;
+      updateDirectoryName: (
+        year,
+        term,
+        parentDirectoryId,
+        directoryId,
+        newName
+      ) => {
+        const key = getSemesterKey(year, term);
 
         set((state) => {
           const currentDirs = state.semesterDirectories[key] ?? [];
+          if (currentDirs.length === 0) return state;
+
           const updatedDirs = currentDirs.map((dir) => {
             if (dir.id === parentDirectoryId) {
               return {
@@ -184,7 +192,6 @@ export const useDirectoryStore = create<DirectoryStore>()(
     {
       name: "directory-storage",
       partialize: (state) => ({
-        selectedSemesterKey: state.selectedSemesterKey,
         semesterDirectories: state.semesterDirectories,
       }),
     }
