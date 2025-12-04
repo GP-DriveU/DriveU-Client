@@ -13,11 +13,20 @@ export interface QuestionItem {
   answer: string;
 }
 
+export interface QuestionResultItem {
+  questionIndex: number;
+  userAnswer: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+}
+
 export interface QuestionGenerationResponse {
   questionId: number;
   title: string;
   version: number;
   questions: QuestionItem[];
+  isSolved: boolean;
+  results: QuestionResultItem[] | null;
 }
 
 export interface SemesterQuestionSummary {
@@ -32,6 +41,20 @@ export interface QuestionTitleUpdateResponse {
   title: string;
   version: number;
   updatedAt: string;
+}
+
+export interface QuestionSubmissionRequest {
+  submissions: {
+    questionIndex: number;
+    userAnswer: string;
+  }[];
+}
+
+export interface QuestionSubmissionResponse {
+  questionId: number;
+  submittedAt: string;
+  results: QuestionResultItem[];
+  isSolved: boolean;
 }
 
 export const generateQuestions = async (
@@ -70,6 +93,17 @@ export const updateQuestionTitle = async (
   const response = await http.patch<QuestionTitleUpdateResponse>(
     `questions/${questionId}/title`,
     { title }
+  );
+  return response.response;
+};
+
+export const submitQuestionResults = async (
+  questionId: number,
+  submissions: QuestionSubmissionRequest
+): Promise<QuestionSubmissionResponse> => {
+  const response = await http.post<QuestionSubmissionResponse>(
+    `questions/${questionId}/submit`,
+    submissions
   );
   return response.response;
 };
