@@ -7,12 +7,11 @@ import katex from "katex";
 import TextSection from "@/commons/section/TextSection";
 import Button from "@/commons/inputs/Button";
 import TagItem from "@/commons/tag/TagItem";
-
 import { IconArrowLeft } from "@/assets";
 import type { TagData } from "@/types/tag";
 import { useTagStore } from "@/store/useTagStore";
-import { useDirectoryStore } from "@/store/useDirectoryStore";
 import { updateNoteContent, updateNoteTag, updateNoteTitle } from "@/api/Note";
+import { useSemesterDirectoriesStore } from "@/store/useSemesterDirectoriesStore";
 
 function NoteEditPage() {
   const navigate = useNavigate();
@@ -22,12 +21,7 @@ function NoteEditPage() {
   const directoryId = Number(slug?.split("-").pop());
   const noteId = Number(id);
   const allTags = useTagStore((state) => state.tags);
-
-  const studyDirectory = useDirectoryStore
-    .getState()
-    .getCurrentDirectories()
-    .find((dir) => dir.name === "학업");
-  const studyDirectoryId = studyDirectory?.id;
+  const { studyDirectoryId } = useSemesterDirectoriesStore();
 
   const originalTitle = location.state?.title || "";
   const originalContent = location.state?.markdownContent || "";

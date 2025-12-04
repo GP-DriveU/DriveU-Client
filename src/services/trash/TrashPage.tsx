@@ -51,7 +51,8 @@ function TrashPage() {
     order: "desc",
   });
   const [activeFilters, setActiveFilters] = useState<string[]>(["all"]);
-  const { selectedSemesterKey, fetchAndUpdateDirectories } = useDirectoryStore();
+  const { fetchAndUpdateDirectories } = useDirectoryStore();
+  const { selectedSemesterKey } = useSemesterStore();
   const { semesters } = useSemesterStore();
 
   const loadTrashItems = async () => {

@@ -3,16 +3,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import MDEditor from "@uiw/react-md-editor";
 import { getCodeString } from "rehype-rewrite";
 import katex from "katex";
-
 import TextSection from "@/commons/section/TextSection";
 import Button from "@/commons/inputs/Button";
 import TagItem from "@/commons/tag/TagItem";
-
 import type { TagData } from "@/types/tag";
 import { useTagStore } from "@/store/useTagStore";
 import { IconArrowLeft } from "@/assets";
-import { useDirectoryStore } from "@/store/useDirectoryStore";
 import { createNote } from "@/api/Note";
+import { useSemesterDirectoriesStore } from "@/store/useSemesterDirectoriesStore";
 
 function NoteWritePage() {
   const navigate = useNavigate();
@@ -22,12 +20,7 @@ function NoteWritePage() {
   const [title, setTitle] = useState("");
   const allTags = useTagStore((state) => state.tags);
   const [selectedTag, setSelectedTag] = useState<TagData | null>(null);
-
-  const studyDirectory = useDirectoryStore
-    .getState()
-    .getCurrentDirectories()
-    .find((dir) => dir.name === "학업");
-  const studyDirectoryId = studyDirectory?.id;
+  const { studyDirectoryId } = useSemesterDirectoriesStore();
 
   return (
     <div className="w-full flex bg-white flex-col">
