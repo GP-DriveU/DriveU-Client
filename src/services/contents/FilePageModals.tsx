@@ -28,7 +28,7 @@ const FilePageModals = ({ data, modals, actions }: FilePageModalsProps) => {
               data.tagOptions.length === 0 ||
               data.baseDir?.name === "대외활동"
             ) {
-              actions.registerLink(title, url, 0);
+              actions.registerLink(title, url);
             } else {
               modalActions.setPendingLink({ title, url });
               modalActions.open("tag");

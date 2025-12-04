@@ -37,15 +37,18 @@ function SidebarGroup({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newDirName, setNewDirName] = useState("");
 
-  const { selectedSemesterKey } = useSemesterStore();
-  const currentSemesterId =
-    useSemesterStore().getCurrentSemester()?.userSemesterId;
+  const { selectedSemesterKey, semesters } = useSemesterStore();
 
   const { year, term } = useMemo(() => {
     if (!selectedSemesterKey) return { year: 0, term: "" };
     const [yearStr, termStr] = selectedSemesterKey.split("-");
     return { year: Number(yearStr), term: termStr };
   }, [selectedSemesterKey]);
+
+  const selectedSemester = useMemo(() => {
+    if (!year || !term) return undefined;
+    return semesters.find((s) => s.year === year && s.term === term);
+  }, [semesters, year, term]);
 
   const { setSemesterDirectories, updateDirectoryName: updateStoreDirName } =
     useDirectoryStore();
@@ -56,7 +59,8 @@ function SidebarGroup({
 
   const handleDelete = async (directoryId: number) => {
     try {
-      if (!currentSemesterId) throw new Error("학기 정보가 없습니다.");
+      if (!selectedSemester?.userSemesterId)
+        throw new Error("학기 정보가 없습니다.");
       if (!year || !term) return;
 
       await deleteDirectory(directoryId);
@@ -154,13 +158,20 @@ function SidebarGroup({
             alert("학기 정보를 찾을 수 없습니다.");
             return;
           }
+
+          const userSemesterId = selectedSemester?.userSemesterId;
+
+          if (!userSemesterId) {
+            alert("학기 정보를 찾을 수 없습니다. (ID Missing)");
+            return;
+          }
+
           const isDuplicate = items.some((item) => item.name === name.trim());
           if (isDuplicate) {
             alert("이미 존재하는 디렉토리 이름입니다.");
             return;
           }
           try {
-            const userSemesterId = currentSemesterId ?? 0;
             const parentDirectoryId = parent;
             const newDir = await createDirectory(userSemesterId, {
               parentDirectoryId,
