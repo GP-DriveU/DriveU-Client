@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+﻿import { useState, useMemo } from "react"; // useMemo 추가
 import { useParams, useNavigate } from "react-router-dom";
 import MDEditor from "@uiw/react-md-editor";
 import { getCodeString } from "rehype-rewrite";
@@ -12,6 +12,7 @@ import type { TagData } from "@/types/tag";
 import { useTagStore } from "@/store/useTagStore";
 import { IconArrowLeft } from "@/assets";
 import { useDirectoryStore } from "@/store/useDirectoryStore";
+import { useSemesterStore } from "@/store/useSemesterStore";
 import { createNote } from "@/api/Note";
 
 function NoteWritePage() {
@@ -23,10 +24,19 @@ function NoteWritePage() {
   const allTags = useTagStore((state) => state.tags);
   const [selectedTag, setSelectedTag] = useState<TagData | null>(null);
 
-  const studyDirectory = useDirectoryStore
-    .getState()
-    .getCurrentDirectories()
-    .find((dir) => dir.name === "학업");
+  const { selectedSemesterKey } = useSemesterStore();
+
+  const { year, term } = useMemo(() => {
+    if (!selectedSemesterKey) return { year: 0, term: "" };
+    const [y, t] = selectedSemesterKey.split("-");
+    return { year: Number(y), term: t };
+  }, [selectedSemesterKey]);
+
+  const directories = useDirectoryStore((state) =>
+    state.getDirectoriesBySemester(year, term)
+  );
+
+  const studyDirectory = directories.find((dir) => dir.name === "학업");
   const studyDirectoryId = studyDirectory?.id;
 
   return (

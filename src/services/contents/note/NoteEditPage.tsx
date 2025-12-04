@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+﻿import { useMemo, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import MDEditor from "@uiw/react-md-editor";
 import { getCodeString } from "rehype-rewrite";
@@ -13,6 +13,7 @@ import type { TagData } from "@/types/tag";
 import { useTagStore } from "@/store/useTagStore";
 import { useDirectoryStore } from "@/store/useDirectoryStore";
 import { updateNoteContent, updateNoteTag, updateNoteTitle } from "@/api/Note";
+import { useSemesterStore } from "@/store/useSemesterStore";
 
 function NoteEditPage() {
   const navigate = useNavigate();
@@ -23,10 +24,19 @@ function NoteEditPage() {
   const noteId = Number(id);
   const allTags = useTagStore((state) => state.tags);
 
-  const studyDirectory = useDirectoryStore
-    .getState()
-    .getCurrentDirectories()
-    .find((dir) => dir.name === "학업");
+  const { selectedSemesterKey } = useSemesterStore();
+
+  const { year, term } = useMemo(() => {
+    if (!selectedSemesterKey) return { year: 0, term: "" };
+    const [y, t] = selectedSemesterKey.split("-");
+    return { year: Number(y), term: t };
+  }, [selectedSemesterKey]);
+
+  const directories = useDirectoryStore((state) =>
+    state.getDirectoriesBySemester(year, term)
+  );
+
+  const studyDirectory = directories.find((dir) => dir.name === "학업");
   const studyDirectoryId = studyDirectory?.id;
 
   const originalTitle = location.state?.title || "";
