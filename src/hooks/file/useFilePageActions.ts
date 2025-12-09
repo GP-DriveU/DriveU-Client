@@ -119,6 +119,7 @@ export const useFilePageActions = ({
         clearTimeout(timeoutId);
       }
     }
+    setItems((prev) => [...uploaded, ...prev]);
     return uploaded;
   };
 
@@ -157,6 +158,7 @@ export const useFilePageActions = ({
     modalActions.setLoading(true);
     modalActions.setConfirmType("delete");
     const selectedIds = items.filter((i) => i.isSelected).map((i) => i.id);
+
     try {
       await Promise.all(selectedIds.map((id) => deleteResource(id)));
       setItems((prev) => prev.filter((item) => !selectedIds.includes(item.id)));

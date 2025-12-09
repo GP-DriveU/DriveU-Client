@@ -17,6 +17,11 @@ export const useFilePageController = () => {
     data,
     ui: { ...uiState, ...uiActions },
     modals,
-    actions,
+    actions: {
+      ...actions,
+      setSortOption: data.setSortOption,
+      setFavoriteFilter: data.setFavoriteFilter,
+      setLinkTypeFilter: data.setLinkTypeFilter,
+    },
   };
 };
