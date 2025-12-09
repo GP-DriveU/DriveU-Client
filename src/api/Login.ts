@@ -1,5 +1,4 @@
-﻿import type { User } from "@/store/useAuthStore";
-import { http } from "@/api/Fetch";
+﻿import { http } from "@/api/Fetch";
 import type { TermType } from "@/types/semester";
 
 interface OAuthResponse {
@@ -32,10 +31,6 @@ interface OAuthResponse {
   }[];
 }
 
-interface RefreshReponse {
-  access_token: string;
-}
-
 export const startGoogleLogin = (redirectUri: string) => {
   return `${
     import.meta.env.VITE_API_BASE_URL
@@ -47,16 +42,4 @@ export const exchangeGoogleCode = async (code: string, redirectUri: string) => {
     `auth/code/google?code=${code}&redirect=${encodeURIComponent(redirectUri)}`
   );
   return response.response;
-};
-
-export const refreshToken = async (refresh_token: string): Promise<string> => {
-  const response = await http.post<RefreshReponse>("/auth/refresh", {
-    refresh_token,
-  });
-  return response.response.access_token;
-};
-
-export const getUserInfo = async (): Promise<User> => {
-  const { response } = await http.get<User>(`/user/self`);
-  return response;
 };
