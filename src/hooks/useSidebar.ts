@@ -1,4 +1,4 @@
-﻿import { useMemo } from "react";
+﻿import { useMemo, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import {
   KeyboardSensor,
@@ -11,6 +11,7 @@ import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { useDirectoryStore } from "@/store/useDirectoryStore";
 import { useSemesterStore } from "@/store/useSemesterStore";
 import { useStorageStore } from "@/store/useStorageStore";
+import { useTagStore } from "@/store/useTagStore";
 import { updateDirectoryParent, updateDirectoriesOrder } from "@/api/Directory";
 import { useShallow } from "zustand/shallow";
 
@@ -19,6 +20,7 @@ export const useSidebar = () => {
   const { selectedSemesterKey } = useSemesterStore();
   const { totalStorage, remainingStorage } = useStorageStore();
   const { updateDirectoryOrder, moveDirectory } = useDirectoryStore();
+  const setTags = useTagStore((state) => state.setTags);
 
   const { year, term } = useMemo(() => {
     if (!selectedSemesterKey) return { year: 0, term: "" };
@@ -29,6 +31,31 @@ export const useSidebar = () => {
   const currentDirectories = useDirectoryStore(
     useShallow((state) => state.getDirectoriesBySemester(year, term))
   );
+
+  useEffect(() => {
+    const tagSourceDirs = ["학업", "과목"];
+    const availableColorKeys = [
+      "yellow",
+      "green",
+      "orange",
+      "red",
+      "gray",
+      "lightblue",
+    ];
+
+    const newTags = currentDirectories
+      .filter((dir) => tagSourceDirs.includes(dir.name))
+      .flatMap((dir) =>
+        (dir.children ?? []).map((child, index) => ({
+          id: child.id,
+          title: child.name,
+          color: `tag-${availableColorKeys[index % availableColorKeys.length]}`,
+          parentDirectoryId: dir.id,
+        }))
+      );
+
+    setTags(newTags);
+  }, [currentDirectories, setTags]);
 
   const { usedStorage, usagePercentage } = useMemo(() => {
     const safeTotal = Math.max(totalStorage, 1);
