@@ -20,9 +20,6 @@ export const useSidebar = () => {
   const { totalStorage, remainingStorage } = useStorageStore();
   const { updateDirectoryOrder, moveDirectory } = useDirectoryStore();
 
-  const currentSemesterId =
-    useSemesterStore().getCurrentSemester()?.userSemesterId;
-
   const { year, term } = useMemo(() => {
     if (!selectedSemesterKey) return { year: 0, term: "" };
     const [yearStr, termStr] = selectedSemesterKey.split("-");
@@ -99,7 +96,6 @@ export const useSidebar = () => {
         updateDirectoryOrder(year, term, oldParentId, newChildrenForStore);
 
         try {
-          if (!currentSemesterId) throw new Error("학기 정보 없음");
           await updateDirectoriesOrder({
             parentDirectoryId: oldParentId,
             updates: newChildrenForStore.map((item) => ({
