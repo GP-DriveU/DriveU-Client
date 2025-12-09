@@ -1,10 +1,6 @@
 ﻿const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const baseFetch = async (
-  url: RequestInfo,
-  init?: RequestInit
-  // retry: boolean = true
-) => {
+const baseFetch = async (url: RequestInfo, init?: RequestInit) => {
   const accessToken = localStorage.getItem("auth-storage");
   let parsedToken: string | null = null;
 
@@ -24,12 +20,18 @@ const baseFetch = async (
         Authorization: `Bearer ${parsedToken}`,
       }),
       "Content-Type": "application/json",
+      ...init?.headers,
     },
   });
 
   if (!res.ok) {
-    if (res.status === 403 || res.status === 502) {
+    if (res.status === 401 || res.status === 403 || res.status === 502) {
+      alert("세션이 만료되었습니다. 다시 로그인해주세요.");
       localStorage.removeItem("auth-storage");
+      localStorage.removeItem("directory-storage");
+      localStorage.removeItem("semester-storage");
+      localStorage.removeItem("tag-storage");
+
       window.location.href = "/login";
       return Promise.reject(new Error("Unauthorized, redirected to login"));
     }
@@ -42,7 +44,8 @@ const baseFetch = async (
     throw new Error(`HTTP error! status: ${res.status}`);
   }
 
-  const json = await res.json();
+  const text = await res.text();
+  const json = text ? JSON.parse(text) : {};
   return { response: json };
 };
 
