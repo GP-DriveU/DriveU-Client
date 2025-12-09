@@ -1,18 +1,22 @@
 ﻿import { useState } from "react";
 import SortConfig from "@/commons/sorting/SortConfig";
-import { SORT_FIELDS, SORT_ORDERS, type SortOption } from "@/types/sort";
+import { SORT_ORDERS, type SortOption } from "@/types/sort";
 import { IconChevronDown, IconChevronUp } from "@/assets";
 
-interface SortProps {
-  sortOption: SortOption;
-  onSortChange: (newSortOption: SortOption) => void;
+interface SortProps<T extends string> {
+  sortOption: SortOption<T>;
+  onSortChange: (newSortOption: SortOption<T>) => void;
+  fieldOptions: Record<T, string>;
 }
 
-function Sort({ sortOption, onSortChange }: SortProps) {
-
+function Sort<T extends string>({
+  sortOption,
+  onSortChange,
+  fieldOptions,
+}: SortProps<T>) {
   const [isConfigOpen, setIsConfigOpen] = useState<boolean>(false);
 
-  const currentSortText = `${SORT_FIELDS[sortOption.field]} : ${
+  const currentSortText = `${fieldOptions[sortOption.field]} : ${
     SORT_ORDERS[sortOption.order]
   }`;
 
@@ -41,10 +45,14 @@ function Sort({ sortOption, onSortChange }: SortProps) {
       </div>
 
       <div className={!isConfigOpen ? "invisible" : ""}>
-        <SortConfig currentSort={sortOption} onSortChange={onSortChange} />
+        <SortConfig
+          currentSort={sortOption}
+          onSortChange={onSortChange}
+          fieldOptions={fieldOptions}
+        />
       </div>
     </div>
   );
-};
+}
 
 export default Sort;
