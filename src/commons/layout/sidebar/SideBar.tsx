@@ -17,28 +17,29 @@ import { updateDirectoryParent, updateDirectoriesOrder } from "@/api/Directory";
 import SidebarItem from "@/commons/layout/sidebar/SideBarItem";
 import SidebarGroup from "@/commons/layout/sidebar/SideBarGroup";
 import { IconHome, IconStore, IconTrash } from "@/assets";
-
-const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return "0B";
-
-  const k = 1024;
-  const sizes = ["B", "KB", "MB", "GB", "TB"];
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(1))}${sizes[i]}`;
-};
+import { formatFileSize } from "@/utils/itemUtils";
+import { useShallow } from "zustand/shallow";
 
 function Sidebar() {
   const location = useLocation();
   const { selectedSemesterKey } = useSemesterStore();
   const { totalStorage, remainingStorage } = useStorageStore();
-
-  const { getDirectoriesBySemester, updateDirectoryOrder, moveDirectory } =
-    useDirectoryStore();
+  const { updateDirectoryOrder, moveDirectory } = useDirectoryStore();
 
   const currentSemesterId =
     useSemesterStore().getCurrentSemester()?.userSemesterId;
+
+  const { year, term } = useMemo(() => {
+    if (!selectedSemesterKey) {
+      return { year: 0, term: "" };
+    }
+    const [yearStr, termStr] = selectedSemesterKey.split("-");
+    return { year: Number(yearStr), term: termStr };
+  }, [selectedSemesterKey]);
+
+  const currentDirectories = useDirectoryStore(
+    useShallow((state) => state.getDirectoriesBySemester(year, term))
+  );
 
   const { usedStorage, usagePercentage } = useMemo(() => {
     const safeTotal = Math.max(totalStorage, 1);
@@ -52,16 +53,6 @@ function Sidebar() {
       usagePercentage: Math.max(0, Math.min(100, percentage)),
     };
   }, [totalStorage, remainingStorage]);
-
-  const { year, term, currentDirectories } = useMemo(() => {
-    if (!selectedSemesterKey) {
-      return { year: 0, term: "", currentDirectories: [] };
-    }
-    const [yearStr, termStr] = selectedSemesterKey.split("-");
-    const yearNum = Number(yearStr);
-    const dirs = getDirectoriesBySemester(yearNum, termStr);
-    return { year: yearNum, term: termStr, currentDirectories: dirs };
-  }, [selectedSemesterKey, getDirectoriesBySemester]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
