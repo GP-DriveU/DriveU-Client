@@ -28,6 +28,7 @@ export interface RegisterFileMetaRequest {
 }
 export interface RegisterFileMetaResponse {
   fileId: number;
+  remainingStorage: number;
 }
 
 export interface ToggleFavoriteResponse {

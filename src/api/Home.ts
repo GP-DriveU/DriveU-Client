@@ -13,6 +13,7 @@ export interface MainPageResponse {
   directories: Directory[];
   recentFiles: Item[];
   favoriteFiles: Item[];
+  remainingStorage: number;
 }
 
 export const getMainPage = async (
