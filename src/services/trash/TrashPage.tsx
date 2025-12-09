@@ -20,6 +20,7 @@ import {
 import type { TrashSortType } from "@/types/trash";
 import { useDirectoryStore } from "@/store/useDirectoryStore";
 import { useSemesterStore } from "@/store/useSemesterStore";
+import { useStorageStore } from "@/store/useStorageStore";
 
 // todo: 나중에 modal refactor 필요
 interface ModalData {
@@ -54,6 +55,7 @@ function TrashPage() {
   const { fetchAndUpdateDirectories } = useDirectoryStore();
   const { selectedSemesterKey } = useSemesterStore();
   const { semesters } = useSemesterStore();
+  const { setRemainingStorage } = useStorageStore();
 
   const loadTrashItems = async () => {
     setIsLoading(true);
@@ -156,11 +158,15 @@ function TrashPage() {
 
   const confirmDeleteItem = async (item: TrashItem) => {
     try {
-      if (item.type === "DIRECTORY") {
-        await deleteTrashDirectory(item.id);
-      } else {
-        await deleteTrashFile(item.id);
+      const response =
+        item.type === "DIRECTORY"
+          ? await deleteTrashDirectory(item.id)
+          : await deleteTrashFile(item.id);
+
+      if (response && typeof response.remainingStorage === "number") {
+        setRemainingStorage(response.remainingStorage);
       }
+
       closeModal();
       await loadTrashItems();
     } catch (error) {
@@ -171,9 +177,13 @@ function TrashPage() {
 
   const confirmEmptyTrash = async () => {
     try {
-      await emptyTrash();
-      closeModal();
+      const response = await emptyTrash();
 
+      if (response && typeof response.remainingStorage === "number") {
+        setRemainingStorage(response.remainingStorage);
+      }
+
+      closeModal();
       await loadTrashItems();
     } catch (error) {
       console.error("휴지통 비우기에 실패했습니다:", error);
