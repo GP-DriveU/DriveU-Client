@@ -29,9 +29,9 @@ export const LINK_TYPE_OPTIONS = {
   GITHUB: "Github",
   YOUTUBE: "Youtube",
   DEFAULT: "기타",
-};
+} as const;
 
 export const FAVORITE_OPTIONS = {
   all: "전체 파일",
   favorite: "즐겨찾기",
-};
+} as const;
