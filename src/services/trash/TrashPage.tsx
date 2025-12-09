@@ -3,7 +3,11 @@ import { IconFilter } from "@/assets";
 import Filter from "@/commons/filter/Filter";
 import TitleSection from "@/commons/section/TitleSection";
 import Sort from "@/commons/sorting/Sort";
-import type { SortOption } from "@/types/sort";
+import {
+  TRASH_SORT_FIELDS,
+  type SortOption,
+  type TrashSortField,
+} from "@/types/sort";
 import { FILE_TYPE_OPTIONS } from "@/types/trash";
 import type { TrashItem, ItemType } from "@/types/Item";
 import TrashList from "@/commons/list/TrashList";
@@ -30,13 +34,14 @@ interface ModalData {
   onConfirm: () => void;
 }
 
-const sortOptionToSortType = (sortOption: SortOption): TrashSortType => {
-  const fieldMap = {
+const sortOptionToSortType = (
+  sortOption: SortOption<TrashSortField>
+): TrashSortType => {
+  const fieldMap: Record<TrashSortField, string> = {
     deleteDate: "deletedAt",
     name: "name",
   };
-  const field =
-    fieldMap[sortOption.field as keyof typeof fieldMap] || "deletedAt";
+  const field = fieldMap[sortOption.field];
   return `${field},${sortOption.order}` as TrashSortType;
 };
 
@@ -47,7 +52,7 @@ function TrashPage() {
   const [modalData, setModalData] = useState<ModalData | null>(null);
 
   const iconItems = [{ id: "filter-icon", icon: <IconFilter /> }];
-  const [sortOption, setSortOption] = useState<SortOption>({
+  const [sortOption, setSortOption] = useState<SortOption<TrashSortField>>({
     field: "deleteDate",
     order: "desc",
   });
@@ -87,10 +92,6 @@ function TrashPage() {
     }
 
     setActiveFilters(newFilters);
-  };
-
-  const handleSortChange = (newSortOption: SortOption) => {
-    setSortOption(newSortOption);
   };
 
   const handleFilterToggle = () => {
@@ -202,7 +203,11 @@ function TrashPage() {
       />
       {isFilterVisible && (
         <div className="w-full bg-white flex flex-row gap-16 px-12 mb-4">
-          <Sort sortOption={sortOption} onSortChange={handleSortChange} />
+          <Sort
+            sortOption={sortOption}
+            onSortChange={setSortOption}
+            fieldOptions={TRASH_SORT_FIELDS}
+          />
           <Filter
             title="파일 형식"
             options={FILE_TYPE_OPTIONS}

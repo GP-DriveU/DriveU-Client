@@ -1,17 +1,22 @@
 ﻿import { useState } from "react";
-import { SORT_FIELDS, SORT_ORDERS, type SortField, type SortOption, type SortOrder } from "@/types/sort";
+import { SORT_ORDERS, type SortOption, type SortOrder } from "@/types/sort";
 import SortMenuButton from "@/commons/sorting/SortMenuButton";
 
-interface SortConfigProps {
-  currentSort: SortOption;
-  onSortChange: (newSortOption: SortOption) => void;
+interface SortConfigProps<T extends string> {
+  currentSort: SortOption<T>;
+  onSortChange: (newSortOption: SortOption<T>) => void;
+  fieldOptions: Record<T, string>;
 }
 
-function SortConfig({ currentSort, onSortChange }: SortConfigProps) {
+function SortConfig<T extends string>({
+  currentSort,
+  onSortChange,
+  fieldOptions,
+}: SortConfigProps<T>) {
   const [openMenu, setOpenMenu] = useState<"field" | "order" | null>(null);
 
   const handleFieldSelect = (field: string) => {
-    onSortChange({ ...currentSort, field: field as SortField });
+    onSortChange({ ...currentSort, field: field as T });
     setOpenMenu(null);
   };
 
@@ -23,10 +28,10 @@ function SortConfig({ currentSort, onSortChange }: SortConfigProps) {
   return (
     <div className="px-4 py-4 bg-white rounded outline outline-[0.50px] outline-tag-gray inline-flex justify-start items-center gap-4">
       <SortMenuButton
-        label={SORT_FIELDS[currentSort.field]}
+        label={fieldOptions[currentSort.field]}
         isOpen={openMenu === "field"}
         onClick={() => setOpenMenu(openMenu === "field" ? null : "field")}
-        options={SORT_FIELDS}
+        options={fieldOptions}
         onSelect={handleFieldSelect}
         selectedValue={currentSort.field}
       />

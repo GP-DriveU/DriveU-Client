@@ -1,6 +1,5 @@
 ﻿import { IconArrowDropDown, IconArrowDropUp } from "@/assets";
 import DropdownMenu from "@/commons/sorting/DropDownMenu";
-import type { SortField, SortOrder } from "@/types/sort";
 
 interface SortMenuButtonProps {
   label: string;
@@ -8,7 +7,7 @@ interface SortMenuButtonProps {
   onClick: () => void;
   options: Record<string, string>;
   onSelect: (value: string) => void;
-  selectedValue: SortField | SortOrder;
+  selectedValue: string;
 }
 
 function SortMenuButton({

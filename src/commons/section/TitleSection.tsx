@@ -10,6 +10,7 @@ interface TitleSectionProps {
   semester?: string;
   items?: IconItem[];
   onIconClick?: (id: string) => void;
+  selectedIds?: string[];
   selectedId?: string;
   isIconDisabled?: boolean;
 }
@@ -19,6 +20,7 @@ function TitleSection({
   semester,
   items,
   onIconClick,
+  selectedIds,
   selectedId,
   isIconDisabled,
 }: TitleSectionProps) {
@@ -26,6 +28,12 @@ function TitleSection({
     if (onIconClick && !isIconDisabled) {
       onIconClick(id);
     }
+  };
+
+  const isSelected = (id: string) => {
+    if (selectedIds) return selectedIds.includes(id);
+    if (selectedId) return selectedId === id;
+    return false;
   };
 
   return (
@@ -40,27 +48,30 @@ function TitleSection({
       </div>
       {items && items.length > 0 && (
         <div className="flex justify-start items-center gap-3">
-          {items.map(({ id, icon }) => (
-            <div
-              key={id}
-              onClick={() => handleClick(id)}
-              className={`relative w-8 h-8 flex items-center justify-center rounded ${
-                selectedId === id ? "bg-primary text-white" : "text-black"
-              } ${
-                isIconDisabled
-                  ? "cursor-not-allowed opacity-40"
-                  : "cursor-pointer"
-              }`}
-            >
-              <div className={selectedId === id ? "fill-white text-white" : ""}>
-                {icon}
-              </div>
+          {items.map(({ id, icon }) => {
+            const active = isSelected(id);
+            return (
+              <div
+                key={id}
+                onClick={() => handleClick(id)}
+                className={`relative w-8 h-8 flex items-center justify-center rounded ${
+                  active ? "bg-primary text-white" : "text-black"
+                } ${
+                  isIconDisabled
+                    ? "cursor-not-allowed opacity-40"
+                    : "cursor-pointer"
+                }`}
+              >
+                <div className={active ? "fill-white text-white" : ""}>
+                  {icon}
+                </div>
 
-              {selectedId === id && !isIconDisabled && (
-                <span className="absolute top-[-2px] right-[-2px] w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-white" />
-              )}
-            </div>
-          ))}
+                {active && !isIconDisabled && (
+                  <span className="absolute top-[-2px] right-[-2px] w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-white" />
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

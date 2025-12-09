@@ -5,13 +5,27 @@ import { useSemesterStore } from "@/store/useSemesterStore";
 import { useTagOptions } from "@/hooks/useTagOptions";
 import { getResourcesByDirectory } from "@/api/File";
 import { type Item } from "@/types/Item";
+import { type FileSortField, type SortOption } from "@/types/sort";
+
+const DEFAULT_SORT: SortOption<FileSortField> = {
+  field: "createdAt",
+  order: "desc",
+};
+const DEFAULT_FAV_FILTER = ["all"];
+const DEFAULT_LINK_FILTER = ["ALL"];
 
 export const useFilePageData = () => {
   const params = useParams();
   const location = useLocation();
   const { selectedSemesterKey } = useSemesterStore();
-
   const { getDirectoriesBySemester } = useDirectoryStore();
+
+  const [sortOption, setSortOption] =
+    useState<SortOption<FileSortField>>(DEFAULT_SORT);
+  const [favoriteFilter, setFavoriteFilter] =
+    useState<string[]>(DEFAULT_FAV_FILTER);
+  const [linkTypeFilter, setLinkTypeFilter] =
+    useState<string[]>(DEFAULT_LINK_FILTER);
 
   const { year, term } = useMemo(() => {
     if (!selectedSemesterKey) return { year: 0, term: "" };
@@ -46,18 +60,32 @@ export const useFilePageData = () => {
     };
     return dir.name === map[slugPrefix];
   });
+
   const allTags = useTagOptions();
   const tagOptions = allTags.filter(
     (tag) => tag.parentDirectoryId !== baseDir?.id
   );
 
-  const [items, setItems] = useState<Item[]>([]);
+  const [rawItems, setRawItems] = useState<Item[]>([]);
+
+  useEffect(() => {
+    setSortOption(DEFAULT_SORT);
+    setFavoriteFilter(DEFAULT_FAV_FILTER);
+    setLinkTypeFilter(DEFAULT_LINK_FILTER);
+  }, [directoryId]);
 
   const fetchResources = useCallback(async () => {
     if (!directoryId) return;
 
     try {
-      const response = await getResourcesByDirectory(directoryId);
+      const sortParam = `${sortOption.field},${sortOption.order}`;
+      const isFavoriteOnly = favoriteFilter.includes("favorite");
+
+      const response = await getResourcesByDirectory(directoryId, {
+        sort: sortParam,
+        favoriteOnly: isFavoriteOnly,
+      });
+
       const mappedResponse = response.map((item: any) => {
         const isLink = item.type === "LINK";
         const isFile = !!item.extension;
@@ -67,21 +95,23 @@ export const useFilePageData = () => {
           iconType: isLink ? item.iconType : isFile ? "FILE" : "NOTE",
         };
       });
-      setItems(mappedResponse);
+      setRawItems(mappedResponse);
     } catch (error) {
       console.error("Failed to fetch items:", error);
     }
-  }, [directoryId]);
+  }, [directoryId, sortOption, favoriteFilter]);
 
   useEffect(() => {
     fetchResources();
   }, [fetchResources]);
 
-  useEffect(() => {
-    if (location.state?.openFab) {
-      setItems((prev) => prev.map((item) => ({ ...item, isSelected: false })));
-    }
-  }, [location.state]);
+  const items = useMemo(() => {
+    if (linkTypeFilter.includes("ALL")) return rawItems;
+
+    return rawItems.filter((item) => {
+      return linkTypeFilter.includes(item.iconType);
+    });
+  }, [rawItems, linkTypeFilter]);
 
   return {
     category,
@@ -90,6 +120,13 @@ export const useFilePageData = () => {
     tagOptions,
     baseDir,
     items,
-    setItems,
+    rawItems,
+    setItems: setRawItems,
+    sortOption,
+    setSortOption,
+    favoriteFilter,
+    setFavoriteFilter,
+    linkTypeFilter,
+    setLinkTypeFilter,
   };
 };
