@@ -41,7 +41,7 @@ const sortOptionToSortType = (
     deleteDate: "deletedAt",
     name: "name",
   };
-  const field = fieldMap[sortOption.field] || "deletedAt";
+  const field = fieldMap[sortOption.field];
   return `${field},${sortOption.order}` as TrashSortType;
 };
 
